@@ -1,0 +1,106 @@
+﻿<Window x:Class="Example.Client.WPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:tabs="clr-namespace:Example.Client.WPF.Views.Tabs"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="768" Width="1024">
+    <Grid Margin="10">
+        <Grid.RowDefinitions >
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="90"></RowDefinition>
+            <RowDefinition Height="80"></RowDefinition>
+            <RowDefinition Height="50"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <GroupBox Grid.Row="0" 
+                  Header="Sample cases">
+            <TabControl>
+                <TabItem Header="Send message">
+                    <tabs:SendMessageTab/>
+                </TabItem>
+                <TabItem Header="Elements repository">
+                    <tabs:GetElementsTab/>
+                </TabItem>
+            </TabControl>
+        </GroupBox>
+        <GroupBox Grid.Row="1"
+                  Header="Connection ">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160"/>
+                    <ColumnDefinition Width="*"/> 
+                    <ColumnDefinition Width="160"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" 
+                            Orientation="Horizontal">
+                    <StackPanel Orientation="Vertical"
+                                Margin="10 0  0 0 ">
+                        <TextBlock Text="Chunk size"
+                                   HorizontalAlignment="Left"
+                                   Margin="0 10 0 0"/>
+                        <TextBox x:Name="ChunkSizeTextBox" 
+                                 HorizontalAlignment="Left"
+                                 Width="100"
+                                 Text="1024"
+                                 Margin="0 10 0 0"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="2" 
+                            Orientation="Vertical"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Right">
+                    <Border BorderThickness="1" 
+                            HorizontalAlignment="Right"
+                            Margin="5 5 5 5"
+                            CornerRadius="3"
+                            BorderBrush="Gray">
+                        <StackPanel Orientation="Horizontal"
+                                    Margin="5 0 5 0">
+                            <TextBlock x:Name="ServerStatusTextBlock"
+                                       Text="Offline" />
+                            <Ellipse x:Name="EllipseStatusCircle"
+                                     Fill="Red"
+                                     Margin="5 5 5 5"
+                                     Width="10" 
+                                     Height="10"/>
+                        </StackPanel>
+                    </Border>
+                    <Button x:Name="ConnectToServerButton"
+                            Margin="5 5 5 5"
+                            Content="Connect to server"
+                            Width="150"/>
+                </StackPanel>
+            </Grid>        
+        </GroupBox>
+        <GroupBox Grid.Row="2"
+                  Header="Auth">
+            <StackPanel HorizontalAlignment="Left"
+                        Orientation="Vertical"
+                        Margin="10 0  0 0 ">
+                <TextBlock Text="Auth token" 
+                           Margin="0 10 0 0"/>
+                <TextBox x:Name="AuthTokenTextBox" 
+                         Width="100"
+                         Margin="0 10 0 0"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Grid.Row="3"
+                  Header="Progress status">
+            <StackPanel HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <TextBlock x:Name="ProgressBarTextBlock" 
+                           VerticalAlignment="Center"
+                           Text="Progress"
+                           Margin="0 -5 10 0"/>
+                <ProgressBar x:Name="ProgressBar" 
+                             Minimum="0"
+                             Maximum="100"
+                             Height="15"
+                             Width="250"
+                             HorizontalAlignment="Right"/>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</Window>

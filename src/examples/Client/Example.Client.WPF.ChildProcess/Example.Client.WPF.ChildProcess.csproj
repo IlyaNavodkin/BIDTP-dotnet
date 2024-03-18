@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net6.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <UseWPF>true</UseWPF>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>Example.Client.WPF.ChildProcess</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Client\BIDTP.Dotnet.Client.csproj" />
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
+      <ProjectReference Include="..\BIDTP.Dotnet.Client\BIDTP.Dotnet.Client.csproj" />
+      <ProjectReference Include="..\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\Example.Schemas\Example.Schemas.csproj" />
+    </ItemGroup>
+    
+</Project>
