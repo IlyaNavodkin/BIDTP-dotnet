@@ -8,12 +8,12 @@ using BIDTP.Dotnet.Core.Request;
 using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Dtos;
 using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet.Iteraction;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Server.Server;
+namespace BIDTP.Dotnet;
 
 /// <summary>
 ///  Class of the server. 

@@ -1,10 +1,10 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using BIDTP.Dotnet.Server.Server;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet;
+using BIDTP.Dotnet.Iteraction;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BIDTP.Dotnet.Server.Builder;
+namespace BIDTP.Dotnet.Builder;
 
 /// <summary>
 ///  The server builder of SIDTP protocol
@@ -59,11 +59,11 @@ public class ServerBuilder
     /// </summary>
     /// <returns> The server. </returns>
     /// <exception cref="InvalidOperationException"> PipeStream must be provided. </exception>
-    public Server.Server Build()
+    public Dotnet.Server Build()
     {
         if (_routeHandlers.Count == 0) throw new InvalidOperationException("Route handlers must be provided");
         var buildServiceProvider = ServiceCollection.BuildServiceProvider();
-        var result =  new Server.Server(_options.PipeName, _options.ChunkSize, _options.ReconnectTimeRate, _routeHandlers, buildServiceProvider);
+        var result =  new Dotnet.Server(_options.PipeName, _options.ChunkSize, _options.ReconnectTimeRate, _routeHandlers, buildServiceProvider);
         
         return result;
     }

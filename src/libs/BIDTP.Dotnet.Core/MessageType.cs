@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Core;
+﻿namespace BIDTP.Dotnet;
 
 /// <summary>
 ///  The type of the message

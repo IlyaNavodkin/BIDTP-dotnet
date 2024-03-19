@@ -1,7 +1,7 @@
 ﻿using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Server.Providers;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet.Providers;
+using BIDTP.Dotnet.Iteraction;
 using Example.Schemas.Requests;
 using Example.Server.Providers;
 using Example.Server.Repositories;

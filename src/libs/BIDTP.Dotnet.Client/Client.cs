@@ -8,7 +8,7 @@ using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Client;
+namespace BIDTP.Dotnet;
 /// <summary>
 ///  Client 
 /// </summary>

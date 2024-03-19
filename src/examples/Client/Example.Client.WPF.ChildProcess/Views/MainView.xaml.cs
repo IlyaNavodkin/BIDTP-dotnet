@@ -21,7 +21,7 @@ public sealed partial class MainView
     public MainView()
     {
         InitializeComponent();
-        
+
         RequestCheckButton.Click += async (sender, args) =>
         {
             try
@@ -31,12 +31,12 @@ public sealed partial class MainView
                 {
                     Body = message
                 };
-        
+
                 request.Headers.Add("Authorization", TokenTextBox.Text);
                 request.SetRoute("PrintMessage");
-        
+
                 var response = await App.Client.WriteRequestAsync(request);
-                
+
                 if (response.StatusCode is StatusCode.Success)
                 {
                     TextBlockResponse.Text = response.Body;
@@ -44,7 +44,7 @@ public sealed partial class MainView
                 else
                 {
                     var error = JsonConvert.DeserializeObject<Error>(response.Body);
-            
+
                     MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\n Description: {error.Description}");
                 }
             }
@@ -54,13 +54,13 @@ public sealed partial class MainView
             }
         };
     }
-    
+
     private async void GetElements(object sender, RoutedEventArgs e)
     {
         try
         {
             var request = new Request();
-        
+
             request.Headers.Add("Authorization", TokenTextBox.Text);
             request.SetRoute("GetElements");
 
@@ -68,28 +68,28 @@ public sealed partial class MainView
             {
                 Category = CategoryTextBox.Text
             };
-        
+
             var jsonResponse = JsonConvert.SerializeObject(getCategoryRequest);
             request.Body = jsonResponse;
-        
+
             WindowState = WindowState.Minimized;
-            
+
             var response = await App.Client.WriteRequestAsync(request);
-            
+
             WindowState = WindowState.Normal;
-        
+
             if (response.StatusCode == StatusCode.Success)
             {
                 var json = response.Body;
-            
+
                 var elements = JsonConvert.DeserializeObject<ICollection<ElementDto>>(json);
-            
+
                 DataGridElements.ItemsSource = elements;
             }
             else
             {
                 var error = JsonConvert.DeserializeObject<Error>(response.Body);
-            
+
                 MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }
@@ -104,9 +104,9 @@ public sealed partial class MainView
         try
         {
             var request = new Request();
-        
+
             var selectedItem = (ElementDto)DataGridElements.SelectedItem;
-        
+
             request.Headers.Add("Authorization", TokenTextBox.Text);
             request.SetRoute("DeleteElement");
 
@@ -114,26 +114,26 @@ public sealed partial class MainView
             {
                 Element = selectedItem
             };
-        
+
             var jsonResponse = JsonConvert.SerializeObject(deleteElementRequest);
             request.Body = jsonResponse;
-            
+
             var response = await App.Client.WriteRequestAsync(request);
             if (response.StatusCode == StatusCode.Success)
             {
                 var message = response.Body;
 
                 var newList = new List<ElementDto>();
-            
+
                 foreach (var objectElement in DataGridElements.ItemsSource)
                 {
                     var element = (ElementDto)objectElement;
-                
+
                     if (element.Id == selectedItem.Id) continue;
-                
+
                     newList.Add(element);
                 }
-            
+
                 DataGridElements.ItemsSource = newList;
 
                 MessageBox.Show(message);
@@ -141,7 +141,7 @@ public sealed partial class MainView
             else
             {
                 var error = JsonConvert.DeserializeObject<Error>(response.Body);
-            
+
                 MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }

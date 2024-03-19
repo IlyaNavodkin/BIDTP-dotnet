@@ -7,7 +7,7 @@
         <TargetFramework>net48</TargetFramework>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <RootNamespace>BIDTP.Dotnet.Server</RootNamespace>
+        <RootNamespace>BIDTP.Dotnet</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

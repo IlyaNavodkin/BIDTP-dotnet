@@ -3,7 +3,7 @@ using System.Text.Json;
 using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Dtos;
 using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet.Iteraction;
 using Newtonsoft.Json;
 
 namespace Example.Server.Providers;

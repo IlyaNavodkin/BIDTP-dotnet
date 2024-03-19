@@ -2,6 +2,35 @@
 
 Bidirectional Interprocess Data Transfer Protocol (BIDTP) - a simple-to-use data exchange protocol between two processes.
 
+# Questions and answers
+
+### Ask:
+
+-   Why should I split my application into client and server?
+
+### Answer:
+
+-   Separate testing and debugging of applications. It's easier to abstract yourself
+-   Independence from stack and technologies
+-   Separate process, domain for each application. If your application works as a plugin, then this solves the problem of dependency conflicts (Addin Autodesk Revit)
+-   Separation of areas of responsibility for application development - if it is developed in a team
+
+### Ask:
+
+-   Why should I use this protocol if I can use web protocols?
+
+### Answer:
+
+-   This protocol is intended for local tasks of interaction between two processes. If you use web protocols for such tasks, you may encounter unexpected problems on the client side. For example - the client’s port is closed or there is a problem with the network
+
+### Ask:
+
+-   It's too complicated, I'll have to write a lot of code to interact with the business logic. It's easier to call a service or method directly within one process
+
+### Answer:
+
+-   The protocol is provided with the entire infrastructure with features that allow not only to minimize the cost of writing code for interaction, but also provide general functionality - necessary for creating modern applications - on the client and server sides
+
 # Philosophy and goals
 
 The main issues addressed by this protocol include facilitating simple interaction between two processes. This enables independent and implicit communication between applications, regardless of the technologies used in their development.
@@ -111,7 +140,7 @@ builder.ServiceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLeve
 # Your AuthProvider
 builder.ServiceCollection.AddTransient<AuthProvider>();
 
-# Your ColorProvider (what???)
+# Your ColorProvider
 builder.ServiceCollection.AddScoped<ColorProvider>();
 
 # Your Repository
@@ -130,7 +159,7 @@ builder.AddRoute("PrintMessage", JustChickenGuard, MessageController.PrintMessag
 # Add for "GetElements" route controller method
 builder.AddRoute("GetElements", MessageController.GetElements);
 
-# Local handler\middleware\guard
+# Local handler or middleware or guard
 Task JustChickenGuard(Context context)
 {
     var request = context.Request;

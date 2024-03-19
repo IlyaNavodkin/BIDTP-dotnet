@@ -5,7 +5,7 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
 using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet.Iteraction;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Example.Server.Providers;

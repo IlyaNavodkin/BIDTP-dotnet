@@ -12,10 +12,10 @@ using Autodesk.Revit.UI;
 using BIDTP.Dotnet.Core.Response;
 using BIDTP.Dotnet.Core.Response.Dtos;
 using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Server.Builder;
-using BIDTP.Dotnet.Server.Providers;
-using BIDTP.Dotnet.Server.Server;
-using BIDTP.Dotnet.Server.Server.Iteraction;
+using BIDTP.Dotnet.Builder;
+using BIDTP.Dotnet.Providers;
+using BIDTP.Dotnet;
+using BIDTP.Dotnet.Iteraction;
 using Example.Server.Controllers;
 using Example.Server.Providers;
 using Example.Server.Repositories;
@@ -66,7 +66,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         _ = Task.Run(async () =>
         {
             Process childProcess = null;
-            BIDTP.Dotnet.Server.Server.Server server = null;
+            BIDTP.Dotnet.Server server = null;
             
             try
             {
