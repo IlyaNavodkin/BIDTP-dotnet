@@ -19,18 +19,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.1.24080.9" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.0-preview.1.24080.9" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0-preview.1.24080.9" />
-      <PackageReference Include="System.Text.Json" Version="9.0.0-preview.1.24080.9" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Server\BIDTP.Dotnet.Server.csproj" />
-      <ProjectReference Include="..\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
       <ProjectReference Include="..\Example.Schemas\Example.Schemas.csproj" />
-      <ProjectReference Include="..\BIDTP.Dotnet.Server\BIDTP.Dotnet.Server.csproj" />
     </ItemGroup>
+    
 
 </Project>

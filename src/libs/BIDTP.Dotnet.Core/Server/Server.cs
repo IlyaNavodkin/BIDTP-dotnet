@@ -1,19 +1,26 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Text;
-using BIDTP.Dotnet.Core;
-using BIDTP.Dotnet.Core.Constants;
-using BIDTP.Dotnet.Core.Request;
-using BIDTP.Dotnet.Core.Response;
-using BIDTP.Dotnet.Core.Response.Dtos;
-using BIDTP.Dotnet.Core.Response.Enums;
-using BIDTP.Dotnet.Iteraction;
+using System.Threading;
+using System.Threading.Tasks;
+using BIDTP.Dotnet.Events;
+using BIDTP.Dotnet.Iteraction.Enums;
+using BIDTP.Dotnet.Iteraction.Request;
+using BIDTP.Dotnet.Iteraction.Response;
+using BIDTP.Dotnet.Iteraction.Response.Dtos;
+using BIDTP.Dotnet.Iteraction.Response.Enums;
+using BIDTP.Dotnet.Server.Errors;
+using BIDTP.Dotnet.Server.Iteraction;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet;
+namespace BIDTP.Dotnet.Server;
 
 /// <summary>
 ///  Class of the server. 
@@ -215,7 +222,7 @@ public class Server : IHost
                 Headers = headers
             };
             
-            request.Headers.TryGetValue(Constants.RouteHeaderName, out var route);
+            request.Headers.TryGetValue(Constants.Constants.RouteHeaderName, out var route);
             
             if(route is null) throw new Exception("Route not found");
             
@@ -489,10 +496,10 @@ public class Server : IHost
 
     private void SetGeneralHeaders(Response response)
     {
-        response.Headers.Add(Constants.ProtocolHeaderName, Constants.ProtocolName);
-        response.Headers.Add(Constants.ProtocolFullNameHeaderName, Constants.ProtocolFullName);
-        response.Headers.Add(Constants.ProtocolVersionHeaderName, Constants.ProtocolVersion);
-        response.Headers.Add(Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
+        response.Headers.Add(Constants.Constants.ProtocolHeaderName, Constants.Constants.ProtocolName);
+        response.Headers.Add(Constants.Constants.ProtocolFullNameHeaderName, Constants.Constants.ProtocolFullName);
+        response.Headers.Add(Constants.Constants.ProtocolVersionHeaderName, Constants.Constants.ProtocolVersion);
+        response.Headers.Add(Constants.Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
     }
     
     private void DisposeStreams()

@@ -2,27 +2,28 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using BIDTP.Dotnet.Core.Request;
-using BIDTP.Dotnet.Core.Response.Dtos;
-using BIDTP.Dotnet.Core.Response.Enums;
+using BIDTP.Dotnet.Iteraction.Request;
+using BIDTP.Dotnet.Iteraction.Response.Dtos;
+using BIDTP.Dotnet.Iteraction.Response.Enums;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Newtonsoft.Json;
 
 namespace Example.Client.WPF.Views.Tabs;
 
+/// <summary>
+///  Interaction logic for GetElementsTab.xaml
+/// </summary>
 public partial class GetElementsTab : UserControl
 {
+    /// <summary>
+    ///  Initialize a new instance of the <see cref="GetElementsTab"/> class.
+    /// </summary>
     public GetElementsTab()
     {
         InitializeComponent();
     }
-
-    private void InputTextBox_OnTextChanged(object sender, TextChangedEventArgs e)
-    {
-        throw new System.NotImplementedException();
-    }
-
+    
     private async void GetElements(object sender, RoutedEventArgs e)
     {
         try

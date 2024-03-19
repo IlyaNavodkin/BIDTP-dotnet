@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet;
+﻿namespace BIDTP.Dotnet.Client;
 
 /// <summary>
 ///  Options for the SIDTPClient 

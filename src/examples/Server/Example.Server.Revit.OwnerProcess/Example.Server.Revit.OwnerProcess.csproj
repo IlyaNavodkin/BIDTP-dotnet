@@ -87,14 +87,15 @@
         <Compile Remove="Properties\AssemblyInfo.cs" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Server\BIDTP.Dotnet.Server.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
-      <ProjectReference Include="..\Example.Server\Example.Server.csproj" />
-    </ItemGroup>
 
     <ItemGroup>
       <Folder Include="Properties\" />
       <Folder Include="Resources\Addin\" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
     </ItemGroup>
 </Project>

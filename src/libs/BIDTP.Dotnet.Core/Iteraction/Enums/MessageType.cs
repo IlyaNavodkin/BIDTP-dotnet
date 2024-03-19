@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet;
+﻿namespace BIDTP.Dotnet.Iteraction.Enums;
 
 /// <summary>
 ///  The type of the message

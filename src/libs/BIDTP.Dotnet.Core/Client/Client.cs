@@ -1,21 +1,25 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.IO.Pipes;
 using System.Text;
-using BIDTP.Dotnet.Core;
-using BIDTP.Dotnet.Core.Constants;
-using BIDTP.Dotnet.Core.Request;
-using BIDTP.Dotnet.Core.Response;
-using BIDTP.Dotnet.Core.Response.Enums;
+using System.Threading;
+using System.Threading.Tasks;
+using BIDTP.Dotnet.Events;
+using BIDTP.Dotnet.Iteraction.Enums;
+using BIDTP.Dotnet.Iteraction.Request;
+using BIDTP.Dotnet.Iteraction.Response;
+using BIDTP.Dotnet.Iteraction.Response.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet;
+namespace BIDTP.Dotnet.Client;
 /// <summary>
 ///  Client 
 /// </summary>
 public class Client
 {
     private readonly SemaphoreSlim _pipeSemaphore;
-    
     private NamedPipeClientStream _clientPipeStream;
     private CancellationTokenSource _cancellationTokenSource;
     
@@ -80,15 +84,11 @@ public class Client
         {
             try
             {
-                Debug.WriteLine("[ConnectToServer]: Waiting for connection...");
-
                 if(_clientPipeStream is not null) throw new Exception("Stream already created");
                 
                 _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
 
                 await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
-                
-                Debug.WriteLine("[ConnectToServer]: Connected.");
                 
                 await LifeCheckAsync();
 
@@ -96,50 +96,13 @@ public class Client
             }
             catch (Exception exception)
             {
-                switch (exception)
-                {
-                    case OperationCanceledException:
-                    {
-                        Debug.WriteLine("[ConnectToServer]: Operation canceled");
-                        break;
-                    }
-                    case ObjectDisposedException:
-                    {
-                        Debug.WriteLine("[ConnectToServer]: Client pipe is disposed");
-                        break;
-                    }
-                    case IOException:
-                    {
-                        Debug.WriteLine("[ConnectToServer]: Client pipe is broken");
-                        break;
-                    }
-                    case TimeoutException:
-                    {
-                        Debug.WriteLine("[ConnectToServer]: Client pipe timeout");
-                        break;
-                    }
-                    case InvalidOperationException:
-                    {
-                        Debug.WriteLine("[ConnectToServer]: Invalid operation");
-                        break;
-                    }
-                    default:
-                    {
-                        Debug.WriteLine($"[ConnectToServer]: Exception: {exception.Message}");
-                        break;
-                    }
-                }
-
                 DisposeStream();
                 
                 try
                 {
-                    await Task.Delay(ReconnectTimeRate);
+                    await Task.Delay(ReconnectTimeRate, _cancellationTokenSource.Token);
                 }
-                catch (OperationCanceledException operationCanceledException)
-                {
-                    Debug.WriteLine($"[ConnectToServer]: {operationCanceledException.Message}");
-                }
+                catch (OperationCanceledException) {  }
             }
         }
         
@@ -248,10 +211,10 @@ public class Client
 
     private void SetGeneralHeaders(Request request)
     {
-        request.Headers.Add(Constants.ProtocolHeaderName, Constants.ProtocolName);
-        request.Headers.Add(Constants.ProtocolFullNameHeaderName, Constants.ProtocolFullName);
-        request.Headers.Add(Constants.ProtocolVersionHeaderName, Constants.ProtocolVersion);
-        request.Headers.Add(Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
+        request.Headers.Add(Constants.Constants.ProtocolHeaderName, Constants.Constants.ProtocolName);
+        request.Headers.Add(Constants.Constants.ProtocolFullNameHeaderName, Constants.Constants.ProtocolFullName);
+        request.Headers.Add(Constants.Constants.ProtocolVersionHeaderName, Constants.Constants.ProtocolVersion);
+        request.Headers.Add(Constants.Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
     }
 
     private async Task<Dictionary<string,string>> ReadAsyncInternal(CancellationToken cancellationToken)

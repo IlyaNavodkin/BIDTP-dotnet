@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Providers;
+﻿namespace Example.Server.Providers;
 
 public class ColorProvider 
 {

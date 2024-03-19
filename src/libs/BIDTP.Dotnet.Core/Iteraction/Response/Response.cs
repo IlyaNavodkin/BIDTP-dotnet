@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
-using BIDTP.Dotnet.Core.Response.Enums;
+using BIDTP.Dotnet.Iteraction.Enums;
+using BIDTP.Dotnet.Iteraction.Response.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Core.Response;
+namespace BIDTP.Dotnet.Iteraction.Response;
 
 /// <summary>
 ///  The response from the server

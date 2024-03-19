@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using BIDTP.Dotnet.Core;
+using BIDTP.Dotnet.Events;
 
 namespace Example.Client.WPF.Views
 {

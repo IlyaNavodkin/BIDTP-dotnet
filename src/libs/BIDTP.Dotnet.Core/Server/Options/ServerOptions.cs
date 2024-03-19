@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet;
+﻿namespace BIDTP.Dotnet.Server.Options;
 
 /// <summary>
 ///  The options of the server 

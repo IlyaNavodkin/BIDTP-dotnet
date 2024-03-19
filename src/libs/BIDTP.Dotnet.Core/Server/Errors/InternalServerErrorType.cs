@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet;
+﻿namespace BIDTP.Dotnet.Server.Errors;
 
 /// <summary>
 /// Internal server error type
@@ -8,13 +8,9 @@ public enum InternalServerErrorType
     /// <summary>
     ///  Dispatcher request error in server
     /// </summary>
-    DispatcherExceptionError,
+    DispatcherExceptionError = 1,
     /// <summary>
     ///  Route not found error
     /// </summary>
-    RouteNotFoundError,
-    /// <summary>
-    ///  Unknown error in server
-    /// </summary>
-    UnknownError
+    RouteNotFoundError = 2,
 }

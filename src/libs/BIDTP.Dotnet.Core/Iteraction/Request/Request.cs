@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using BIDTP.Dotnet.Iteraction.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Core.Request;
+namespace BIDTP.Dotnet.Iteraction.Request;
 
 /// <summary>
 ///  The request from the client
