@@ -1,6 +1,5 @@
 ﻿using BIDTP.Dotnet.Iteraction.Response;
 using BIDTP.Dotnet.Iteraction.Response.Enums;
-using BIDTP.Dotnet.Providers;
 using BIDTP.Dotnet.Server.Iteraction;
 using Example.Schemas.Requests;
 using Example.Server.Providers;

@@ -63,11 +63,11 @@ public class ServerBuilder
     /// </summary>
     /// <returns> The server. </returns>
     /// <exception cref="InvalidOperationException"> PipeStream must be provided. </exception>
-    public Dotnet.Server.Server Build()
+    public Server Build()
     {
         if (_routeHandlers.Count == 0) throw new InvalidOperationException("Route handlers must be provided");
         var buildServiceProvider = ServiceCollection.BuildServiceProvider();
-        var result =  new Dotnet.Server.Server(_options.PipeName, _options.ChunkSize, _options.ReconnectTimeRate, _routeHandlers, buildServiceProvider);
+        var result =  new Server(_options.PipeName, _options.ChunkSize, _options.ReconnectTimeRate, _routeHandlers, buildServiceProvider);
         
         return result;
     }

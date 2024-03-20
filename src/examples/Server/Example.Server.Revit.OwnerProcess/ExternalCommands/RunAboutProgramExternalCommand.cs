@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
-using System.Text.Encodings.Web;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using BIDTP.Dotnet.Providers;
-using BIDTP.Dotnet;
 using BIDTP.Dotnet.Iteraction.Response;
 using BIDTP.Dotnet.Iteraction.Response.Dtos;
 using BIDTP.Dotnet.Iteraction.Response.Enums;
