@@ -252,6 +252,8 @@ public class Server : IHost
                 
         var response = context.Response;
         SetGeneralHeaders(response);
+        
+        response.Validate();
                 
         var result = ConvertToDictionary(response);
                 

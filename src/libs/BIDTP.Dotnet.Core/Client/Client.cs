@@ -168,8 +168,10 @@ public class Client
             if(_clientPipeStream is null) throw new Exception("PipeClient is null, connect first");
             if(!IsHealthCheckConnected) throw new Exception("PipeClient is not connected, wait for connection");
             if(!_clientPipeStream.IsConnected) throw new Exception("PipeClient is not connected");
-
+            
             SetGeneralHeaders(request);
+            request.Validate();
+            
             var dictionary = new Dictionary<string, string>();
 
             dictionary.Add(nameof(MessageType), request.MessageType.ToString());
@@ -204,7 +206,7 @@ public class Client
             _pipeSemaphore.Release();
         }
     }
-
+    
     private void SetGeneralHeaders(Request request)
     {
         request.Headers.Add(Constants.Constants.ProtocolHeaderName, Constants.Constants.ProtocolName);

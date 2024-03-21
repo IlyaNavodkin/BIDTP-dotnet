@@ -48,6 +48,8 @@ public class SendMessageTabViewModel : ObservableObject
                 Body = inputMessage,
                 Headers = new Dictionary<string, string>()
             };
+            var req = new Request();
+                
 
             var token = _authService.GetAuthToken();
         

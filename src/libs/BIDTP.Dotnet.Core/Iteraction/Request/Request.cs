@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BIDTP.Dotnet.Iteraction.Enums;
 using Newtonsoft.Json;
 
@@ -58,5 +59,15 @@ public class Request
     public void SetRoute(string route)
     {
         Headers[Constants.Constants.RouteHeaderName] = route;
+    }
+
+    /// <summary>
+    ///  Validate the request 
+    /// </summary>
+    /// <exception cref="Exception"> Thrown if the request is invalid </exception>
+    public void Validate()
+    {
+        if (Body is null) throw new Exception("Request body can't be null, check the request");
+        if (Headers is null) throw new Exception("Request headers can't be null, check the request");
     }
 }

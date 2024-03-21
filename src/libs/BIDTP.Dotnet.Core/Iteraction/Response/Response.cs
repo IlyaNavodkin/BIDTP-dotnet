@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BIDTP.Dotnet.Iteraction.Enums;
 using BIDTP.Dotnet.Iteraction.Response.Enums;
 using Newtonsoft.Json;
@@ -60,4 +61,14 @@ public class Response
     /// <typeparam name="T"> The type of the body </typeparam>
     /// <returns> The body of the response </returns>
     public T GetBody<T>() => JsonConvert.DeserializeObject<T>(Body);
+    
+    /// <summary>
+    ///  Validate the response
+    /// </summary>
+    /// <exception cref="Exception"> Thrown if the response is invalid </exception>
+    public void Validate()
+    {
+        if (Body is null) throw new Exception("Response body can't be null, check the response");
+        if (Headers is null) throw new Exception("Response headers can't be null, check the response");
+    }
 }
