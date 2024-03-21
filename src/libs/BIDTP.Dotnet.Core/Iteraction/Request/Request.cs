@@ -29,7 +29,7 @@ public class Request
     /// <summary>
     ///  The body of the request - a Json string
     /// </summary>
-    public string Body { get; set; }
+    public string Body { get; set; } = string.Empty;
     
     /// <summary>
     ///  The headers of the request

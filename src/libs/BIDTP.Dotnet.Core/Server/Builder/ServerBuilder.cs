@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Server.Iteraction;
 using BIDTP.Dotnet.Server.Options;
@@ -17,20 +14,21 @@ public class ServerBuilder
 {
     private readonly Dictionary<string, Func<Context, Task>[]> _routeHandlers 
         = new Dictionary<string, Func<Context, Task>[]>();
+    private ServerOptions _options;
     
     /// <summary>
-    ///  The service collection of the server 
+    ///  The service provider
     /// </summary>
-    public readonly IServiceCollection ServiceCollection;
-
-    private ServerOptions _options;
-
+    private IServiceProvider _serviceProvider;
+    
     /// <summary>
     ///  Constructor
     /// </summary>
-    public ServerBuilder()
+    public ServerBuilder AddDiContainer(IServiceProvider serviceCollection)
     {
-        ServiceCollection = new ServiceCollection();
+        _serviceProvider = serviceCollection;
+        
+        return this;
     }
     
     /// <summary>
@@ -66,29 +64,20 @@ public class ServerBuilder
     public Server Build()
     {
         if (_routeHandlers.Count == 0) throw new InvalidOperationException("Route handlers must be provided");
-        var buildServiceProvider = ServiceCollection.BuildServiceProvider();
-        var result =  new Server(_options.PipeName, _options.ChunkSize, _options.ReconnectTimeRate, _routeHandlers, buildServiceProvider);
+        
+        Server result;
+
+        if (_serviceProvider is not null)
+        {
+            result =  new Server(_options.PipeName, _options.ChunkSize, 
+                _options.ReconnectTimeRate, _routeHandlers, _serviceProvider);
+        }
+        else
+        {
+            result =  new Server(_options.PipeName, _options.ChunkSize, 
+                _options.ReconnectTimeRate, _routeHandlers);
+        }
         
         return result;
-    }
-    
-    /// <summary>
-    ///  Get the hashed pipe name of the server. Recommended for use.
-    /// </summary>
-    /// <returns> The hashed pipe name. </returns>
-    public static string GetHashedPipeName()
-    {
-        var sha256Managed = new SHA256Managed();
-        
-        var serverDirectory = AppDomain.CurrentDomain.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
-        var pipeNameInput = $"{Environment.UserName}.{serverDirectory}";
-        
-        var hash = sha256Managed.ComputeHash(Encoding.Unicode.GetBytes(pipeNameInput));
-        
-        var name = Convert.ToBase64String(hash)
-            .Replace("/", "_")
-            .Replace("=", string.Empty);
-        
-        return name;
     }
 }

@@ -23,11 +23,17 @@ namespace Example.Server.Console
             var options = new ServerOptions("testpipe", 1024,  5000);
             builder.SetGeneralOptions(options);
             
-            builder.ServiceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-            builder.ServiceCollection.AddScoped<AuthProvider>();
-            builder.ServiceCollection.AddScoped<ColorProvider>();
-            builder.ServiceCollection.AddScoped<ElementRepository>();
+            var serviceCollection = new ServiceCollection();
+
+            serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
+            serviceCollection.AddScoped<AuthProvider>();
+            serviceCollection.AddScoped<ColorProvider>();
+            serviceCollection.AddScoped<ElementRepository>();
             
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            
+            builder.AddDiContainer(serviceProvider);
+             
             builder.AddRoute("PrintMessage", JustChickenGuard, MessageController.PrintMessageHandler);
             builder.AddRoute("GetElements", MessageController.GetElements);
 

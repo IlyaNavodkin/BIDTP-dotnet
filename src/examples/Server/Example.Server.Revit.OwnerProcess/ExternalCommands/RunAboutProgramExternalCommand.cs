@@ -72,10 +72,16 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         
                 builder.SetGeneralOptions(options);
                 
-                builder.ServiceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-                builder.ServiceCollection.AddScoped<AuthProvider>();
-                builder.ServiceCollection.AddScoped<ColorProvider>();
-                builder.ServiceCollection.AddScoped<ElementRepository>();
+                var serviceCollection = new ServiceCollection();
+                
+                serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
+                serviceCollection.AddScoped<AuthProvider>();
+                serviceCollection.AddScoped<ColorProvider>();
+                serviceCollection.AddScoped<ElementRepository>();
+
+                var serviceProvider = serviceCollection.BuildServiceProvider();
+                
+                builder.AddDiContainer(serviceProvider);
                 
                 builder.AddRoute("PrintMessage", ShitWordGuard, MessageController.PrintMessageHandler);
                 builder.AddRoute("GetElements", ElementRevitController.GetElements);

@@ -80,70 +80,32 @@ public class Client
         IsConnectionStarting = true;
         _cancellationTokenSource = cancellationTokenSource;
         
-        while (!_cancellationTokenSource.Token.IsCancellationRequested)
+        try
         {
-            try
-            {
-                if(_clientPipeStream is not null) throw new Exception("Stream already created");
+            if(_clientPipeStream is not null) throw new Exception("Stream already created");
                 
-                _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
+            _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
 
-                await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
-                
-                await LifeCheckAsync();
+            await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
 
-                break;
-            }
-            catch (Exception exception)
-            {
-                DisposeStream();
-                
-                try
-                {
-                    await Task.Delay(ReconnectTimeRate, _cancellationTokenSource.Token);
-                }
-                catch (OperationCanceledException) {  }
-            }
+            await CheckConnection();
+            
+            _ = CheckConnectionBackground();
+        }
+        catch (Exception)
+        {
+            DisposeStream();
         }
         
-        if(cancellationTokenSource.Token.IsCancellationRequested) IsConnectionStarting = false;
+        IsConnectionStarting = false;
     }
     
-    private async Task LifeCheckAsync()
+    private async Task CheckConnectionBackground()
     {
         while (!_cancellationTokenSource.Token.IsCancellationRequested)
         {
-            try
-            {
-                await _pipeSemaphore.WaitAsync(_cancellationTokenSource.Token);
-
-                if (!_clientPipeStream.IsConnected) throw new Exception("PipeClient is not connected");
-
-                var dictionary = new Dictionary<string, string>();
-
-                dictionary.Add("MessageType", MessageType.HealthCheck.ToString());
-
-                await WriteAsyncInternal(dictionary, _cancellationTokenSource.Token);
-
-                Debug.WriteLine($"[LifeCheck Request]: ping");
-                
-                var response = await ReadAsyncInternal(_cancellationTokenSource.Token);
-                
-                IsHealthCheckConnected = !string.IsNullOrEmpty(response["MessageType"]);
-                IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
-                
-                Debug.WriteLine($"[LifeCheck Response]: pong");
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine($"[LifeCheck Error]: {exception.Message}");
-                
-            }
-            finally
-            {
-                _pipeSemaphore.Release();
-            }
-
+            await CheckConnection();
+            
             try
             {
                 await Task.Delay(LifeCheckTimeRate, _cancellationTokenSource.Token);
@@ -155,6 +117,39 @@ public class Client
         }
         
         DisposeStream();
+    }
+    private async Task CheckConnection()
+    {
+        try
+        {
+            await _pipeSemaphore.WaitAsync(_cancellationTokenSource.Token);
+
+            if (!_clientPipeStream.IsConnected) throw new Exception("PipeClient is not connected");
+
+            var dictionary = new Dictionary<string, string>();
+
+            dictionary.Add(nameof(MessageType), MessageType.HealthCheck.ToString());
+
+            await WriteAsyncInternal(dictionary, _cancellationTokenSource.Token);
+
+            Debug.WriteLine($"[LifeCheck Request]: ping");
+                
+            var response = await ReadAsyncInternal(_cancellationTokenSource.Token);
+                
+            IsHealthCheckConnected = !string.IsNullOrEmpty(response[nameof(MessageType)]);
+            IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
+                
+            Debug.WriteLine($"[LifeCheck Response]: pong");
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine($"[LifeCheck Error]: {exception.Message}");
+            DisposeStream();
+        }
+        finally
+        {
+            _pipeSemaphore.Release();
+        }
     }
 
     /// <summary>
@@ -177,10 +172,11 @@ public class Client
             SetGeneralHeaders(request);
             var dictionary = new Dictionary<string, string>();
 
-            dictionary.Add("MessageType", request.MessageType.ToString());
+            dictionary.Add(nameof(MessageType), request.MessageType.ToString());
             
             var headersJsonString = JsonConvert.SerializeObject(request.Headers);
             dictionary.Add("Headers", headersJsonString);
+            
             dictionary.Add("Body", request.Body);
             
             await WriteAsyncInternal(dictionary, cancellationToken);
@@ -188,7 +184,7 @@ public class Client
             var result = await ReadAsyncInternal(cancellationToken);
             
             var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(result["Headers"]);
-            var statusCode = (StatusCode) Enum.Parse(typeof(StatusCode), result["StatusCode"]);
+            var statusCode = (StatusCode) Enum.Parse(typeof(StatusCode), result[nameof(StatusCode)]);
             var response = new Response(statusCode)
             {
                 Body = result["Body"],
@@ -238,7 +234,7 @@ public class Client
             await memoryStream.ReadAsync(messageType, 0, messageType.Length, cancellationToken);
             var messageTypeValue = (MessageType) BitConverter.ToInt32(messageType, 0);
             
-            result.Add("MessageType", messageTypeValue.ToString());
+            result.Add(nameof(MessageType), messageTypeValue.ToString());
             
             if(messageTypeValue == MessageType.HealthCheck)
             {
@@ -297,7 +293,7 @@ public class Client
                 
             var bodyString = Encoding.Unicode.GetString(bodyBuffer);
                 
-            result.Add("StatusCode", statusCode.ToString());
+            result.Add(nameof(StatusCode), statusCode.ToString());
             result.Add("Headers", headersString);
             result.Add("Body", bodyString);
                 
@@ -312,7 +308,7 @@ public class Client
 
         using (var memoryStream = new MemoryStream())
         {
-            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary["MessageType"]);
+            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
             var messageTypeByte = BitConverter.GetBytes((int)messageType);
         
             if (messageType == MessageType.HealthCheck)

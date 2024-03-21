@@ -39,23 +39,45 @@ public class Server : IHost
     /// </summary>
     public int ChunkSize { get; set; }
     private int ReconnectTimeRate { get; }
+    
     /// <summary>
-    ///  Server of the SIDTP protocol
+    ///  Server of the BIDTP protocol
     /// </summary>
     /// <param name="pipeName"> The name of the pipe </param>
     /// <param name="chunkSize"> The chunk size for the transmission data </param>
     /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
     /// <param name="routeHandlers"> The route handlers </param>
-    /// <param name="buildServiceProvider"> The service provider </param>
+    /// <param name="serviceProvider"> The service provider </param>
     public Server(string pipeName, int chunkSize, int reconnectTimeRate,
-        Dictionary<string, Func<Context, Task>[]> routeHandlers, ServiceProvider buildServiceProvider)
+        Dictionary<string, Func<Context, Task>[]> routeHandlers, IServiceProvider serviceProvider)
     {
         _pipeName = pipeName;
         ChunkSize = chunkSize;
         ReconnectTimeRate = reconnectTimeRate;
 
         _routeHandlers = routeHandlers;
-        Services = buildServiceProvider;
+        Services = serviceProvider;
+        
+        _workers = new ConcurrentDictionary<string, IHostedService>(); 
+        
+        _streamSemaphore  = new SemaphoreSlim(1, 1);
+    }
+    
+    /// <summary>
+    ///  Server of the BIDTP protocol
+    /// </summary>
+    /// <param name="pipeName"> The name of the pipe </param>
+    /// <param name="chunkSize"> The chunk size for the transmission data </param>
+    /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
+    /// <param name="routeHandlers"> The route handlers </param>
+    public Server(string pipeName, int chunkSize, int reconnectTimeRate,
+        Dictionary<string, Func<Context, Task>[]> routeHandlers)
+    {
+        _pipeName = pipeName;
+        ChunkSize = chunkSize;
+        ReconnectTimeRate = reconnectTimeRate;
+
+        _routeHandlers = routeHandlers;
         
         _workers = new ConcurrentDictionary<string, IHostedService>(); 
         
@@ -79,21 +101,16 @@ public class Server : IHost
         {
             try
             {
-                Debug.WriteLine("[Start Async]: Startup.");
-                
                 if(_serverPipeStream is not null) throw new Exception("Stream already created");
                 
                 _serverPipeStream = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 
                     1, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 
-                Debug.WriteLine("[Start Async]: Client connected.");
-                
                 await Listen(cancellationToken);
             }
             catch (Exception exception)
             {
-                Debug.WriteLine($"[Start Async]: {exception}");
                 DisposeStreams();
             }
             
@@ -163,7 +180,7 @@ public class Server : IHost
 
                 var result = new Dictionary<string,string>();
                 
-                dictionary.TryGetValue("MessageType", out var messageTypeString);
+                dictionary.TryGetValue(nameof(MessageType), out var messageTypeString);
                 
                 if(messageTypeString is null) throw new Exception("Message type not found");
                 
@@ -171,7 +188,7 @@ public class Server : IHost
 
                 if (messageType is MessageType.HealthCheck)
                 {
-                    result.Add("MessageType", MessageType.HealthCheck.ToString());
+                    result.Add(nameof(MessageType), MessageType.HealthCheck.ToString());
                 }
                 else
                 {
@@ -180,26 +197,6 @@ public class Server : IHost
 
                 await WriteAsyncInternal(result, cancellationToken);
             }
-            catch (OperationCanceledException)
-            {
-                Debug.WriteLine("[Listen]: Operation canceled");
-                throw;
-            }
-            catch (EndOfStreamException endOfStreamException)
-            {
-                Debug.WriteLine($"[Listen]: {endOfStreamException}");
-                throw;
-            }
-            catch (IOException ioException)
-            {
-                Debug.WriteLine($"[Listen]: {ioException}");
-                throw;
-            }
-            catch (Exception exception)
-            {
-                Debug.WriteLine($"[Listen]: {exception}");
-                throw;
-            }
             finally
             {
                 _streamSemaphore.Release();
@@ -207,13 +204,13 @@ public class Server : IHost
         }
     }
     
-    private async Task<Dictionary<string,string>> ServeRequest(Dictionary<string,string> requestMessage)
+    private async Task<Dictionary<string,string>> ServeRequest(Dictionary<string,string> requestDictionary)
     {
         try
         {
-            var body = requestMessage["Body"];
+            var body = requestDictionary["Body"];
             
-            var headersString = requestMessage["Headers"];
+            var headersString = requestDictionary["Headers"];
             var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(headersString);
             
             var request = new Request
@@ -224,71 +221,82 @@ public class Server : IHost
             
             request.Headers.TryGetValue(Constants.Constants.RouteHeaderName, out var route);
             
-            if(route is null) throw new Exception("Route not found");
+            if(route is null) throw new Exception("Route key is not found. Add route header in the request!"); 
             
             var serverRouteNotExist = !_routeHandlers.TryGetValue(route, out var handlers);
         
             if (serverRouteNotExist)
             {
-                var error = new Error
-                {
-                    Message = $"Route {route} is not found!",
-                    ErrorCode = (int) InternalServerErrorType.RouteNotFoundError
-                };
-        
-                var response = new Response(StatusCode.NotFound)
-                {
-                    Body = JsonConvert.SerializeObject(error)
-                };
-                
-                SetGeneralHeaders(response);
-
-                return ConvertToDictionary(response);
+                return HandleRouteNotExistRequest(route);
             }
         
-            using (var scope = Services.CreateScope())
-            {
-                var serviceProvider = scope.ServiceProvider;
-                var context = new Context(request, serviceProvider);
-        
-                foreach (var handler in handlers)
-                {
-                    await handler(context);
-                    if (context.Response != null) break;
-                }
-        
-                if (context.Response is null) throw new InvalidOperationException("Server response is not set!");
-                
-                var response = context.Response;
-                SetGeneralHeaders(response);
-                
-                var result = ConvertToDictionary(response);
-                
-                return result;
-            }
+            return await HandleGenericResponse(request, handlers);
         }
         catch (Exception exception)
         {
-            Console.WriteLine(exception);
-        
-            var error = new Error 
-            {
-                Message = "Внутренняя ошибка сервера!",
-                Description = exception.Message,
-                ErrorCode = (int) InternalServerErrorType.DispatcherExceptionError
-            };
-        
-            var response = new Response(StatusCode.ServerError)
-            {
-                Body = JsonConvert.SerializeObject(error)
-            };
-            
-            SetGeneralHeaders(response);
-                
-            var result = ConvertToDictionary(response);
-                
-            return result;
+            return HandleServerInternalErrorResponse(exception);
         }
+    }
+
+    private async Task<Dictionary<string, string>> HandleGenericResponse(Request request, Func<Context, Task>[] handlers)
+    {
+        var context = new Context(request, Services);
+        
+        foreach (var handler in handlers)
+        {
+            await handler(context);
+            if (context.Response != null) break;
+        }
+        
+        if (context.Response is null) throw new InvalidOperationException("Server response is not set!");
+                
+        var response = context.Response;
+        SetGeneralHeaders(response);
+                
+        var result = ConvertToDictionary(response);
+                
+        return result;
+    }
+
+    private Dictionary<string, string> HandleServerInternalErrorResponse(Exception exception)
+    {
+        Console.WriteLine(exception);
+        
+        var error = new Error 
+        {
+            Message = "Внутренняя ошибка сервера!",
+            Description = exception.Message,
+            ErrorCode = (int) InternalServerErrorType.DispatcherExceptionError
+        };
+        
+        var errorResponse = new Response(StatusCode.ServerError)
+        {
+            Body = JsonConvert.SerializeObject(error)
+        };
+            
+        SetGeneralHeaders(errorResponse);
+                
+        var result = ConvertToDictionary(errorResponse);
+                
+        return result;
+    }
+
+    private Dictionary<string, string> HandleRouteNotExistRequest(string route)
+    {
+        var error = new Error
+        {
+            Message = $"Route {route} is not found!",
+            ErrorCode = (int) InternalServerErrorType.RouteNotFoundError
+        };
+        
+        var notExistResponse = new Response(StatusCode.NotFound)
+        {
+            Body = JsonConvert.SerializeObject(error)
+        };
+                
+        SetGeneralHeaders(notExistResponse);
+
+        return ConvertToDictionary(notExistResponse);
     }
 
     private static Dictionary<string, string> ConvertToDictionary(Response response)
@@ -298,8 +306,8 @@ public class Server : IHost
         var headerString = JsonConvert.SerializeObject(response.Headers);
         var bodyString = response.Body;
                 
-        dictionary.Add("MessageType", response.MessageType.ToString());
-        dictionary.Add("StatusCode", response.StatusCode.ToString());
+        dictionary.Add(nameof(MessageType), response.MessageType.ToString());
+        dictionary.Add(nameof(StatusCode), response.StatusCode.ToString());
         dictionary.Add("Headers", headerString);
         dictionary.Add("Body", bodyString);
                 
@@ -326,8 +334,8 @@ public class Server : IHost
             var messageType = new byte[4];
             await memoryStream.ReadAsync(messageType, 0, messageType.Length, cancellationToken);
             var messageTypeValue = (MessageType) BitConverter.ToInt32(messageType, 0);
-            
-            result.Add("MessageType", messageTypeValue.ToString());
+
+            result.Add(nameof(MessageType), messageTypeValue.ToString());
             
             if(messageTypeValue == MessageType.HealthCheck)
             {
@@ -394,7 +402,7 @@ public class Server : IHost
 
         using (var memoryStream = new MemoryStream())
         {
-            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary["MessageType"]);
+            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
             var messageTypeByte = BitConverter.GetBytes((int)messageType);
         
             if (messageType == MessageType.HealthCheck)
@@ -407,7 +415,7 @@ public class Server : IHost
             }
             else
             {
-                var status = (StatusCode)Enum.Parse(typeof(StatusCode), dictionary["StatusCode"]);
+                var status = (StatusCode)Enum.Parse(typeof(StatusCode), dictionary[nameof(StatusCode)]);
                 var statusByte = BitConverter.GetBytes((int)status);
 
                 var headerString = dictionary["Headers"];
@@ -481,19 +489,7 @@ public class Server : IHost
         ReadProgress?.Invoke(this, 
             new ProgressEventArgs(bytesReads, totalBytes, ProgressOperationType.Read));
     }
-
-    private static string GetBinaryBitString(byte[] contentBuffer)
-    {
-        var binaryString = new StringBuilder();
-        foreach (byte b in contentBuffer)
-        {
-            binaryString.Append(Convert.ToString(b, 2).PadLeft(8, '0'));
-            binaryString.Append(" ");
-        }
-
-        return binaryString.ToString();
-    }
-
+    
     private void SetGeneralHeaders(Response response)
     {
         response.Headers.Add(Constants.Constants.ProtocolHeaderName, Constants.Constants.ProtocolName);
@@ -525,6 +521,7 @@ public class Server : IHost
         DisposeStreams();
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         ReleaseUnmanagedResources();
@@ -536,5 +533,6 @@ public class Server : IHost
         ReleaseUnmanagedResources();
     }
 
+    /// <inheritdoc />
     public IServiceProvider Services { get; }
 }
