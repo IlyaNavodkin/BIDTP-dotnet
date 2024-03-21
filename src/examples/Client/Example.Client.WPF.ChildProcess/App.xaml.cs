@@ -22,10 +22,6 @@ public sealed partial class App
     ///  The client 
     /// </summary>
     public static  BIDTP.Dotnet.Iteraction.Client? Client;
-    /// <summary>
-    ///  The client cancel token source
-    /// </summary>
-    public static CancellationTokenSource ClientCancelTokenSource;
 
     static App()
     {
@@ -54,10 +50,6 @@ public sealed partial class App
     /// <param name="e"> The <see cref="StartupEventArgs"/> instance containing the event data.</param>
     protected override async void OnStartup(StartupEventArgs e)
     {
-#if DEBUG
-        // Wait for debugger
-        Thread.Sleep(10000);
-#endif
         if (CommandLineArguments is null) throw new ArgumentNullException(nameof(CommandLineArguments));
             
         var pidParse = int.TryParse(CommandLineArguments.OwnerProcessId, out var pid);
@@ -77,16 +69,8 @@ public sealed partial class App
             1000, 5000);
         
         Client = new BIDTP.Dotnet.Iteraction.Client(options);
-        ClientCancelTokenSource = new CancellationTokenSource();
-        await Client.ConnectToServer(ClientCancelTokenSource);
         
-        var view = new MainView();
-        
-        var args = Environment.GetCommandLineArgs();
-        var argString = string.Join(" ", args);
-        
-        view.RawArgs.Text = argString;
-        view.ServerName.Text = CommandLineArguments.PipeName;
+        var view = new MainWindow();
         
         view.ShowDialog();
     }

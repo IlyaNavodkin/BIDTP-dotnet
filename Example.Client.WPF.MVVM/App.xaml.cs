@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using BIDTP.Dotnet.Iteraction;
 using BIDTP.Dotnet.Iteraction.Options;
 using Example.Client.WPF.MVVM.Views;
 

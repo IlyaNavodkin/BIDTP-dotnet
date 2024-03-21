@@ -1,13 +1,11 @@
-﻿<Window x:Class="Example.Client.WPF.MVVM.Views.MainWindow"
+﻿<Window x:Class="Example.Client.WPF.ChildProcess.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:Example.Client.WPF.MVVM.ViewModels"
-        xmlns:tabs="clr-namespace:Example.Client.WPF.MVVM.Views.Tabs"
+        xmlns:tabs="clr-namespace:Example.Client.WPF.ChildProcess.Views.Tabs"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
-        Title="Client MVVM" Height="768" Width="1024">
+        Title="ChildProcessClient" Height="768" Width="400">
     <Grid Margin="10">
         <Grid.RowDefinitions >
             <RowDefinition Height="*"></RowDefinition>
@@ -42,9 +40,10 @@
                         <TextBlock Text="Chunk size"
                                    HorizontalAlignment="Left"
                                    Margin="0 10 0 0"/>
-                        <TextBox HorizontalAlignment="Left"
+                        <TextBox x:Name="ChunkSizeTextBox" 
+                                 HorizontalAlignment="Left"
                                  Width="100"
-                                 Text="{Binding ChunkSize}"
+                                 Text="1024"
                                  Margin="0 10 0 0"/>
                     </StackPanel>
                 </StackPanel>
@@ -71,7 +70,6 @@
                     <Button x:Name="ConnectToServerButton"
                             Margin="5 5 5 5"
                             Content="Connect to server"
-                            Command="{Binding ConnectToServerCommand }"
                             Width="150"/>
                 </StackPanel>
             </Grid>        
@@ -85,7 +83,6 @@
                            Margin="0 10 0 0"/>
                 <TextBox x:Name="AuthTokenTextBox" 
                          Width="100"
-                         Text="{Binding AuthToken}"
                          Margin="0 10 0 0"/>
             </StackPanel>
         </GroupBox>

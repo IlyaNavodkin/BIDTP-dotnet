@@ -1,95 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using BIDTP.Dotnet.Iteraction;
+using System.Windows.Controls;
 using BIDTP.Dotnet.Iteraction.Dtos;
 using BIDTP.Dotnet.Iteraction.Enums;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Newtonsoft.Json;
 
-namespace Example.Client.WPF.ChildProcess.Views;
+namespace Example.Client.WPF.ChildProcess.Views.Tabs;
 
 /// <summary>
-///  Interaction logic for MainView.xaml
+///  Interaction logic for GetElementsTab.xaml
 /// </summary>
-public sealed partial class MainView
+public partial class GetElementsTab : UserControl
 {
     /// <summary>
-    ///  Initialize a new instance of the <see cref="MainView"/> class.
+    ///  Initialize a new instance of the <see cref="GetElementsTab"/> class.
     /// </summary>
-    public MainView()
+    public GetElementsTab()
     {
         InitializeComponent();
-
-        RequestCheckButton.Click += async (sender, args) =>
-        {
-            try
-            {
-                var message = MessageTextBox.Text;
-                var request = new Request
-                {
-                    Body = message
-                };
-
-                request.Headers.Add("Authorization", TokenTextBox.Text);
-                request.SetRoute("PrintMessage");
-
-                var response = await App.Client.WriteRequestAsync(request);
-
-                if (response.StatusCode is StatusCode.Success)
-                {
-                    TextBlockResponse.Text = response.Body;
-                }
-                else
-                {
-                    var error = JsonConvert.DeserializeObject<Error>(response.Body);
-
-                    MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\n Description: {error.Description}");
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        };
     }
-
+    
     private async void GetElements(object sender, RoutedEventArgs e)
     {
         try
         {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            var token = mainWindow.AuthTokenTextBox.Text;
+            
             var request = new Request();
-
-            request.Headers.Add("Authorization", TokenTextBox.Text);
+        
+            request.Headers.Add("Authorization", token);
             request.SetRoute("GetElements");
 
             var getCategoryRequest = new GetElementsByCategoryRequest
             {
                 Category = CategoryTextBox.Text
             };
-
+        
             var jsonResponse = JsonConvert.SerializeObject(getCategoryRequest);
             request.Body = jsonResponse;
-
-            WindowState = WindowState.Minimized;
-
+            
             var response = await App.Client.WriteRequestAsync(request);
-
-            WindowState = WindowState.Normal;
-
+        
             if (response.StatusCode == StatusCode.Success)
             {
                 var json = response.Body;
-
+            
                 var elements = JsonConvert.DeserializeObject<ICollection<ElementDto>>(json);
-
+            
                 DataGridElements.ItemsSource = elements;
             }
             else
             {
                 var error = JsonConvert.DeserializeObject<Error>(response.Body);
-
+            
                 MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }
@@ -103,37 +70,40 @@ public sealed partial class MainView
     {
         try
         {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            var token = mainWindow.AuthTokenTextBox.Text;
+            
             var request = new Request();
-
+        
             var selectedItem = (ElementDto)DataGridElements.SelectedItem;
-
-            request.Headers.Add("Authorization", TokenTextBox.Text);
+        
+            request.Headers.Add("Authorization", token);
             request.SetRoute("DeleteElement");
 
             var deleteElementRequest = new DeleteElementRequest
             {
                 Element = selectedItem
             };
-
+        
             var jsonResponse = JsonConvert.SerializeObject(deleteElementRequest);
             request.Body = jsonResponse;
-
+            
             var response = await App.Client.WriteRequestAsync(request);
             if (response.StatusCode == StatusCode.Success)
             {
                 var message = response.Body;
 
                 var newList = new List<ElementDto>();
-
+            
                 foreach (var objectElement in DataGridElements.ItemsSource)
                 {
                     var element = (ElementDto)objectElement;
-
+                
                     if (element.Id == selectedItem.Id) continue;
-
+                
                     newList.Add(element);
                 }
-
+            
                 DataGridElements.ItemsSource = newList;
 
                 MessageBox.Show(message);
@@ -141,7 +111,7 @@ public sealed partial class MainView
             else
             {
                 var error = JsonConvert.DeserializeObject<Error>(response.Body);
-
+            
                 MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }

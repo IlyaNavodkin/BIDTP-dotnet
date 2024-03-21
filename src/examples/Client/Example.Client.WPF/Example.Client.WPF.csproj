@@ -10,6 +10,7 @@
         <RootNamespace>Example.Client.WPF</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
+    
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />

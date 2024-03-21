@@ -124,8 +124,16 @@ var builder = new ServerBuilder();
 var options = new ServerOptions("testpipe", 1024,  5000);
 builder.SetGeneralOptions(options);
 
+# U can use any DI container
+var serviceCollection = new ServiceCollection();
+
 # Add providers in DI container
 builder.ServiceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
+
+var serviceProvider = serviceCollection.BuildServiceProvider();
+
+# Add custom DI container
+builder.AddDiContainer(serviceProvider);
 
 # Add route and handle this
 builder.AddRoute("route", HandleThisRoute);
@@ -152,6 +160,8 @@ builder.ServiceCollection.AddScoped<ColorProvider>();
 builder.ServiceCollection.AddSingleton<ElementRepository>();
 
 ```
+
+U can use ur custom DI container, implemet IServiceProvider and do it!
 
 ## Flexible routing system
 
@@ -214,13 +224,13 @@ server.AddBackgroundService<LoggingWorker>();
 You can use your data transfer events (write and read) to use this information to more accurately display progress of server:
 
 ```c#
-# Чтение события
+# Read event
 App.Server.ReadProgress += OnProgress;
 
-# Запись события
+# Write event
 App.Server.WriteProgress += OnProgress;
 
-# Обработка!
+# Handle!
 private void OnProgress(object? sender, ProgressEventArgs e)
 {
     var bytesWritten = e.BytesWritten;
@@ -383,8 +393,9 @@ var isConnected = App.Client.IsHealthCheckConnected;
 In the repository, there are examples of .NET applications:
 
 1. Example.Client.WPF - A reconnectable client application based on the .NET Core 6 framework.
-2. Example.Client.WPF.ChildProcess - A client application based on the .NET Core 6 framework. It needs to be run by the server (owner process).
-3. Example.Server.Console - A server application based on the .NET Framework 4.8, presented as a console application.
-4. Example.Server.Console.OwnerProcess - A server application based on the .NET Framework 4.8, which runs another client-child process.
-5. Example.Server.Revit.OwnerProcess - A server application based on the .NET Framework 4.8 and Revit API, also running another client-child process.
-6. Example.Schemas - Declaration of generic DTO schemas for client-server communication.
+2. Example.Client.WPF.MVVM - A reconnectable client application based on the .NET Core 6 framework with MVVM
+3. Example.Client.WPF.ChildProcess - A client application based on the .NET Core 6 framework. It needs to be run by the server (owner process).
+4. Example.Server.Console - A server application based on the .NET Framework 4.8, presented as a console application.
+5. Example.Server.Console.OwnerProcess - A server application based on the .NET Framework 4.8, which runs another client-child process.
+6. Example.Server.Revit.OwnerProcess - A server application based on the .NET Framework 4.8 and Revit API, also running another client-child process.
+7. Example.Schemas - Declaration of generic DTO schemas for client-server communication.
