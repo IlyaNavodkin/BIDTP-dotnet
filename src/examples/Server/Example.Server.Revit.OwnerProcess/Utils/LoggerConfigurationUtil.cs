@@ -2,7 +2,7 @@
 using System.IO;
 using Serilog;
 
-namespace Example.Server.Revit.Utils
+namespace Example.Server.Revit.OwnerProcess.Utils
 {
     /// <summary>
     ///  The logger configuration util 

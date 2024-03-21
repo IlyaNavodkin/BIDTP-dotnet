@@ -2,7 +2,7 @@
 using Nice3point.Revit.Toolkit.External;
 using Serilog;
 
-namespace Example.Server.Revit.Extensions;
+namespace Example.Server.Revit.OwnerProcess.Extensions;
 
 /// <summary>
 ///  Extension for <see cref="ExternalApplication"/>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,16 +16,18 @@ using BIDTP.Dotnet.Iteraction.Providers;
 using Example.Server.Controllers;
 using Example.Server.Providers;
 using Example.Server.Repositories;
-using Example.Server.Revit.Controllers;
+using Example.Server.Revit.OwnerProcess.Controllers;
 using Example.Server.Utils;
 using Example.Server.Workers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
 using Newtonsoft.Json;
 using Nice3point.Revit.Toolkit.External;
 using Serilog;
+using UIFrameworkServices;
 
-namespace Example.Server.Revit.ExternalCommands;
+namespace Example.Server.Revit.OwnerProcess.ExternalCommands;
 
 /// <summary>
 ///  The run about program external command
@@ -56,9 +59,17 @@ public class RunAboutProgramExternalCommand: ExternalCommand
             return;
         }
         
+        var openFileDialog = new OpenFileDialog();
+        openFileDialog.Filter = "Text files (*.exe)|*.exe"; 
+        openFileDialog.Multiselect = false;
+
+        var result = openFileDialog.ShowDialog(); 
+        if (result != true) throw new FileNotFoundException("File not found");
+
+        var filename = openFileDialog.FileName;
         _isRunning = true;
         
-        _ = Task.Run(async () =>
+        Task.Run(async () =>
         {
             Process childProcess = null;
             BIDTP.Dotnet.Iteraction.Server server = null;
@@ -119,7 +130,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 
                 server.AddBackgroundService<LoggingWorker>();
                
-                childProcess = RunClientProcess(options.PipeName);
+                childProcess = RunClientProcess(options.PipeName, filename);
                 
                 await server.StartAsync(cancellationTokenSource.Token);
             }
@@ -138,17 +149,16 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         Result = Result.Succeeded;
     }
     
-    private Process RunClientProcess(string pipeName)
+    private Process RunClientProcess(string pipeName, string clientPath)
     {
-        var currentDirectory = new DirectoryInfo (Directory.GetCurrentDirectory());
-        var parentDirectory = currentDirectory.Parent.Parent.Parent;
-    
-        var fileName = FileUtils.SearchFile(parentDirectory.FullName, "Example.Client.WPF.ChildProcess.exe");
-    
+        var fileIsExist = File.Exists(clientPath);
+        
+        if (!fileIsExist) throw new FileNotFoundException($"Client file not found at { clientPath }.");
+        
         var processId = Process.GetCurrentProcess().Id.ToString();
     
         var arguments = "--pn=\"" + pipeName + "\" --pid=\"" + processId + "\"";
-        var childProcess = Process.Start(fileName, arguments);
+        var childProcess = Process.Start(clientPath, arguments);
         
         return childProcess;
     }

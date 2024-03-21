@@ -52,8 +52,12 @@ public sealed partial class App
     /// Main entry point
     /// </summary>
     /// <param name="e"> The <see cref="StartupEventArgs"/> instance containing the event data.</param>
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
+#if DEBUG
+        // Wait for debugger
+        Thread.Sleep(10000);
+#endif
         if (CommandLineArguments is null) throw new ArgumentNullException(nameof(CommandLineArguments));
             
         var pidParse = int.TryParse(CommandLineArguments.OwnerProcessId, out var pid);
@@ -69,12 +73,12 @@ public sealed partial class App
         OwnerProcess.EnableRaisingEvents = true;
         OwnerProcess.Exited += OnOwnerProcessExited;
         
-        var options = new ClientOptions("testpipe", 1024, 9000, 
+        var options = new ClientOptions(CommandLineArguments.PipeName, 1024, 9000, 
             1000, 5000);
         
         Client = new BIDTP.Dotnet.Iteraction.Client(options);
         ClientCancelTokenSource = new CancellationTokenSource();
-        Client.ConnectToServer(ClientCancelTokenSource);
+        await Client.ConnectToServer(ClientCancelTokenSource);
         
         var view = new MainView();
         

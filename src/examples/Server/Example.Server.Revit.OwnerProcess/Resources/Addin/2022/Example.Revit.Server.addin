@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Application">
-    <Name>Example.Server.Revit</Name>
-    <Assembly>Example.Server.Revit\Example.Server.Revit.dll</Assembly>
-    <ClientId>af347787-4290-4e76-82e1-d5dc57e53f86</ClientId>
-    <FullClassName>Example.Server.Revit.SimpleDimpleExternalApplication</FullClassName>
+    <Name>Example.Server.Revit.OwnerProcess</Name>
+    <Assembly>Example.Server.Revit.OwnerProcess\Example.Server.Revit.OwnerProcess.dll</Assembly>
+    <ClientId>b8f7c671-2c18-43c4-b0b4-44dcaca4e572</ClientId>
+    <FullClassName>Example.Server.Revit.OwnerProcess.SimpleDimpleExternalApplication</FullClassName>
     <VendorId>https://t.me/IAMCHAMION</VendorId>
     <VendorDescription>https://t.me/IAMCHAMION</VendorDescription>
   </AddIn>

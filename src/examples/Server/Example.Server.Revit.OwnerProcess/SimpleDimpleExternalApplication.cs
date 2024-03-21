@@ -1,14 +1,14 @@
 ﻿using System;
 using Autodesk.Revit.UI;
-using Example.Server.Revit.Configurator;
-using Example.Server.Revit.Extensions;
-using Example.Server.Revit.Utils;
+using Example.Server.Revit.OwnerProcess.Configurator;
+using Example.Server.Revit.OwnerProcess.Extensions;
+using Example.Server.Revit.OwnerProcess.Utils;
 using Nice3point.Revit.Toolkit.External;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using Serilog;
 using Exception = System.Exception;
 
-namespace Example.Server.Revit;
+namespace Example.Server.Revit.OwnerProcess;
 
 /// <summary>
 ///  The simple dimple external application

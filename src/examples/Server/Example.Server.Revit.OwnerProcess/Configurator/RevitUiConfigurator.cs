@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Windows.Media.Imaging;
 using Autodesk.Revit.UI;
 using Autodesk.Windows;
-using Example.Server.Revit.ExternalCommands;
-using Example.Server.Revit.Utils;
+using Example.Server.Revit.OwnerProcess.ExternalCommands;
+using Example.Server.Revit.OwnerProcess.Utils;
 
-namespace Example.Server.Revit.Configurator;
+namespace Example.Server.Revit.OwnerProcess.Configurator;
 
 /// <summary>
 ///  The revit ui configurator 
@@ -18,23 +17,23 @@ public class RevitUiConfigurator
     /// <summary>
     ///  Returns the instance of the singleton
     /// </summary>
-    /// <returns> Экземпляр синглтона</returns>
+    /// <returns> Singleton instance. </returns>
     public static RevitUiConfigurator GetInstance () => Instance.Value;
     
     /// <summary>
     /// Configures the revit ui components.
     /// </summary>
     /// <param name="uiControlledApplication"></param>
-    /// <returns></returns>
+    /// <returns> Ribbon tab.</returns>
     public RibbonTab ConfigureRevitUiComponents(UIControlledApplication uiControlledApplication)
     {
         var uiService = UiComponentCreateUtil.GetInstance(); 
             
-        var bimdataTab = uiService.CreateRibbonTab( uiControlledApplication,"PIDERS");
+        var bimdataTab = uiService.CreateRibbonTab( uiControlledApplication,"BIDTP");
         
         var uploadPanel = uiService.CreateRibbonPanel(uiControlledApplication,bimdataTab, 
-            "PIDERS_PN1", 
-            "PIDERS панель");
+            "BIDTP_PN1", 
+            "BIDTP панель");
         
         var uploadModelButton = uiService
             .CreatePushButton<RunAboutProgramExternalCommand>

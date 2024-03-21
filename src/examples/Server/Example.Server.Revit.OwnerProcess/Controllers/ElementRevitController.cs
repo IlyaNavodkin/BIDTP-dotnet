@@ -3,19 +3,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
-using BIDTP.Dotnet.Iteraction;
 using BIDTP.Dotnet.Iteraction.Dtos;
 using BIDTP.Dotnet.Iteraction.Enums;
 using BIDTP.Dotnet.Iteraction.Providers;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Example.Server.Providers;
-using Example.Server.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Nice3point.Revit.Toolkit.External.Handlers;
 
-namespace Example.Server.Revit.Controllers;
+namespace Example.Server.Revit.OwnerProcess.Controllers;
 
 /// <summary>
 ///  The message controller
