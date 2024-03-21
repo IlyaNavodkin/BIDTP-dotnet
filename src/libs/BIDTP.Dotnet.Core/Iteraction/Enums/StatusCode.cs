@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Iteraction.Response.Enums;
+﻿namespace BIDTP.Dotnet.Iteraction.Enums;
 
 /// <summary>
 ///  The status code of the response

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using BIDTP.Dotnet.Iteraction.Request;
 using Example.Client.WPF.MVVM.ViewModels.Tabs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;

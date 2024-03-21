@@ -1,6 +1,7 @@
-﻿using BIDTP.Dotnet.Iteraction.Response;
-using BIDTP.Dotnet.Iteraction.Response.Enums;
-using BIDTP.Dotnet.Server.Iteraction;
+﻿using BIDTP.Dotnet.Iteraction;
+using BIDTP.Dotnet.Iteraction.Dtos;
+using BIDTP.Dotnet.Iteraction.Enums;
+using BIDTP.Dotnet.Iteraction.Providers;
 using Example.Schemas.Requests;
 using Example.Server.Providers;
 using Example.Server.Repositories;

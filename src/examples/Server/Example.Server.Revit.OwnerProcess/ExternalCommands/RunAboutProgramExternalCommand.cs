@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using BIDTP.Dotnet.Iteraction.Response;
-using BIDTP.Dotnet.Iteraction.Response.Dtos;
-using BIDTP.Dotnet.Iteraction.Response.Enums;
-using BIDTP.Dotnet.Server.Builder;
-using BIDTP.Dotnet.Server.Iteraction;
-using BIDTP.Dotnet.Server.Options;
+using BIDTP.Dotnet.Extensions;
+using BIDTP.Dotnet.Iteraction.Builders;
+using BIDTP.Dotnet.Iteraction.Dtos;
+using BIDTP.Dotnet.Iteraction.Enums;
+using BIDTP.Dotnet.Iteraction.Options;
+using BIDTP.Dotnet.Iteraction.Providers;
 using Example.Server.Controllers;
 using Example.Server.Providers;
 using Example.Server.Repositories;
@@ -27,31 +27,30 @@ using Serilog;
 namespace Example.Server.Revit.ExternalCommands;
 
 /// <summary>
-///  Команда "О программе проекта"
+///  The run about program external command
 /// </summary>
 [Transaction(TransactionMode.Manual)]
 [Regeneration(RegenerationOption.Manual)]
 public class RunAboutProgramExternalCommand: ExternalCommand
 {
     /// <summary>
-    ///  Флаг запуска
+    ///  Is running flag
     /// </summary>
     private static bool _isRunning;
     /// <summary>
-    ///  Запуск окна "О программе проекта"
+    ///  Execute the external command
     /// </summary>
     public override void Execute()
     {
         
         SuppressExceptions(exception =>
         {
-            _isRunning = false;
-            Log.Fatal(exception, "Unhandled exception");
+            Log.Fatal(exception, $"Unhandled exception in { nameof(RunAboutProgramExternalCommand) }");
         });
 
         if (_isRunning)
         {
-            MessageBox.Show("Программа уже запущена");
+            MessageBox.Show($"UI process of { nameof(RunAboutProgramExternalCommand) } is already running");
             
             Result = Result.Cancelled;
             return;
@@ -62,12 +61,15 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         _ = Task.Run(async () =>
         {
             Process childProcess = null;
-            BIDTP.Dotnet.Server.Server server = null;
+            BIDTP.Dotnet.Iteraction.Server server = null;
             
             try
             {
                 var cancellationTokenSource = new CancellationTokenSource();
-                var options = new ServerOptions("testpipe", 1024,  5000);
+
+                var pipeName = AppDomain.CurrentDomain.GetHashedPipeName();
+                
+                var options = new ServerOptions(pipeName, 1024,  5000);
                 var builder = new ServerBuilder();
         
                 builder.SetGeneralOptions(options);
@@ -136,7 +138,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         Result = Result.Succeeded;
     }
     
-    Process RunClientProcess(string pipeName)
+    private Process RunClientProcess(string pipeName)
     {
         var currentDirectory = new DirectoryInfo (Directory.GetCurrentDirectory());
         var parentDirectory = currentDirectory.Parent.Parent.Parent;

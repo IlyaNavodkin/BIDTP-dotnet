@@ -11,9 +11,9 @@ using Exception = System.Exception;
 namespace Example.Server.Revit;
 
 /// <summary>
-/// Основной класс приложение, реализующий запуск и конфигурацию плагина
+///  The simple dimple external application
 /// </summary>
-/// <remarks>Запуск производится с помощью манифест файла *.addin.</remarks>
+/// <remarks>The application should be placed in *.addin.</remarks>
 public class SimpleDimpleExternalApplication: ExternalApplication
 {
     /// <summary>

@@ -5,16 +5,16 @@ using Serilog;
 namespace Example.Server.Revit.Extensions;
 
 /// <summary>
-///  Расширения для <see cref="ExternalApplication"/>
+///  Extension for <see cref="ExternalApplication"/>
 /// </summary>
 public static class  ExternalApplicationExtension
 {
     /// <summary>
-    ///  Перехватывает и обрабатывает необработанные исключения 
+    ///  Handle unhandled exception in the external application
     /// </summary>
     /// <param name="externalApplication"> <see cref="ExternalApplication"/></param>
-    /// <param name="sender"> Сендер</param>
-    /// <param name="e"> Аргументы события</param>
+    /// <param name="sender">Sender</param>
+    /// <param name="e">Event args</param>
     public static void HandleUnhandledException(this ExternalApplication externalApplication, 
         object sender, UnhandledExceptionEventArgs e)
     {

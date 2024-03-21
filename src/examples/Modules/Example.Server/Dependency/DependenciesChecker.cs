@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Linq;
 
-namespace BIDTP.Dotnet.Core.Dependency;
+namespace Example.Server.Dependency;
 
 /// <summary>
 ///  Check if dotnet is installed in windows machine

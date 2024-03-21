@@ -4,7 +4,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using BIDTP.Dotnet;
-using BIDTP.Dotnet.Client;
+using BIDTP.Dotnet.Iteraction;
+using BIDTP.Dotnet.Iteraction.Options;
 using Example.Client.WPF.ChildProcess.Args;
 using Example.Client.WPF.ChildProcess.Views;
 
@@ -20,7 +21,7 @@ public sealed partial class App
     /// <summary>
     ///  The client 
     /// </summary>
-    public static  BIDTP.Dotnet.Client.Client? Client;
+    public static  BIDTP.Dotnet.Iteraction.Client? Client;
     /// <summary>
     ///  The client cancel token source
     /// </summary>
@@ -71,7 +72,7 @@ public sealed partial class App
         var options = new ClientOptions("testpipe", 1024, 9000, 
             1000, 5000);
         
-        Client = new BIDTP.Dotnet.Client.Client(options);
+        Client = new BIDTP.Dotnet.Iteraction.Client(options);
         ClientCancelTokenSource = new CancellationTokenSource();
         Client.ConnectToServer(ClientCancelTokenSource);
         

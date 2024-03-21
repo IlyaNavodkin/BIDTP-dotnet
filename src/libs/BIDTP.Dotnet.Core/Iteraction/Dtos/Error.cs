@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Iteraction.Response.Dtos;
+﻿namespace BIDTP.Dotnet.Iteraction.Dtos;
 
 /// <summary>
 ///  The error of the response 

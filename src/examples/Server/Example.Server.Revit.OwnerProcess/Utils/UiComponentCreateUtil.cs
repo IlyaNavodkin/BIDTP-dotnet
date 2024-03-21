@@ -9,7 +9,7 @@ using RibbonPanel = Autodesk.Revit.UI.RibbonPanel;
 namespace Example.Server.Revit.Utils
 {
     /// <summary>
-    /// Служба для создания кнопки на элементе интерфейса пользователя, таком как панель ленты инструментов.
+    ///  The ui component create util  
     /// </summary>
     public class UiComponentCreateUtil 
     {
@@ -17,23 +17,23 @@ namespace Example.Server.Revit.Utils
             new Lazy<UiComponentCreateUtil>(() => new UiComponentCreateUtil());
 
         /// <summary>
-        ///  Возвращает экземпляр синглтона
+        ///  Get the instance of the singleton
         /// </summary>q
-        /// <returns> Экземпляр синглтона</returns>
+        /// <returns> The instance. </returns>
         public static UiComponentCreateUtil GetInstance () => Instance.Value;
         
         /// <summary>
-        /// Создает кнопку с указанными свойствами и добавляет ее на указанную панель ленты инструментов.
+        ///  Creates a push button data
         /// </summary>
-        /// <typeparam name="T">Тип внешней команды, которую выполнит кнопка.</typeparam>
-        /// <param name="smallIcon">Источник изображения для маленькой иконки</param>
-        /// <param name="largeIcon">Изображение для отображения на кнопке.</param>
-        /// <param name="buttonName">Имя кнопки.</param>
-        /// <param name="toolTip">Текст для отображения всплывающей подсказки при наведении на кнопку.</param>
-        /// <param name="toolTipImage">Источник изображения для всплывающей подсказки</param>
-        /// <param name="longDescription">Описание для всплывающей подсказки</param>
+        /// <typeparam name="T">The type of the external command .</typeparam>
+        /// <param name="smallIcon"> Small icon.</param>
+        /// <param name="largeIcon"> Large icon.</param>
+        /// <param name="buttonName"> The name of the button .</param>
+        /// <param name="toolTip"> The tool tip .</param>
+        /// <param name="toolTipImage"> The tool tip image. </param>
+        /// <param name="longDescription"> The long description. </param>
         /// <remarks>
-        /// Параметр типа T должен реализовывать интерфейс IExternalCommand.
+        /// T is the type of the external command
         /// </remarks>
         public PushButtonData CreatePushButton<T>(string buttonName,
             ImageSource smallIcon = null, ImageSource largeIcon = null, string toolTip = null, ImageSource toolTipImage = null, 
@@ -57,13 +57,13 @@ namespace Example.Server.Revit.Utils
         }
         
         /// <summary>
-        /// Инициализирует панель ленты инструментов для интерфейса пользователя управляемого приложения.
+        ///  Creates a ribbon panel
         /// </summary>
-        /// <param name="application">Управляемое приложение.</param>
-        /// <param name="ribbonTab">Лента инструментов, к которой будет добавлена панель.</param>
-        /// <param name="panelName">Имя панели.</param>
-        /// <param name="panelTitle">Заголовок панели.</param>
-        /// <returns>Инициализированная панель ленты инструментов.</returns>
+        /// <param name="application">The application.</param>
+        /// <param name="ribbonTab">The ribbon tab .</param>
+        /// <param name="panelName"> The name of the panel .</param>
+        /// <param name="panelTitle"> The title of the panel .</param>
+        /// <returns> The ribbon panel .</returns>
         public RibbonPanel CreateRibbonPanel(UIControlledApplication application, RibbonTab ribbonTab, 
             string panelName,string panelTittle)
         {
@@ -87,11 +87,11 @@ namespace Example.Server.Revit.Utils
         }
     
         /// <summary>
-        /// Инициализирует вкладку ленты инструментов для интерфейса пользователя управляемого приложения.
+        ///  Creates a ribbon tab .
         /// </summary>
-        /// <param name="application">Управляемое приложение.</param>
-        /// <param name="tabPanelName">Имя вкладки.</param>
-        /// <returns>Инициализированная вкладка ленты инструментов.</returns>
+        /// <param name="application">The application .</param>
+        /// <param name="tabPanelName"> The name of the tab .</param>
+        /// <returns> The ribbon tab .</returns>
         public RibbonTab CreateRibbonTab(UIControlledApplication application, string tabPanelName)
         {
             var ribbonControlTabs = ComponentManager.Ribbon.Tabs;

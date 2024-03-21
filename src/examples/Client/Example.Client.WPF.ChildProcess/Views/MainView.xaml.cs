@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows;
-using BIDTP.Dotnet.Iteraction.Request;
-using BIDTP.Dotnet.Iteraction.Response.Dtos;
-using BIDTP.Dotnet.Iteraction.Response.Enums;
+using BIDTP.Dotnet.Iteraction;
+using BIDTP.Dotnet.Iteraction.Dtos;
+using BIDTP.Dotnet.Iteraction.Enums;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Newtonsoft.Json;

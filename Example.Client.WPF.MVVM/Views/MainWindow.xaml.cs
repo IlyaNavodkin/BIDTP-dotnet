@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
-using BIDTP.Dotnet.Events;
+using BIDTP.Dotnet.Iteraction.Events;
 using Example.Client.WPF.MVVM.ViewModels;
 
 namespace Example.Client.WPF.MVVM.Views

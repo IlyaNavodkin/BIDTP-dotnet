@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Response.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Iteraction.Response;
+namespace BIDTP.Dotnet.Iteraction.Dtos;
 
 /// <summary>
 ///  The response from the server

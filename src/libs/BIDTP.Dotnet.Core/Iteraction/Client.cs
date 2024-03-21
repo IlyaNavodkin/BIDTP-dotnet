@@ -6,14 +6,13 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BIDTP.Dotnet.Events;
+using BIDTP.Dotnet.Iteraction.Dtos;
 using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Request;
-using BIDTP.Dotnet.Iteraction.Response;
-using BIDTP.Dotnet.Iteraction.Response.Enums;
+using BIDTP.Dotnet.Iteraction.Events;
+using BIDTP.Dotnet.Iteraction.Options;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Client;
+namespace BIDTP.Dotnet.Iteraction;
 /// <summary>
 ///  Client 
 /// </summary>

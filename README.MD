@@ -2,6 +2,11 @@
 
 Bidirectional Interprocess Data Transfer Protocol (BIDTP) - a simple-to-use data exchange protocol between two processes.
 
+<br />
+<div align="center">
+    <img src="./Common/images/BIDTP-dotnet-references-schema-1.png" alt="Logo" width="700" height="500">
+</div>
+
 # Questions and answers
 
 ### Ask:
@@ -50,10 +55,10 @@ Below are listed the main components along with their general descriptions.
 
 <br />
 <div align="center">
-    <img src="./Common/images/PIDERS_Schema_1.png" alt="Logo" width="700" height="700">
+    <img src="./Common/images/BIDTP-dotnet-arch-schema-1.png" alt="Logo" width="700" height="700">
 </div>
 
-The PIDERS protocol is based on client-server interaction. Communication between the components occurs using messages in a byte stream (pipe stream). The messages consist of Request\Response objects.
+The BIDTP protocol is based on client-server interaction. Communication between the components occurs using messages in a byte stream (pipe stream). The messages consist of Request\Response objects.
 
 ## Requirements of data types
 

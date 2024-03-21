@@ -5,17 +5,17 @@ using Serilog;
 namespace Example.Server.Revit.Utils
 {
     /// <summary>
-    /// Конфигуратор для логгера.
+    ///  The logger configuration util 
     /// </summary>
     public static class LoggerConfigurationUtil
     {
         /// <summary>
-        /// Инициализирует логгер с конфигурацией для внешнего приложения.
+        ///  Initializes the logger. 
         /// </summary>
-        /// <typeparam name="T">Тип внешнего приложения.</typeparam>
-        /// <remarks>Логгер настраивается для записи логов в файл.</remarks>
+        /// <typeparam name="T"> The type of the logger .</typeparam>
+        /// <remarks>The logger should be placed in *.addin .</remarks>
         /// <exception cref="System.IO.DirectoryNotFoundException">
-        /// Вызывается, когда директория для записи логов не существует и не может быть создана.
+        ///  Thrown if the directory is not found. 
         /// </exception>
         public static void InitializeLogger<T>() where T : class
         {

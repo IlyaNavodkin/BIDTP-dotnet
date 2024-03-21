@@ -1,8 +1,7 @@
 ﻿using System;
-using BIDTP.Dotnet.Iteraction.Request;
-using BIDTP.Dotnet.Iteraction.Response;
+using BIDTP.Dotnet.Iteraction.Dtos;
 
-namespace BIDTP.Dotnet.Server.Iteraction;
+namespace BIDTP.Dotnet.Iteraction.Providers;
 
 /// <summary>
 ///  The context of the server in the request scope

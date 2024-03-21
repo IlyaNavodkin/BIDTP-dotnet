@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using BIDTP.Dotnet.Iteraction.Enums;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Iteraction.Request;
+namespace BIDTP.Dotnet.Iteraction.Dtos;
 
 /// <summary>
 ///  The request from the client
