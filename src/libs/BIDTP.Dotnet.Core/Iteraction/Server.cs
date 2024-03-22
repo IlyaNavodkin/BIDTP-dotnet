@@ -29,12 +29,12 @@ public class Server : IHost
     private readonly SemaphoreSlim _streamSemaphore;
     
     private NamedPipeServerStream _serverPipeStream;
+    private int ReconnectTimeRate { get; }
     
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
     public int ChunkSize { get; set; }
-    private int ReconnectTimeRate { get; }
     
     /// <summary>
     ///  Server of the BIDTP protocol
@@ -93,6 +93,8 @@ public class Server : IHost
     /// <exception cref="Exception"> The stream already created. </exception>
     public async Task StartAsync(CancellationToken  cancellationToken)
     {
+        Console.WriteLine("[StartAsync]: Trying to start server");
+        
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -103,14 +105,25 @@ public class Server : IHost
                     1, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 
+                Console.WriteLine("[StartAsync]: Server wait for connection");
+                
                 await Listen(cancellationToken);
+                
+                Console.WriteLine("[StartAsync]: Server listening");
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 DisposeStreams();
             }
-            
-            await Task.Delay(ReconnectTimeRate); 
+
+            try
+            {
+                await Task.Delay(ReconnectTimeRate, cancellationToken);
+            }
+            catch (OperationCanceledException exception)
+            {
+                Console.WriteLine(exception);
+            }
         }
     }
 
@@ -501,6 +514,8 @@ public class Server : IHost
         _serverPipeStream?.Close();
         _serverPipeStream?.Dispose();
         _serverPipeStream = null;
+        
+        Console.WriteLine("[Dispose stream]: Dispose stream");
     }
     
     /// <summary>
@@ -519,13 +534,16 @@ public class Server : IHost
         DisposeStreams();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    ///  Event handler for progress of read operations
+    /// </summary>
     public void Dispose()
     {
         ReleaseUnmanagedResources();
         GC.SuppressFinalize(this);
     }
 
+    /// <inheritdoc />
     ~Server()
     {
         ReleaseUnmanagedResources();

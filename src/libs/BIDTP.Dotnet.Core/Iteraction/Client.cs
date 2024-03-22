@@ -111,7 +111,7 @@ public class Client
             }
             catch (OperationCanceledException operationCanceledException)
             {
-                Debug.WriteLine($"[LifeCheck Error]: {operationCanceledException.Message}");
+                Console.WriteLine($"[LifeCheck Error]: {operationCanceledException.Message}");
             }
         }
         
@@ -142,7 +142,7 @@ public class Client
         }
         catch (Exception exception)
         {
-            Debug.WriteLine($"[LifeCheck Error]: {exception.Message}");
+            Console.WriteLine($"[LifeCheck Error]: {exception.Message}");
             DisposeStream();
         }
         finally
@@ -197,7 +197,7 @@ public class Client
         }
         catch (Exception exception)
         {
-            Debug.WriteLine($"[Client Error]: {exception.Message}");
+            Console.WriteLine($"[Client Error]: {exception.Message}");
             throw;
         }
         finally
@@ -389,8 +389,6 @@ public class Client
 
     private void DisposeStream()
     {
-        Debug.WriteLine($"[Dispose stream]: Start");
-        
         IsHealthCheckConnected = false;
         IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
         
@@ -400,7 +398,7 @@ public class Client
         _clientPipeStream?.Dispose();
         _clientPipeStream = null;
         
-        Debug.WriteLine($"[Dispose stream]: Success");
+        Console.WriteLine($"[Dispose stream]: Disposed client resources.");
     }
     
     /// <summary>

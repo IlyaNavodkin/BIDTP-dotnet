@@ -25,7 +25,6 @@ public class Context
     ///  Constructor
     /// </summary>
     /// <param name="request"> The request.</param>
-    /// <param name="pipeStream"> The pipe stream.</param>
     /// <param name="serviceProvider"> The service provider.</param>
     /// <exception cref="ArgumentNullException"> request -or- pipeStream -or- serviceProvider</exception>
     public Context(Request request, IServiceProvider serviceProvider)
