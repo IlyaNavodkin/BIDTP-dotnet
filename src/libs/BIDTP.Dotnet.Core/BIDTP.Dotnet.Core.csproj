@@ -20,7 +20,7 @@
         <ProjectUrl>https://github.com/IlyaNavodkin/BIDTP-dotnet</ProjectUrl>
         <RepositoryType>git</RepositoryType>
         <RepositoryUrl>https://github.com/IlyaNavodkin/BIDTP-dotnet</RepositoryUrl>
-        <Copyright>Copyright © IlyaNavodkin 2024</Copyright>
+        <Copyright>Copyright (c) 2024 Khudoshin Ilya (or Ilia) Igorevich</Copyright>
         <Tags>BIDTP-dotnet Interprocess-Communication Client-Server-Architecture Dotnet-Library BIDTP-Protocol Process-Communication Network-Protocol Inter-Process-Messaging Client-Server-Interaction Dotnet-Core</Tags>
         <EnablePackageValidation>true</EnablePackageValidation>
         <IncludeSymbols>true</IncludeSymbols>
