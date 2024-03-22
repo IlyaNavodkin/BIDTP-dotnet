@@ -21,9 +21,7 @@ public static class MessageController
     /// <param name="context"> The context. </param>
     /// <returns></returns>
     public static async Task PrintMessageHandler(Context context)
-    {
-        // await Task.Delay(4000);
-        
+    {       
         var authService = context.ServiceProvider.GetService<AuthProvider>();
         var getRandomColorRequest = context.ServiceProvider.GetService<ColorProvider>();
         

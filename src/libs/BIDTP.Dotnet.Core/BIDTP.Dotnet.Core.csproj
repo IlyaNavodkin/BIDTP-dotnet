@@ -3,8 +3,8 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
-        <TargetFrameworks>net48;net6.0</TargetFrameworks>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <TargetFrameworks>net48;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+        <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>BIDTP.Dotnet</RootNamespace>
     </PropertyGroup>
@@ -26,7 +26,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <None Include="..\..\..\README.md" Pack="true" PackagePath="\" />
         <None Include="..\..\..\LICENSE.md" Pack="true" PackagePath="\" />
