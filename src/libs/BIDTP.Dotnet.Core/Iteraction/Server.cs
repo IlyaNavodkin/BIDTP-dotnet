@@ -277,7 +277,8 @@ public class Server : IHost
         {
             Message = "Внутренняя ошибка сервера!",
             Description = exception.Message,
-            ErrorCode = (int) InternalServerErrorType.DispatcherExceptionError
+            ErrorCode = (int) InternalServerErrorType.DispatcherExceptionError,
+            StackTrace = exception.StackTrace
         };
         
         var errorResponse = new Response(StatusCode.ServerError)
