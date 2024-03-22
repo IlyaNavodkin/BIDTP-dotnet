@@ -4,7 +4,7 @@ BIDTP-dotnet - this is library for implementing client-server architecture for i
 
 Bidirectional Interprocess Data Transfer Protocol (BIDTP) - a simple-to-use data exchange protocol between two processes.
 
-![Logo](https://github.com/IlyaNavodkin/BIDTP-dotnet/blob/master/Common/images/BIDTP-dotnet-references-schema-1.png)
+[References diagram](https://github.com/IlyaNavodkin/BIDTP-dotnet/blob/master/Common/images/BIDTP-dotnet-references-schema-1.png)
 
 # Questions and answers
 
@@ -54,7 +54,7 @@ Below are listed the main components along with their general descriptions.
 
 ## Interaction scheme
 
-![Logo](https://github.com/IlyaNavodkin/BIDTP-dotnet/blob/master/Common/images/BIDTP-dotnet-arch-schema-1.png)
+[Common interaction diagram](https://github.com/IlyaNavodkin/BIDTP-dotnet/blob/master/Common/images/BIDTP-dotnet-arch-schema-1.png)
 
 The BIDTP protocol is based on client-server interaction. Communication between the components occurs using messages in a byte stream (pipe stream). The messages consist of Request\Response objects.
 
