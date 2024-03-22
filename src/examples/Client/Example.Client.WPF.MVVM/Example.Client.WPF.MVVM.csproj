@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\examples\Modules\Example.Schemas\Example.Schemas.csproj" />
-      <ProjectReference Include="..\src\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
     </ItemGroup>
 
 </Project>
