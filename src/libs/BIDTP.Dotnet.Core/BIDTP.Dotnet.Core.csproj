@@ -4,7 +4,6 @@
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
         <TargetFrameworks>net48;net6.0</TargetFrameworks>
-        <TargetFramework>netstandard2.0</TargetFramework>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>BIDTP.Dotnet</RootNamespace>
@@ -15,10 +14,23 @@
         <Version>1.0.0</Version>
         <Authors>IlyaNavodkin</Authors>
         <Company>IlyaNavodkin</Company>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <Description>Library for implementing client-server architecture for inter-process communication based on BIDTP protocol for dotnet.</Description>
+        <ProjectUrl>https://github.com/IlyaNavodkin/BIDTP-dotnet</ProjectUrl>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/IlyaNavodkin/BIDTP-dotnet</RepositoryUrl>
+        <Copyright>Copyright © IlyaNavodkin 2024</Copyright>
+        <Tags>BIDTP-dotnet Interprocess-Communication Client-Server-Architecture Dotnet-Library BIDTP-Protocol Process-Communication Network-Protocol Inter-Process-Messaging Client-Server-Interaction Dotnet-Core</Tags>
         <EnablePackageValidation>true</EnablePackageValidation>
         <IncludeSymbols>true</IncludeSymbols>
         <DebugSymbols>true</DebugSymbols>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\..\LICENSE.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
     
     <ItemGroup>
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />

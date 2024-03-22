@@ -1,5 +1,7 @@
 # Preface
 
+BIDTP-dotnet - this is library for implementing client-server architecture for inter-process communication based on BIDTP protocol for dotnet.
+
 Bidirectional Interprocess Data Transfer Protocol (BIDTP) - a simple-to-use data exchange protocol between two processes.
 
 <br />
