@@ -79,20 +79,17 @@
         
         <PackageReference Include="Serilog" Version="3.0.2-dev-02056" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
-
     </ItemGroup>
 
     <ItemGroup>
         <Compile Remove="Properties\AssemblyInfo.cs" />
     </ItemGroup>
-
-
+    
     <ItemGroup>
       <Folder Include="Properties\" />
       <Folder Include="Resources\Addin\" />
     </ItemGroup>
-
-
+    
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
       <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
