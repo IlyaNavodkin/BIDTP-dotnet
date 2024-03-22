@@ -6,13 +6,13 @@ using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BIDTP.Dotnet.Iteraction.Dtos;
-using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Events;
-using BIDTP.Dotnet.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Events;
+using BIDTP.Dotnet.Core.Iteraction.Options;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Iteraction;
+namespace BIDTP.Dotnet.Core.Iteraction;
 /// <summary>
 ///  Client 
 /// </summary>
@@ -21,27 +21,28 @@ public class Client
     private readonly SemaphoreSlim _pipeSemaphore;
     private NamedPipeClientStream _clientPipeStream;
     private CancellationTokenSource _cancellationTokenSource;
+    private string PipeName { get; }
     
     /// <summary>
     ///  Connection is starting
     /// </summary>
     public bool IsConnectionStarting;
-    /// <summary>
-    ///  The name of the pipe 
-    /// </summary>
-    public string PipeName { get; }
+    
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
     public int ChunkSize { get; set; }
+    
     /// <summary>
     ///  The time rate of the life check 
     /// </summary>
     public int LifeCheckTimeRate { get; }
+    
     /// <summary>
     ///  The time rate of the reconnect 
     /// </summary>
     public int ReconnectTimeRate { get; }
+    
     /// <summary>
     ///  The timeout of the connect 
     /// </summary>
@@ -117,6 +118,7 @@ public class Client
         
         DisposeStream();
     }
+    
     private async Task CheckConnection()
     {
         try
@@ -301,8 +303,7 @@ public class Client
             return result;
         } 
     }
-
-
+    
     private async Task WriteAsyncInternal(Dictionary<string, string> dictionary, CancellationToken cancellationToken)
     {
         var bytesWrite = 0;

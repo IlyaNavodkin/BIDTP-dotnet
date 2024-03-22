@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BIDTP.Dotnet.Iteraction.Events;
+namespace BIDTP.Dotnet.Core.Iteraction.Events;
 
 /// <summary>
 ///  The progress event args

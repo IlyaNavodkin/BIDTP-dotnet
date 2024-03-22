@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Constants;
+﻿namespace BIDTP.Dotnet.Core.Constants;
 
 /// <summary>
 ///  Constants for the protocol 

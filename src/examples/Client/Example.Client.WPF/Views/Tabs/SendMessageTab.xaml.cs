@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using BIDTP.Dotnet.Iteraction;
-using BIDTP.Dotnet.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 

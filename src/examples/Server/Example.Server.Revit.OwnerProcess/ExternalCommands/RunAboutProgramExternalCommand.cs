@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using BIDTP.Dotnet.Extensions;
-using BIDTP.Dotnet.Iteraction.Builders;
-using BIDTP.Dotnet.Iteraction.Dtos;
-using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Options;
-using BIDTP.Dotnet.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Extensions;
+using BIDTP.Dotnet.Core.Iteraction.Builders;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Example.Server.Controllers;
 using Example.Server.Providers;
 using Example.Server.Repositories;
@@ -72,7 +72,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         Task.Run(async () =>
         {
             Process childProcess = null;
-            BIDTP.Dotnet.Iteraction.Server server = null;
+            BIDTP.Dotnet.Core.Iteraction.Server server = null;
             
             try
             {
@@ -159,6 +159,11 @@ public class RunAboutProgramExternalCommand: ExternalCommand
     
         var arguments = "--pn=\"" + pipeName + "\" --pid=\"" + processId + "\"";
         var childProcess = Process.Start(clientPath, arguments);
+        
+        childProcess.Exited += (sender, args) =>
+        {
+            _isRunning = false;
+        };
         
         return childProcess;
     }

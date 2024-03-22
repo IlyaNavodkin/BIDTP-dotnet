@@ -1,9 +1,8 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
-using BIDTP.Dotnet.Iteraction;
-using BIDTP.Dotnet.Iteraction.Dtos;
-using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Newtonsoft.Json;
 
 namespace Example.Server.Providers;

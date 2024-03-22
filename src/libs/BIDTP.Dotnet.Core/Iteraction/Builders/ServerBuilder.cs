@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BIDTP.Dotnet.Iteraction.Options;
-using BIDTP.Dotnet.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Providers;
 
-namespace BIDTP.Dotnet.Iteraction.Builders;
+namespace BIDTP.Dotnet.Core.Iteraction.Builders;
 
 /// <summary>
 ///  The server builder of SIDTP protocol

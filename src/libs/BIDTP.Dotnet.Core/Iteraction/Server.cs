@@ -8,15 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BIDTP.Dotnet.Iteraction.Dtos;
-using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Events;
-using BIDTP.Dotnet.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Events;
+using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Iteraction;
+namespace BIDTP.Dotnet.Core.Iteraction;
 
 /// <summary>
 ///  Class of the server. 

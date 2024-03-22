@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Iteraction.Enums;
+﻿namespace BIDTP.Dotnet.Core.Iteraction.Enums;
 
 /// <summary>
 /// Internal server error type

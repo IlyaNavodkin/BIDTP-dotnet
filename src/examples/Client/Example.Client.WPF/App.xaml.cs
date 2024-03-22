@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using BIDTP.Dotnet;
-using BIDTP.Dotnet.Iteraction;
-using BIDTP.Dotnet.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Options;
 using Example.Client.WPF.Views;
 
 
@@ -12,7 +11,7 @@ namespace Example.Client.WPF
     /// </summary>
     public partial class App
     {
-        public static BIDTP.Dotnet.Iteraction.Client? Client;
+        public static BIDTP.Dotnet.Core.Iteraction.Client? Client;
         
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -20,7 +19,7 @@ namespace Example.Client.WPF
                 1024, 9000, 
                 1000, 5000);
             
-            Client = new BIDTP.Dotnet.Iteraction.Client(options);
+            Client = new BIDTP.Dotnet.Core.Iteraction.Client(options);
             
             var view = new MainWindow();
 

@@ -4,8 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using BIDTP.Dotnet;
-using BIDTP.Dotnet.Iteraction;
-using BIDTP.Dotnet.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Options;
 using Example.Client.WPF.ChildProcess.Args;
 using Example.Client.WPF.ChildProcess.Views;
 
@@ -21,7 +20,7 @@ public sealed partial class App
     /// <summary>
     ///  The client 
     /// </summary>
-    public static  BIDTP.Dotnet.Iteraction.Client? Client;
+    public static  BIDTP.Dotnet.Core.Iteraction.Client? Client;
 
     static App()
     {
@@ -68,7 +67,7 @@ public sealed partial class App
         var options = new ClientOptions(CommandLineArguments.PipeName, 1024, 9000, 
             1000, 5000);
         
-        Client = new BIDTP.Dotnet.Iteraction.Client(options);
+        Client = new BIDTP.Dotnet.Core.Iteraction.Client(options);
         
         var view = new MainWindow();
         

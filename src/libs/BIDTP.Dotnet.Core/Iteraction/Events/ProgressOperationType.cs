@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Iteraction.Events;
+﻿namespace BIDTP.Dotnet.Core.Iteraction.Events;
 
 /// <summary>
 ///  The progress operation type

@@ -1,9 +1,8 @@
-﻿using BIDTP.Dotnet.Iteraction;
-using BIDTP.Dotnet.Iteraction.Builders;
-using BIDTP.Dotnet.Iteraction.Dtos;
-using BIDTP.Dotnet.Iteraction.Enums;
-using BIDTP.Dotnet.Iteraction.Options;
-using BIDTP.Dotnet.Iteraction.Providers;
+﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
+using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Example.Server.Controllers;
 using Example.Server.Providers;
 using Example.Server.Repositories;
@@ -65,7 +64,7 @@ namespace Example.Server.Console
             
             var server = builder.Build();
             
-            var logger = server.Services.GetRequiredService<ILogger<BIDTP.Dotnet.Iteraction.Server>>();
+            var logger = server.Services.GetRequiredService<ILogger<BIDTP.Dotnet.Core.Iteraction.Server>>();
     
             logger.LogInformation("Server started");
     

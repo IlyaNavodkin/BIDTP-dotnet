@@ -6,12 +6,12 @@
         <TargetFrameworks>net48;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
         <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <RootNamespace>BIDTP.Dotnet</RootNamespace>
+        <RootNamespace>BIDTP.Dotnet.Core</RootNamespace>
     </PropertyGroup>
     
     <PropertyGroup Label="Nuget">
         <PackageId>BIDTP.Dotnet.Core</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.2.0</Version>
         <Authors>IlyaNavodkin</Authors>
         <Company>IlyaNavodkin</Company>
         <PackageReadmeFile>README.md</PackageReadmeFile>

@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BIDTP.Dotnet.Extensions;
+namespace BIDTP.Dotnet.Core.Extensions;
 
 /// <summary>
 ///  Extensions of the AppDomain class

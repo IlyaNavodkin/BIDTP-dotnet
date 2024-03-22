@@ -1,4 +1,4 @@
-﻿namespace BIDTP.Dotnet.Iteraction.Options;
+﻿namespace BIDTP.Dotnet.Core.Iteraction.Options;
 
 /// <summary>
 ///  Options for the SIDTPClient 
