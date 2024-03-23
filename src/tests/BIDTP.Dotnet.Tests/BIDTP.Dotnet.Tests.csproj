@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0"/>
         <PackageReference Include="NUnit" Version="3.13.3"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.2.1"/>
@@ -21,6 +22,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="BIDTP.Dotnet.Tests">
+        <HintPath>bin\Debug\net6.0\BIDTP.Dotnet.Tests.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

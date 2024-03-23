@@ -94,7 +94,7 @@ public class Server : IHost
     /// <exception cref="Exception"> The stream already created. </exception>
     public async Task StartAsync(CancellationToken  cancellationToken)
     {
-        Console.WriteLine("[StartAsync]: Trying to start server");
+        Console.WriteLine("[SERVER: StartAsync]: Trying to start server");
         
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -106,11 +106,11 @@ public class Server : IHost
                     1, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 
-                Console.WriteLine("[StartAsync]: Server wait for connection");
+                Console.WriteLine("[SERVER: StartAsync]: Server wait for connection");
                 
                 await Listen(cancellationToken);
                 
-                Console.WriteLine("[StartAsync]: Server listening");
+                Console.WriteLine("[SERVER: StartAsync]: Server listening");
             }
             catch (Exception)
             {
@@ -533,7 +533,7 @@ public class Server : IHost
         _serverPipeStream?.Dispose();
         _serverPipeStream = null;
         
-        Console.WriteLine("[Dispose stream]: Dispose stream");
+        Console.WriteLine("[SERVER: Dispose stream]: Dispose stream");
     }
     
     /// <summary>
