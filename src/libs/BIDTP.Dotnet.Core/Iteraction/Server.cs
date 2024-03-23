@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
+using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -253,8 +254,21 @@ public class Server : IHost
         
         foreach (var handler in handlers)
         {
-            await handler(context);
-            if (context.Response != null) break;
+            var methodInfo = handler.Method;
+            var attributes = methodInfo.GetCustomAttributes(true); 
+            foreach (var attribute in attributes)
+            {
+                if (attribute is IMethodScopedPreInvokable preInvokableHandlerAttribute)
+                {
+                    await preInvokableHandlerAttribute.Invoke(context);
+                    if (context.Response != null) break;
+                }
+            }
+            if (context.Response == null)
+            {
+                await handler(context);
+                if (context.Response != null) break;
+            }
         }
         
         if (context.Response is null) throw new InvalidOperationException("Server response is not set!");
