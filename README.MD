@@ -249,7 +249,7 @@ private void OnProgress(object? sender, ProgressEventArgs e)
 
 # Client connection
 
-For connecting a client to the server, you need to create a settings class, instantiate a PIDERS client, and establish a connection to the server:
+For connecting a client to the server, you need to create a settings class, instantiate a BIDTP client, and establish a connection to the server:
 
 ```c#
 # Simple WPF app
