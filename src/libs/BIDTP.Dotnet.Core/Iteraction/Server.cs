@@ -240,7 +240,7 @@ public class Server : IHost
                 return HandleRouteNotExistRequest(route);
             }
         
-            return await HandleGenericResponse(request, handlers);
+            return await HandleGeneralResponse(request, handlers);
         }
         catch (Exception exception)
         {
@@ -248,22 +248,25 @@ public class Server : IHost
         }
     }
 
-    private async Task<Dictionary<string, string>> HandleGenericResponse(Request request, Func<Context, Task>[] handlers)
+    private async Task<Dictionary<string, string>> HandleGeneralResponse(Request request, Func<Context, Task>[] handlers)
     {
         var context = new Context(request, Services);
         
         foreach (var handler in handlers)
         {
             var methodInfo = handler.Method;
-            var attributes = methodInfo.GetCustomAttributes(true); 
+            var attributes = methodInfo
+                .GetCustomAttributes(true)
+                .Where(atr => atr is IMethodScopedPreInvokable)
+                .Cast<IMethodScopedPreInvokable>()
+                .ToArray(); 
+            
             foreach (var attribute in attributes)
             {
-                if (attribute is IMethodScopedPreInvokable preInvokableHandlerAttribute)
-                {
-                    await preInvokableHandlerAttribute.Invoke(context);
-                    if (context.Response != null) break;
-                }
+                await attribute.Invoke(context);
+                if (context.Response != null) break;
             }
+            
             if (context.Response == null)
             {
                 await handler(context);

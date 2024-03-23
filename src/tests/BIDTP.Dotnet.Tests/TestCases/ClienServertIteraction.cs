@@ -17,22 +17,35 @@ namespace BIDTP.Dotnet.Tests.TestCases
 
         private Core.Iteraction.Server _server;
         private Client _client;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource _clientCancellationTokenSource;
+        private CancellationTokenSource _serverCancellationTokenSource;
         
-        public ClienServertIteraction()
+        [SetUp]
+        public void SetUp()
         {
             _server = ServerTestFactory.CreateServer();
-            _cancellationTokenSource = new CancellationTokenSource();
-            _server.StartAsync(_cancellationTokenSource.Token);
-
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
-            _client = new Client(clientOptions);
-            _client.ConnectToServer(_cancellationTokenSource);
+            _clientCancellationTokenSource = new CancellationTokenSource();
+            _serverCancellationTokenSource = new CancellationTokenSource();
+            
+            _server.StartAsync(_serverCancellationTokenSource.Token);
+        }
+        
+        
+        [TearDown]
+        public void TearDown()
+        {
+            _clientCancellationTokenSource?.Cancel();
+            _serverCancellationTokenSource?.Cancel();
+            _server?.Dispose();
         }
         
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_SuccessfullyWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+            
             var request = new Request()
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
@@ -48,6 +61,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_UnauthorizedWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+            
             var request = new Request
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
@@ -62,6 +79,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_RouteNotExist()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+            
             var request = new Request
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
@@ -77,6 +98,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_Spam_RouteNotExist()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+            
             var tasks = new List<Task<Response>>();
 
             for (int i = 0; i < 5; i++)
@@ -103,6 +128,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_Spam_AllMessagesRoute()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+            
             var tasks = new List<Task<Response>>();
 
             var messageForAdminRequest = new Request()
@@ -140,6 +169,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_InternalErrorWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
             var request = new Request
             {
                 Body = "internal error",
@@ -151,9 +184,14 @@ namespace BIDTP.Dotnet.Tests.TestCases
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.ServerError));
         }
+        
         [Test]
         public async Task WriteRequestAsync_GetMessageForUser_SuccessfullyWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
             var request = new Request()
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
@@ -168,9 +206,14 @@ namespace BIDTP.Dotnet.Tests.TestCases
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             Assert.That(successMessageString == response.Body);
         }
+        
         [Test]
         public async Task WriteRequestAsync_GetAuthAccessResponse_SuccessfullyWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
             var request = new Request()
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
@@ -189,6 +232,10 @@ namespace BIDTP.Dotnet.Tests.TestCases
         [Test]
         public async Task WriteRequestAsync_GetFreeAccessResponse_SuccessfullyWritesRequest()
         {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
             var request = new Request()
             {
                 Body = "{ \"Message\": \"" + "Hello World" + "\" }",
