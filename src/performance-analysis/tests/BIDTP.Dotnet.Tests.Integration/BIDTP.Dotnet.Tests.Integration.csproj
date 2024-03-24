@@ -19,9 +19,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     </ItemGroup>
-
     <ItemGroup>
-      <ProjectReference Include="..\..\..\BIDTP.Dotnet.Module.MockableServer\BIDTP.Dotnet.Module.MockableServer.csproj" />
-      <ProjectReference Include="..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\modules\BIDTP.Dotnet.Module.MockableServer\BIDTP.Dotnet.Module.MockableServer.csproj" />
     </ItemGroup>
 </Project>
