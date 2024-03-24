@@ -11,7 +11,7 @@
     
     <PropertyGroup Label="Nuget">
         <PackageId>BIDTP.Dotnet.Core</PackageId>
-        <Version>1.2.0</Version>
+        <Version>1.2.1</Version>
         <Authors>IlyaNavodkin</Authors>
         <Company>IlyaNavodkin</Company>
         <PackageReadmeFile>README.md</PackageReadmeFile>
