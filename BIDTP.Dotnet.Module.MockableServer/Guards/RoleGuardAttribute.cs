@@ -1,10 +1,9 @@
-﻿using BIDTP.Dotnet.Core.Iteraction;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 
-namespace BIDTP.Dotnet.Tests.Server.Guards;
+namespace BIDTP.Dotnet.Module.MockableServer.Guards;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class RoleGuardAttribute : Attribute, IMethodScopedPreInvokable

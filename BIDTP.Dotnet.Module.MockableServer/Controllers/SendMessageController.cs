@@ -1,9 +1,9 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using BIDTP.Dotnet.Tests.Server.Guards;
+using BIDTP.Dotnet.Module.MockableServer.Guards;
 
-namespace BIDTP.Dotnet.Tests.Server.Controllers;
+namespace BIDTP.Dotnet.Module.MockableServer.Controllers;
 
 public class SendMessageController
 {

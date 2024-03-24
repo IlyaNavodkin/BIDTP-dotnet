@@ -1,6 +1,6 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Providers;
 
-namespace BIDTP.Dotnet.Tests.Server.Middlewares;
+namespace BIDTP.Dotnet.Module.MockableServer.Middlewares;
 
 public class AuthMiddleware
 {

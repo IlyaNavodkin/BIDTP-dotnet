@@ -1,15 +1,11 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
-using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
-using BIDTP.Dotnet.Tests.Server.Controllers;
-using BIDTP.Dotnet.Tests.Server.Middlewares;
+using BIDTP.Dotnet.Module.MockableServer.Controllers;
+using BIDTP.Dotnet.Module.MockableServer.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Tests.Server;
+namespace BIDTP.Dotnet.Module.MockableServer;
 
 public static class ServerTestFactory
 {

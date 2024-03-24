@@ -4,8 +4,8 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
+        <RootNamespace>BIDTP.Dotnet.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -21,13 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\BIDTP.Dotnet.Module.MockableServer\BIDTP.Dotnet.Module.MockableServer.csproj" />
       <ProjectReference Include="..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="BIDTP.Dotnet.Tests">
-        <HintPath>bin\Debug\net6.0\BIDTP.Dotnet.Tests.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
 </Project>

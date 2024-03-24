@@ -2,12 +2,13 @@ using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Tests.Server;
+using BIDTP.Dotnet.Module.MockableServer;
+using NUnit.Framework;
 
-namespace BIDTP.Dotnet.Tests.TestCases
+namespace BIDTP.Dotnet.Tests
 {
     [TestFixture]
-    public partial class ClienServertIteraction
+    public class ClienServertIteraction
     {
         private const string PipeName = "testPipe";
         private const int ChunkSize = 1024;
@@ -15,7 +16,7 @@ namespace BIDTP.Dotnet.Tests.TestCases
         private const int ReconnectTimeRate = 10000;
         private const int ConnectTimeout = 5000;
 
-        private Core.Iteraction.Server _server;
+        private Server _server;
         private Client _client;
         private CancellationTokenSource _clientCancellationTokenSource;
         private CancellationTokenSource _serverCancellationTokenSource;
