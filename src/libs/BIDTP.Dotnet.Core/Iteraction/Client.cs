@@ -112,7 +112,7 @@ public class Client
             }
             catch (OperationCanceledException operationCanceledException)
             {
-                Console.WriteLine($"[LifeCheck Error]: {operationCanceledException.Message}");
+                Console.WriteLine($"[CLIENT: LifeCheck Error]: {operationCanceledException.Message}");
             }
         }
         
@@ -133,18 +133,18 @@ public class Client
 
             await WriteAsyncInternal(dictionary, _cancellationTokenSource.Token);
 
-            Debug.WriteLine($"[LifeCheck Request]: ping");
+            Debug.WriteLine($"[CLIENT: LifeCheck Request]: ping");
                 
             var response = await ReadAsyncInternal(_cancellationTokenSource.Token);
                 
             IsHealthCheckConnected = !string.IsNullOrEmpty(response[nameof(MessageType)]);
             IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
                 
-            Debug.WriteLine($"[LifeCheck Response]: pong");
+            Debug.WriteLine($"[CLIENT: LifeCheck Response]: pong");
         }
         catch (Exception exception)
         {
-            Console.WriteLine($"[LifeCheck Error]: {exception.Message}");
+            Console.WriteLine($"[CLIENT: LifeCheck Error]: {exception.Message}");
             DisposeStream();
         }
         finally
@@ -199,7 +199,7 @@ public class Client
         }
         catch (Exception exception)
         {
-            Console.WriteLine($"[Client Error]: {exception.Message}");
+            Console.WriteLine($"[CLIENT: Error]: {exception.Message}");
             throw;
         }
         finally
@@ -399,7 +399,7 @@ public class Client
         _clientPipeStream?.Dispose();
         _clientPipeStream = null;
         
-        Console.WriteLine($"[Dispose stream]: Disposed client resources.");
+        Console.WriteLine($"[CLIENT: Dispose stream]: Disposed client resources.");
     }
     
     /// <summary>

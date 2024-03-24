@@ -247,6 +247,101 @@ private void OnProgress(object? sender, ProgressEventArgs e)
 }
 ```
 
+## Custom attributes
+
+You can create custom attributes that you can use to create Guard or Middleware components that will execute BEFORE the method.
+
+```c#
+# Create custom attribute and implement IMethodScopedPreInvokable interface
+[AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
+public class AuthGuardAttribute : Attribute, IMethodScopedPreInvokable
+{
+    public Task Invoke(Context context)
+    {
+        var request = context.Request;
+
+        request.Headers.TryGetValue("UserId", out var userIdString);
+
+        if (string.IsNullOrEmpty(userIdString))
+        {
+            var dto = new Error
+            {
+                Message = "Not authorized",
+                Description = "Not authorized ",
+                ErrorCode = 403
+            };
+
+            var response = new Response(StatusCode.Unauthorized)
+            {
+                Body = JsonConvert.SerializeObject(dto)
+            };
+
+            context.Response = response;
+            return Task.CompletedTask;
+        }
+
+        return Task.CompletedTask;
+    }
+}
+```
+
+For example, you can implement protection for your data or some logic based on the attribute's input data.
+
+```c#
+# Add custom attribute to method
+public class SendMessageController
+{
+    [AuthGuard]
+    [RoleGuard("admin")]
+    public static Task GetMessageForAdmin(Context context)
+    {
+        var request = context.Request;
+
+        if (request.Body.Equals("internal error")) throw new Exception("Mock error");
+
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = "{ \"Response\": \"" + "Hello admin" + "\" }"
+        };
+
+        return Task.CompletedTask;
+    }
+
+    [AuthGuard]
+    [RoleGuard("user")]
+    public static Task GetMessageForUser(Context context)
+    {
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = "{ \"Response\": \"" + "Hello user" + "\" }"
+        };
+
+        return Task.CompletedTask;
+    }
+
+    [AuthGuard]
+    public static Task GetAuthAccessResponse(Context context)
+    {
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = "{ \"Response\": \"" + "Auth access" + "\" }"
+        };
+
+        return Task.CompletedTask;
+    }
+
+    public static Task GetFreeAccessResponse(Context context)
+    {
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = "{ \"Response\": \"" + "Free access" + "\" }"
+        };
+
+        return Task.CompletedTask;
+    }
+}
+```
+
 # Client connection
 
 For connecting a client to the server, you need to create a settings class, instantiate a BIDTP client, and establish a connection to the server:

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
+using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -93,7 +94,7 @@ public class Server : IHost
     /// <exception cref="Exception"> The stream already created. </exception>
     public async Task StartAsync(CancellationToken  cancellationToken)
     {
-        Console.WriteLine("[StartAsync]: Trying to start server");
+        Console.WriteLine("[SERVER: StartAsync]: Trying to start server");
         
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -105,11 +106,11 @@ public class Server : IHost
                     1, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 
-                Console.WriteLine("[StartAsync]: Server wait for connection");
+                Console.WriteLine("[SERVER: StartAsync]: Server wait for connection");
                 
                 await Listen(cancellationToken);
                 
-                Console.WriteLine("[StartAsync]: Server listening");
+                Console.WriteLine("[SERVER: StartAsync]: Server listening");
             }
             catch (Exception)
             {
@@ -239,7 +240,7 @@ public class Server : IHost
                 return HandleRouteNotExistRequest(route);
             }
         
-            return await HandleGenericResponse(request, handlers);
+            return await HandleGeneralResponse(request, handlers);
         }
         catch (Exception exception)
         {
@@ -247,14 +248,30 @@ public class Server : IHost
         }
     }
 
-    private async Task<Dictionary<string, string>> HandleGenericResponse(Request request, Func<Context, Task>[] handlers)
+    private async Task<Dictionary<string, string>> HandleGeneralResponse(Request request, Func<Context, Task>[] handlers)
     {
         var context = new Context(request, Services);
         
         foreach (var handler in handlers)
         {
-            await handler(context);
-            if (context.Response != null) break;
+            var methodInfo = handler.Method;
+            var attributes = methodInfo
+                .GetCustomAttributes(true)
+                .Where(atr => atr is IMethodScopedPreInvokable)
+                .Cast<IMethodScopedPreInvokable>()
+                .ToArray(); 
+            
+            foreach (var attribute in attributes)
+            {
+                await attribute.Invoke(context);
+                if (context.Response != null) break;
+            }
+            
+            if (context.Response == null)
+            {
+                await handler(context);
+                if (context.Response != null) break;
+            }
         }
         
         if (context.Response is null) throw new InvalidOperationException("Server response is not set!");
@@ -516,7 +533,7 @@ public class Server : IHost
         _serverPipeStream?.Dispose();
         _serverPipeStream = null;
         
-        Console.WriteLine("[Dispose stream]: Dispose stream");
+        Console.WriteLine("[SERVER: Dispose stream]: Dispose stream");
     }
     
     /// <summary>

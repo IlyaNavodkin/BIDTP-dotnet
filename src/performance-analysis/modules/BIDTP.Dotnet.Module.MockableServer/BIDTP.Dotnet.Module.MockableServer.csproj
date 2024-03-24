@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net48</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+        <RootNamespace>BIDTP.Dotnet.Module.MockableServer</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Reference Include="System.Net.Http" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Properties\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+    </ItemGroup>
+    
+</Project>
