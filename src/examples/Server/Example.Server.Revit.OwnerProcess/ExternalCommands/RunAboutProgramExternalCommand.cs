@@ -99,6 +99,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 builder.AddRoute("PrintMessage", ShitWordGuard, MessageController.PrintMessageHandler);
                 builder.AddRoute("GetElements", ElementRevitController.GetElements);
                 builder.AddRoute("DeleteElement", ElementRevitController.DeleteElement);
+                builder.AddRoute("GetParameters", ElementRevitController.GetParameters);
 
                 Task ShitWordGuard(Context context)
                 {

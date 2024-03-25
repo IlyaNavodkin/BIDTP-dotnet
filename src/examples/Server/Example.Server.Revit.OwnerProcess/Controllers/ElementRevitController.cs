@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
@@ -19,6 +21,10 @@ namespace Example.Server.Revit.OwnerProcess.Controllers;
 /// </summary>
 public static class ElementRevitController
 {
+    private static Regex _regex;
+    private static Regex _regex2;
+    private static Regex _regex3;
+
     /// <summary>
     ///  Get elements by category route handler
     /// </summary>
@@ -109,4 +115,54 @@ public static class ElementRevitController
             Body = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted"
         };
     }
+
+    public static async Task GetParameters(Context context)
+    {
+        var requestDto = context.Request.GetBody<GetParametersRequest>();
+        var familyName = requestDto.FamilyName;
+        
+        var document = Nice3point.Revit.Toolkit.Context.Document;
+        var element = new FilteredElementCollector(document)
+            .OfClass(typeof(Family))
+            .FirstOrDefault(e => e.Name == familyName);
+
+        if (element == null)
+        {
+            var response = new Response(StatusCode.ClientError)
+            {
+                Body = "Family not found",
+            };
+            
+            context.Response = response;
+
+            return;
+        }
+
+        var family = (Family)element;
+        using (var familyDocument = document.EditFamily(family))
+        {
+            var familyManager = familyDocument.FamilyManager;
+            var defaultType = familyManager.CurrentType;
+            var parameters = familyManager.GetParameters();
+
+            _regex = new Regex(@"Section #(\d+)");
+            _regex2 = new Regex(@"Section #(\d+) Length");
+            _regex3 = new Regex(@"Section #(\d+) Height");
+            
+            var familyParameters = parameters
+                .Where(p => requestDto.ParametersMap
+                .Any(map => p.Definition.Name == map.RevitParameterName) || PredicateRegex(p))
+                .ToList();
+            
+        }
+    }
+
+    private static bool PredicateRegex(FamilyParameter familyParameter)
+    {
+        var definitionName = familyParameter.Definition.Name;
+        var match = _regex.Match(definitionName);
+        
+        return match.Success;
+    }
 }
+            

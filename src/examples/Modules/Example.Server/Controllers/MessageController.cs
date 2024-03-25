@@ -60,4 +60,28 @@ public static class MessageController
             Body = JsonConvert.SerializeObject(result)
         };
     }
+    /// <summary>
+    ///  Mutate context
+    /// </summary>
+    /// <param name="context"> The context. </param>
+    /// <returns> The response. </returns>
+    public static async Task MutateContext(Context context)
+    {
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+        var elementRepository = context.ServiceProvider.GetService<ElementRepository>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+        
+        if(!authorizationIsValid) return;
+        
+        var requestBody = context.Request.Body;
+        var getElementsByCategoryRequest = JsonConvert.DeserializeObject<GetElementsByCategoryRequest>(requestBody);
+        
+        var result = elementRepository.GetElementsByCategory(getElementsByCategoryRequest.Category);
+    
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = JsonConvert.SerializeObject(result)
+        };
+    }
 }

@@ -23,6 +23,9 @@
                 <TabItem Header="Elements repository">
                     <tabs:GetElementsTab/>
                 </TabItem>
+                <TabItem Header="Convert parameter from schema">
+                    <tabs:TransferParameterMap/>
+                </TabItem>
             </TabControl>
         </GroupBox>
         <GroupBox Grid.Row="1"

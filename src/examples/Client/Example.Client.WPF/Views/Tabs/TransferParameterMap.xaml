@@ -1,0 +1,28 @@
+﻿<Page x:Class="Example.Client.WPF.Views.Tabs.TransferParameterMap"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:local="clr-namespace:Example.Client.WPF.Views.Tabs"
+      mc:Ignorable="d"
+      Title="TransferParameterMap" Height="450" Width="800">
+    <GroupBox Margin="10"
+              Header="Send message">
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="Message text" 
+                       Margin="0 10 0 0"/>
+            <DataGrid x:Name = "ParametersMap"
+                      Margin="0 10 0 10"
+                      CanUserAddRows="True"
+                      Height="200">
+            </DataGrid>
+
+            <Button x:Name="SendMessageButton"
+                    Content="Get parameters"
+                    Width="100"
+                    HorizontalAlignment="Right"  
+                    Click="GetParameters"
+                    Margin="0 10 0 0"/>
+        </StackPanel>
+    </GroupBox>
+</Page>

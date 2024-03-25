@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Providers;
@@ -19,7 +20,11 @@ public class Context
     /// <summary>
     ///  The service provider of the server
     /// </summary>
-    public IServiceProvider ServiceProvider { get; }
+    public IServiceProvider ServiceProvider { get; }    
+    /// <summary>
+    ///  Additional data of the request for mutation 
+    /// </summary>
+    public Dictionary<Type, object[]> AdditionalData { get; } = new Dictionary<Type, object[]>();
 
     /// <summary>
     ///  Constructor

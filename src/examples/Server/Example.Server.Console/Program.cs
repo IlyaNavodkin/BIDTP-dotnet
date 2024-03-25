@@ -35,6 +35,7 @@ namespace Example.Server.Console
              
             builder.AddRoute("PrintMessage", JustChickenGuard, MessageController.PrintMessageHandler);
             builder.AddRoute("GetElements", MessageController.GetElements);
+            builder.AddRoute("MutateContext", MutateContextMiddleware ,MessageController.GetElements);
 
             Task JustChickenGuard(Context context)
             {
@@ -74,6 +75,15 @@ namespace Example.Server.Console
             var cancellationTokenSource = new CancellationTokenSource();
 
             await server.StartAsync(cancellationTokenSource.Token);
+        }
+
+        private static Task MutateContextMiddleware(Context arg)
+        {
+            var request = arg.Request;
+            
+            var body = request.Body;
+            
+            return Task.CompletedTask;
         }
     }
 }
