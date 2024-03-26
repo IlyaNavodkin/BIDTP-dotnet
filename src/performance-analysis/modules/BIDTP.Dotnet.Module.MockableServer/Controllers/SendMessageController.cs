@@ -1,7 +1,10 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Module.MockableServer.Dtos;
 using BIDTP.Dotnet.Module.MockableServer.Guards;
+using BIDTP.Dotnet.Module.MockableServer.Middlewares;
+using Newtonsoft.Json;
 
 namespace BIDTP.Dotnet.Module.MockableServer.Controllers;
 
@@ -51,6 +54,23 @@ public class SendMessageController
         context.Response = new Response(StatusCode.Success)
         {
             Body = "{ \"Response\": \"" + "Free access" + "\" }"
+        };
+        
+        return Task.CompletedTask;
+    }
+    
+    [MappingMiddleware(typeof(SimpleObject))]
+    public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
+    {
+        var objectContainer = context.ObjectContainer;
+        var simpleObject = objectContainer.GetObject<SimpleObject>();
+        var additionalData = objectContainer.GetObject<AdditionalData>();
+        
+        if (simpleObject is null || additionalData is null) throw new Exception("No object in object container");
+        
+        context.Response = new Response(StatusCode.Success)
+        {
+            Body = context.Request.Body
         };
         
         return Task.CompletedTask;

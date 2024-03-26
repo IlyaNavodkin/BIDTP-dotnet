@@ -53,6 +53,12 @@ public class Request
     public T GetBody<T>() => JsonConvert.DeserializeObject<T>(Body);
     
     /// <summary>
+    ///  Set the body of the response as a T
+    /// </summary>
+    /// <typeparam name="T"> The type of the body </typeparam>
+    public void SetBody<T>(T obj) => Body = JsonConvert.SerializeObject(obj);
+    
+    /// <summary>
     ///  Set the route of the request
     /// </summary>
     /// <param name="route"> The route of the request </param>

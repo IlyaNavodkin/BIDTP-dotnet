@@ -24,7 +24,7 @@ public class Context
     /// <summary>
     ///  Additional data of the request for mutation 
     /// </summary>
-    public Dictionary<Type, object[]> AdditionalData { get; } = new Dictionary<Type, object[]>();
+    public ObjectContainer ObjectContainer { get; } = new ObjectContainer();
 
     /// <summary>
     ///  Constructor
@@ -35,6 +35,6 @@ public class Context
     public Context(Request request, IServiceProvider serviceProvider)
     {
         Request = request ?? throw new ArgumentNullException(nameof(request));
-        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        ServiceProvider = serviceProvider;
     }
 }

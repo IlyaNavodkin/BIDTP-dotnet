@@ -3,6 +3,7 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Module.MockableServer;
+using BIDTP.Dotnet.Module.MockableServer.Dtos;
 using NUnit.Framework;
 
 namespace BIDTP.Dotnet.Tests
@@ -249,6 +250,35 @@ namespace BIDTP.Dotnet.Tests
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             Assert.That(successMessageString == response.Body);
+        }
+        [Test]
+        public async Task WriteRequestAsync_GetMappedObjectWithMetadataFromObjectContainer_MappingMiddlewareMiddleware_SuccessfullyWritesRequest()
+        {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
+            var simpleObject = new SimpleObject
+            {
+                Guid = Guid.NewGuid().ToString(),
+                Items = new List<string>  { "Item1", "Item2" },
+                Name = "Test"
+            };
+
+            var request = new Request();
+            request.SetRoute("GetMappedObjectFromObjectContainer");
+            
+            request.SetBody(simpleObject);
+            
+            var response = await _client.WriteRequestAsync(request);
+
+            var dto = response.GetBody<SimpleObject>();
+            
+            Assert.That(dto.Name, Is.EqualTo(simpleObject.Name));
+            Assert.That(dto.Items, Is.EqualTo(simpleObject.Items));
+            Assert.That(dto.Guid, Is.EqualTo(simpleObject.Guid));
+            
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
         }
     }
 }

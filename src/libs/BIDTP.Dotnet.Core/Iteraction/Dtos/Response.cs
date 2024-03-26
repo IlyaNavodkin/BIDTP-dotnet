@@ -60,7 +60,13 @@ public class Response
     /// <typeparam name="T"> The type of the body </typeparam>
     /// <returns> The body of the response </returns>
     public T GetBody<T>() => JsonConvert.DeserializeObject<T>(Body);
-    
+
+    /// <summary>
+    ///  Set the body of the response as a T
+    /// </summary>
+    /// <typeparam name="T"> The type of the body </typeparam>
+    public void SetBody<T>(T obj) => Body = JsonConvert.SerializeObject(obj);
+
     /// <summary>
     ///  Validate the response
     /// </summary>

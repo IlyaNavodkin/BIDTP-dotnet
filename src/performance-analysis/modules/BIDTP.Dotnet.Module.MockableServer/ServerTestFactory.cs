@@ -28,6 +28,7 @@ public static class ServerTestFactory
         builder.AddRoute("GetMessageForUser", AuthMiddleware.Handle, SendMessageController.GetMessageForUser);
         builder.AddRoute("GetAuthAccessResponse", AuthMiddleware.Handle,SendMessageController.GetAuthAccessResponse);
         builder.AddRoute("GetFreeAccessResponse", SendMessageController.GetFreeAccessResponse);
+        builder.AddRoute("GetMappedObjectFromObjectContainer", SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
         
         var server = builder.Build();
 
