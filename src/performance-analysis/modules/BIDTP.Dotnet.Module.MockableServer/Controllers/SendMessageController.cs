@@ -41,20 +41,24 @@ public class SendMessageController
     [AuthGuard]
     public static Task GetAuthAccessResponse(Context context)
     {
-        context.Response = new Response(StatusCode.Success)
+        var response = new Response(StatusCode.Success)
         {
             Body = "{ \"Response\": \"" + "Auth access" + "\" }"
         };
+        
+        context.SetResponse(response);
         
         return Task.CompletedTask;
     }
     
     public static Task GetFreeAccessResponse(Context context)
     {
-        context.Response = new Response(StatusCode.Success)
+        var response = new Response(StatusCode.Success)
         {
             Body = "{ \"Response\": \"" + "Free access" + "\" }"
         };
+        
+        context.SetResponse(response);
         
         return Task.CompletedTask;
     }
@@ -68,10 +72,12 @@ public class SendMessageController
         
         if (simpleObject is null || additionalData is null) throw new Exception("No object in object container");
         
-        context.Response = new Response(StatusCode.Success)
+        var response = new Response(StatusCode.Success)
         {
             Body = context.Request.Body
         };
+        
+        context.SetResponse(response);
         
         return Task.CompletedTask;
     }

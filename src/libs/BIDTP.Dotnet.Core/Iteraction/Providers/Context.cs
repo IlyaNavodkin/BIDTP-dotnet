@@ -37,4 +37,10 @@ public class Context
         Request = request ?? throw new ArgumentNullException(nameof(request));
         ServiceProvider = serviceProvider;
     }
+    
+    /// <summary>
+    ///  Set the response of the request
+    /// </summary>
+    /// <param name="response"> The response.</param>
+    public void SetResponse(Response response) => Response = response;
 }
