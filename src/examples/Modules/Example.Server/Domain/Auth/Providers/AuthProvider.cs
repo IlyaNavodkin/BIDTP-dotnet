@@ -1,11 +1,8 @@
-﻿using System.Text.Encodings.Web;
-using System.Text.Json;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Newtonsoft.Json;
 
-namespace Example.Server.Providers;
+namespace Example.Server.Domain.Auth.Providers;
 
 /// <summary>
 ///  The auth provider for the server
@@ -44,12 +41,11 @@ public class AuthProvider
                 Description = "Вы не авторизованы!"
             };
             
-            var jsonString = JsonConvert.SerializeObject(error);
+            var response = new Response(StatusCode.Unauthorized);
             
-            context.Response = new Response(StatusCode.Unauthorized)
-            {
-                Body = jsonString
-            };
+            response.SetBody<Error>(error);
+
+            context.Response = response;
         }
         
         return authorizationIsValid;

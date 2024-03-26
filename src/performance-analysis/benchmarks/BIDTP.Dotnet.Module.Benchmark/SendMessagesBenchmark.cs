@@ -44,10 +44,9 @@ public class SendMessagesBenchmark
     [Benchmark]
     public async Task SingleSendGeneralRequestAndGetResponse()
     {
-        var request = new Request
-        {
-            Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-        };
+        var request = new Request();
+        request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }"); 
+        
         request.SetRoute("GetMessageForAdmin");
         request.Headers.Add("Authorization", "adminToken");
         
@@ -59,10 +58,10 @@ public class SendMessagesBenchmark
     {
         for (int i = 0; i < 20; i++)
         {
-            var request = new Request
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
+            
             request.SetRoute("GetMessageForAdmin");
             request.Headers.Add("Authorization", "adminToken");
         

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Example.Server.Dependency;
+namespace Example.Server.Core.Dependency;
 
 /// <summary>
 ///  Check if dotnet is installed in windows machine

@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
         <RootNamespace>BIDTP.Dotnet.Tests</RootNamespace>
+        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +21,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
     </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\..\..\examples\Modules\Example.Schemas\Example.Schemas.csproj" />
       <ProjectReference Include="..\..\modules\BIDTP.Dotnet.Module.MockableServer\BIDTP.Dotnet.Module.MockableServer.csproj" />
     </ItemGroup>
 </Project>

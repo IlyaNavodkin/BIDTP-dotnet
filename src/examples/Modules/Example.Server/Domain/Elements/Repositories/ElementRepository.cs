@@ -1,6 +1,6 @@
 ﻿using Example.Schemas.Dtos;
 
-namespace Example.Server.Repositories;
+namespace Example.Server.Domain.Elements.Repositories;
 
 /// <summary>
 ///  The element repository for the server

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Example.Server.Workers;
+namespace Example.Server.Core.Workers;
 
 /// <summary>
 /// The logging worker - simple example of a background service

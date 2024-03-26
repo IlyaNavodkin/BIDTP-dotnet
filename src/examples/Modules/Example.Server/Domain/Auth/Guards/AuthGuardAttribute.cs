@@ -2,9 +2,8 @@
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Newtonsoft.Json;
 
-namespace BIDTP.Dotnet.Module.MockableServer.Guards;
+namespace Example.Server.Domain.Auth.Guards;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class AuthGuardAttribute : Attribute, IMethodScopedPreInvokable
@@ -24,10 +23,9 @@ public class AuthGuardAttribute : Attribute, IMethodScopedPreInvokable
                 ErrorCode = 403
             };
 
-            var response = new Response(StatusCode.Unauthorized)
-            {
-                Body = JsonConvert.SerializeObject(dto)
-            };
+            var response = new Response(StatusCode.Unauthorized);
+            
+            response.SetBody(dto);
 
             context.Response = response;
             return Task.CompletedTask;

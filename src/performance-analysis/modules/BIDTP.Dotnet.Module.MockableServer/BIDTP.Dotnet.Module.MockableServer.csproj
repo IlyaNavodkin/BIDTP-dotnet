@@ -25,6 +25,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\..\..\examples\Modules\Example.Server\Example.Server.csproj" />
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
     </ItemGroup>
     

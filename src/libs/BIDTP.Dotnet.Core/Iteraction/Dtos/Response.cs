@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using Newtonsoft.Json;
+using BIDTP.Dotnet.Core.Iteraction.Helpers;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Dtos;
 
@@ -23,6 +24,8 @@ namespace BIDTP.Dotnet.Core.Iteraction.Dtos;
 /// </summary>
 public class Response 
 {
+    private string _body = string.Empty;
+    
     /// <summary>
     ///  The type of the message, general - is default message logic with Response and Request
     /// </summary>
@@ -32,12 +35,7 @@ public class Response
     /// Response status code
     /// </summary>
     public StatusCode StatusCode { get; }
-
-    /// <summary>
-    ///  The body of the request - a Json string
-    /// </summary>
-    public string Body { get; set; } = string.Empty;
-
+    
     /// <summary>
     ///  The headers of the request
     /// </summary>
@@ -55,25 +53,46 @@ public class Response
     }
     
     /// <summary>
-    ///  Get the body of the response as a T
+    ///  Get the deserialized body as a T
     /// </summary>
     /// <typeparam name="T"> The type of the body </typeparam>
+    /// <param name="options"> The json serializer options </param>
     /// <returns> The body of the response </returns>
-    public T GetBody<T>() => JsonConvert.DeserializeObject<T>(Body);
+    public T GetBody<T>(JsonSerializerOptions options = default)
+    {
+        if (typeof(T) == typeof(string))
+        {
+            return (T)(object)_body;
+        }
+
+        return JsonSerializer.Deserialize<T>(_body, JsonHelper.GetDefaultJsonSerializerOptions());
+    }
 
     /// <summary>
-    ///  Set the body of the response as a T
+    ///  Set the serialized body as a T
     /// </summary>
     /// <typeparam name="T"> The type of the body </typeparam>
-    public void SetBody<T>(T obj) => Body = JsonConvert.SerializeObject(obj);
-
+    /// <param name="obj"> The body of the request </param>
+    /// <param name="options"> The json serializer options </param>
+    public void SetBody<T>(T obj, JsonSerializerOptions options = default) 
+    {
+        if (typeof(T) == typeof(string))
+        {
+            _body = obj as string;
+        }
+        else
+        {
+            _body = JsonSerializer.Serialize(obj, JsonHelper.GetDefaultJsonSerializerOptions());
+        }
+    }
+    
     /// <summary>
     ///  Validate the response
     /// </summary>
     /// <exception cref="Exception"> Thrown if the response is invalid </exception>
     public void Validate()
     {
-        if (Body is null) throw new Exception("Response body can't be null, check the response");
+        if (_body is null) throw new Exception("Response body can't be null, check the response");
         if (Headers is null) throw new Exception("Response headers can't be null, check the response");
     }
 }

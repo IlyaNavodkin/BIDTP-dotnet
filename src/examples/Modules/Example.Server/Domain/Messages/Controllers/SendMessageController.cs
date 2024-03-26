@@ -1,12 +1,11 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using BIDTP.Dotnet.Module.MockableServer.Dtos;
-using BIDTP.Dotnet.Module.MockableServer.Guards;
-using BIDTP.Dotnet.Module.MockableServer.Middlewares;
-using Newtonsoft.Json;
+using Example.Schemas.Dtos;
+using Example.Server.Domain.Auth.Guards;
+using Example.Server.Domain.Auth.Middlewares;
 
-namespace BIDTP.Dotnet.Module.MockableServer.Controllers;
+namespace Example.Server.Domain.Messages.Controllers;
 
 public class SendMessageController
 {
@@ -16,12 +15,11 @@ public class SendMessageController
     {
         var request = context.Request;
         
-        if (request.Body.Equals("internal error")) throw new Exception("Mock error");
+        if (request.GetBody<string>().Equals("internal error")) throw new Exception("Mock error");
+
+        context.Response = new Response(StatusCode.Success);
         
-        context.Response = new Response(StatusCode.Success)
-        {
-            Body = "{ \"Response\": \"" + "Hello admin" + "\" }"
-        };
+        context.Response.SetBody( "{ \"Response\": \"" + "Hello admin" + "\" }" );
         
         return Task.CompletedTask;
     }
@@ -30,10 +28,9 @@ public class SendMessageController
     [RoleGuard("user")]
     public static Task GetMessageForUser(Context context)
     {
-        context.Response = new Response(StatusCode.Success)
-        {
-            Body = "{ \"Response\": \"" + "Hello user" + "\" }"
-        };
+        context.Response = new Response(StatusCode.Success);
+        
+        context.Response.SetBody( "{ \"Response\": \"" + "Hello user" + "\" }" );
         
         return Task.CompletedTask;
     }
@@ -41,29 +38,26 @@ public class SendMessageController
     [AuthGuard]
     public static Task GetAuthAccessResponse(Context context)
     {
-        var response = new Response(StatusCode.Success)
-        {
-            Body = "{ \"Response\": \"" + "Auth access" + "\" }"
-        };
+        var response = new Response(StatusCode.Success);
         
-        context.SetResponse(response);
+        response.SetBody( "{ \"Response\": \"" + "Auth access" + "\" }" );
+        
+        context.Response = response;
         
         return Task.CompletedTask;
     }
     
     public static Task GetFreeAccessResponse(Context context)
     {
-        var response = new Response(StatusCode.Success)
-        {
-            Body = "{ \"Response\": \"" + "Free access" + "\" }"
-        };
+        var response = new Response(StatusCode.Success);
         
-        context.SetResponse(response);
+        response.SetBody( "{ \"Response\": \"" + "Free access" + "\" }" );
+        
+        context.Response = response;
         
         return Task.CompletedTask;
     }
     
-    [MappingMiddleware(typeof(SimpleObject))]
     public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
     {
         var objectContainer = context.ObjectContainer;
@@ -71,13 +65,12 @@ public class SendMessageController
         var additionalData = objectContainer.GetObject<AdditionalData>();
         
         if (simpleObject is null || additionalData is null) throw new Exception("No object in object container");
+
+        var response = new Response(StatusCode.Success);
         
-        var response = new Response(StatusCode.Success)
-        {
-            Body = context.Request.Body
-        };
+        response.SetBody(simpleObject);
         
-        context.SetResponse(response);
+        context.Response = response;
         
         return Task.CompletedTask;
     }

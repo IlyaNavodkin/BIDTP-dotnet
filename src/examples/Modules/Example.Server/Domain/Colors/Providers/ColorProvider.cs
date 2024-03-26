@@ -1,4 +1,4 @@
-﻿namespace Example.Server.Providers;
+﻿namespace Example.Server.Domain.Colors.Providers;
 
 public class ColorProvider 
 {

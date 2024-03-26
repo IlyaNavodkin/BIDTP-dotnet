@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Xml;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Example.Client.WPF.MVVM.Services;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Example.Client.WPF.MVVM.ViewModels.Tabs;
 
@@ -43,27 +42,20 @@ public class SendMessageTabViewModel : ObservableObject
         {
             var inputMessage = InputMessage;
             
-            var request = new Request
-            {
-                Body = inputMessage,
-                Headers = new Dictionary<string, string>()
-            };
-            var req = new Request();
-                
-
+            var request = new Request ();
+            
+            request.SetBody(inputMessage);
+            
             var token = _authService.GetAuthToken();
         
             request.Headers.Add("Authorization", token);
             request.SetRoute("PrintMessage");
         
             var response = await App.Client.WriteRequestAsync(request);
-        
-            var formattedResponseText = JToken.Parse(response.Body)
-                .ToString(Formatting.Indented);
             
-            OutputMessage = formattedResponseText;
+            OutputMessage = response.GetBody<string>();
     
-            MessageBox.Show(formattedResponseText);
+            MessageBox.Show(OutputMessage);
         }
         catch (Exception exception)
         {

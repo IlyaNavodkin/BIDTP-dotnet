@@ -1,4 +1,7 @@
-﻿namespace BIDTP.Dotnet.Core.Iteraction.Options;
+﻿using System.Text.Json;
+using BIDTP.Dotnet.Core.Iteraction.Helpers;
+
+namespace BIDTP.Dotnet.Core.Iteraction.Options;
 
 /// <summary>
 ///  The options of the server 
@@ -6,9 +9,13 @@
 public class ServerOptions
 {
     /// <summary>
+    ///  The json serializer options
+    /// </summary>
+    public readonly JsonSerializerOptions JsonSerializerOptions;
+    /// <summary>
     ///  The name of the pipe 
     /// </summary>
-    public readonly string PipeName;
+    public readonly string ServerName;
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
@@ -21,13 +28,21 @@ public class ServerOptions
     /// <summary>
     ///  Create a new instance of the ServerOptions
     /// </summary>
-    /// <param name="pipeName"> The name of the pipe </param>
+    /// <param name="serverName"> The name of the server </param>
     /// <param name="chunkSize"> The chunk size for the transmission data </param>
     /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
-    public ServerOptions(string pipeName, int chunkSize, int reconnectTimeRate)
+    /// <param name="jsonSerializerOptions"> The json serializer options </param>
+    public ServerOptions(
+        string serverName = "defaultServerName", 
+        int chunkSize = 1024, 
+        int reconnectTimeRate = 5000, 
+        JsonSerializerOptions jsonSerializerOptions = null
+        )
     {
-        PipeName = pipeName;
+        ServerName = serverName;
         ChunkSize = chunkSize;
         ReconnectTimeRate = reconnectTimeRate;
+        JsonSerializerOptions = jsonSerializerOptions 
+        ?? JsonHelper.GetDefaultJsonSerializerOptions();
     }
 }

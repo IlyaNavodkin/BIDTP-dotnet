@@ -13,16 +13,16 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Example.Server.Controllers;
-using Example.Server.Providers;
-using Example.Server.Repositories;
+using Example.Server.Core.Workers;
+using Example.Server.Domain.Auth.Providers;
+using Example.Server.Domain.Colors.Controllers;
+using Example.Server.Domain.Colors.Providers;
+using Example.Server.Domain.Elements.Repositories;
+using Example.Server.Domain.Messages.Controllers;
 using Example.Server.Revit.OwnerProcess.Controllers;
-using Example.Server.Utils;
-using Example.Server.Workers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using Newtonsoft.Json;
 using Nice3point.Revit.Toolkit.External;
 using Serilog;
 using UIFrameworkServices;
@@ -96,16 +96,17 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 
                 builder.AddDiContainer(serviceProvider);
                 
-                builder.AddRoute("PrintMessage", ShitWordGuard, MessageController.PrintMessageHandler);
+                builder.AddRoute("PrintMessage", ShitWordGuard, ColorController.GetRandomColor);
                 builder.AddRoute("GetElements", ElementRevitController.GetElements);
                 builder.AddRoute("DeleteElement", ElementRevitController.DeleteElement);
-                builder.AddRoute("GetParameters", ElementRevitController.GetParameters);
 
                 Task ShitWordGuard(Context context)
                 {
                     var request = context.Request;
                     
-                    var isShitWord = request.Body.Contains("Плохой");
+                    var isShitWord = request
+                        .GetBody<string>()
+                        .Contains("Плохой");
                     
                     if(isShitWord)
                     {
@@ -115,11 +116,9 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                             Description = "Сам такой?",
                             ErrorCode = 228
                         };
-                        
-                        var response = new Response(StatusCode.ClientError)
-                        {
-                            Body = JsonConvert.SerializeObject(dto)
-                        };
+
+                        var response = new Response(StatusCode.ClientError);
+                        response.SetBody(dto);
                         
                         context.Response = response;
                     }
@@ -131,7 +130,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 
                 server.AddBackgroundService<LoggingWorker>();
                
-                childProcess = RunClientProcess(options.PipeName, filename);
+                childProcess = RunClientProcess(options.ServerName, filename);
                 
                 await server.StartAsync(cancellationTokenSource.Token);
             }

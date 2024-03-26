@@ -4,13 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using Newtonsoft.Json;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 /// <summary>
@@ -21,7 +22,16 @@ public class Client
     private readonly SemaphoreSlim _pipeSemaphore;
     private NamedPipeClientStream _clientPipeStream;
     private CancellationTokenSource _cancellationTokenSource;
-    private string PipeName { get; }
+    
+    /// <summary>
+    ///  The name of the server for connection
+    /// </summary>
+    private string ServerName { get; }
+    
+    /// <summary>
+    ///  Json serializer options
+    /// </summary>
+    private JsonSerializerOptions JsonSerializerOptions { get; }
     
     /// <summary>
     ///  Connection is starting
@@ -31,12 +41,12 @@ public class Client
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
-    public int ChunkSize { get; set; }
+    private int ChunkSize { get; set; }
     
     /// <summary>
     ///  The time rate of the life check 
     /// </summary>
-    public int LifeCheckTimeRate { get; }
+    private int LifeCheckTimeRate { get; }
     
     /// <summary>
     ///  The time rate of the reconnect 
@@ -46,7 +56,7 @@ public class Client
     /// <summary>
     ///  The timeout of the connect 
     /// </summary>
-    public int ConnectTimeout { get; }
+    private int ConnectTimeout { get; }
     
     /// <summary>
     ///  The status of the connection 
@@ -61,12 +71,14 @@ public class Client
     {
         _pipeSemaphore = new SemaphoreSlim(1, 1);
         
-        PipeName = options.PipeName;
+        JsonSerializerOptions = options.JsonSerializerOptions;
+        ServerName = options.ServerName;
         ChunkSize = options.ChunkSize;
         LifeCheckTimeRate = options.LifeCheckTimeRate;
         ReconnectTimeRate = options.ReconnectTimeRate;
         ConnectTimeout = options.ConnectTimeout;
     }
+
 
     /// <summary>
     ///  Connect to the server and check the health time to connect
@@ -84,7 +96,7 @@ public class Client
         {
             if(_clientPipeStream is not null) throw new Exception("Stream already created");
                 
-            _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
+            _clientPipeStream = new NamedPipeClientStream(".", ServerName, PipeDirection.InOut);
 
             await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
 
@@ -132,15 +144,11 @@ public class Client
             dictionary.Add(nameof(MessageType), MessageType.HealthCheck.ToString());
 
             await WriteAsyncInternal(dictionary, _cancellationTokenSource.Token);
-
-            Debug.WriteLine($"[CLIENT: LifeCheck Request]: ping");
-                
+            
             var response = await ReadAsyncInternal(_cancellationTokenSource.Token);
                 
             IsHealthCheckConnected = !string.IsNullOrEmpty(response[nameof(MessageType)]);
             IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
-                
-            Debug.WriteLine($"[CLIENT: LifeCheck Response]: pong");
         }
         catch (Exception exception)
         {
@@ -177,22 +185,26 @@ public class Client
 
             dictionary.Add(nameof(MessageType), request.MessageType.ToString());
             
-            var headersJsonString = JsonConvert.SerializeObject(request.Headers);
+            // var headersJsonString = JsonConvert.SerializeObject(request.Headers);
+            var headersJsonString = JsonSerializer.Serialize(request.Headers, JsonSerializerOptions);
+            
             dictionary.Add("Headers", headersJsonString);
             
-            dictionary.Add("Body", request.Body);
+            dictionary.Add("Body", request.GetBody<string>());
             
             await WriteAsyncInternal(dictionary, cancellationToken);
             
             var result = await ReadAsyncInternal(cancellationToken);
             
-            var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(result["Headers"]);
+            // var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(result["Headers"]);
+            var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(result["Headers"]);
             var statusCode = (StatusCode) Enum.Parse(typeof(StatusCode), result[nameof(StatusCode)]);
             var response = new Response(statusCode)
             {
-                Body = result["Body"],
                 Headers = headers
             };
+            
+            response.SetBody(result["Body"]);
             
             return response;
 

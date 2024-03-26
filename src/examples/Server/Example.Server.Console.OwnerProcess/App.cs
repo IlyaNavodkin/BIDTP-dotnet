@@ -5,14 +5,16 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Example.Server.Controllers;
-using Example.Server.Providers;
-using Example.Server.Repositories;
-using Example.Server.Utils;
-using Example.Server.Workers;
+using Example.Server.Core.Utils;
+using Example.Server.Core.Workers;
+using Example.Server.Domain.Auth.Providers;
+using Example.Server.Domain.Colors.Controllers;
+using Example.Server.Domain.Colors.Providers;
+using Example.Server.Domain.Elements.Controllers;
+using Example.Server.Domain.Elements.Repositories;
+using Example.Server.Domain.Messages.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 var cancellationTokenSource = new CancellationTokenSource();
 Process childProcess = null;
@@ -34,14 +36,15 @@ try
     
     builder.AddDiContainer(serviceProvider);
     
-    builder.AddRoute("PrintMessage", ShitWordGuard, MessageController.PrintMessageHandler);
-    builder.AddRoute("GetElements", MessageController.GetElements);
+    builder.AddRoute("PrintMessage", ShitWordGuard, ColorController.GetRandomColor);
+    builder.AddRoute("GetElements", ElementController.GetElements);
 
     Task ShitWordGuard(Context context)
     {
         var request = context.Request;
         
-        var isShitWord = request.Body.Contains("Дурак");
+        var isShitWord = request.GetBody<string>()
+            .Contains("Дурак");
 
         if (!isShitWord) return Task.CompletedTask;
         
@@ -51,12 +54,11 @@ try
             Description = "Зачем материшься",
             ErrorCode = 228
         };
-            
-        var response = new Response(StatusCode.ClientError)
-        {
-            Body = JsonConvert.SerializeObject(dto)
-        };
-            
+
+        var response = new Response(StatusCode.ClientError);
+        
+        response.SetBody(dto);
+        
         context.Response = response;
 
         return Task.CompletedTask;
@@ -69,11 +71,11 @@ try
     logger.LogInformation("Server started");
     
     server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
-    server.AddBackgroundService<LoggingWorker>("BackgroundWorker2"); 
+    server.AddBackgroundService<LoggingWorker>("BackgroundWorker2");
+
+    var serverName = server.ServerName;
     
-    var pipeName = server.GetPipeName();
-    
-    childProcess = RunClientProcess(pipeName);
+    childProcess = RunClientProcess(serverName);
 
     await server.StartAsync(cancellationTokenSource.Token);
 }

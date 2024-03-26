@@ -1,4 +1,6 @@
-﻿namespace BIDTP.Dotnet.Module.MockableServer.Dtos;
+﻿using System.Collections.Generic;
+
+namespace Example.Schemas.Dtos;
 
 public class SimpleObject
 {

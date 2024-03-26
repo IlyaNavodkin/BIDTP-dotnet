@@ -3,7 +3,7 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 
-namespace BIDTP.Dotnet.Module.MockableServer.Guards;
+namespace Example.Server.Domain.Auth.Guards;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class RoleGuardAttribute : Attribute, IMethodScopedPreInvokable
@@ -20,20 +20,19 @@ public class RoleGuardAttribute : Attribute, IMethodScopedPreInvokable
         var request = context.Request;
         if (!request.Headers.TryGetValue("Role", out var roleString) || string.IsNullOrEmpty(roleString))
         {
-            context.Response = new Response(StatusCode.Unauthorized)
-            {
-                Body = "{ \"Message\": \"Role not specified in the request headers\" }"
-            };
+            context.Response = new Response(StatusCode.Unauthorized);
+            
+            context.Response.SetBody("{ \"Message\": \"Role is not specified\" }");
 
             return Task.CompletedTask;
         }
          
         if (!RequiredRoles.Contains(roleString))
         {
-            context.Response = new Response(StatusCode.Unauthorized)
-            {
-                Body = "{ \"Message\": \"You don't have permission to access this resource\" }"
-            };
+            context.Response = new Response(StatusCode.Unauthorized);
+            
+            context.Response.SetBody("{ \"Message\": \"You dont have access\" }");
+            
             return Task.CompletedTask;
         }
 

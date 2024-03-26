@@ -1,4 +1,6 @@
-﻿namespace BIDTP.Dotnet.Module.MockableServer.Dtos;
+﻿using System;
+
+namespace Example.Schemas.Dtos;
 
 public class AdditionalData
 {

@@ -6,16 +6,18 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Interfaces;
+using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 
@@ -26,53 +28,43 @@ public class Server : IHost
 {
     private readonly Dictionary<string, Func<Context, Task>[]> _routeHandlers;
     private readonly ConcurrentDictionary<string, IHostedService> _workers;
-    private readonly string _pipeName;
     private readonly SemaphoreSlim _streamSemaphore;
-    
     private NamedPipeServerStream _serverPipeStream;
-    private int ReconnectTimeRate { get; }
+    
+    /// <summary>
+    ///  Reconnect time rate of the server
+    /// </summary>
+    public int ReconnectTimeRate { get; }
+    
+    /// <summary>
+    ///  The name of the server for connection
+    /// </summary>
+    public string ServerName { get; }
+    
+    /// <summary>
+    ///  Json serializer options for request\response serialization
+    /// </summary>
+    public JsonSerializerOptions JsonSerializerOptions { get; }
     
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
-    public int ChunkSize { get; set; }
-    
+    private int ChunkSize { get; set; }
+
     /// <summary>
     ///  Server of the BIDTP protocol
     /// </summary>
-    /// <param name="pipeName"> The name of the pipe </param>
-    /// <param name="chunkSize"> The chunk size for the transmission data </param>
-    /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
+    /// <param name="options"> The options of the server </param>
     /// <param name="routeHandlers"> The route handlers </param>
     /// <param name="serviceProvider"> The service provider </param>
-    public Server(string pipeName, int chunkSize, int reconnectTimeRate,
-        Dictionary<string, Func<Context, Task>[]> routeHandlers, IServiceProvider serviceProvider)
+    public Server(ServerOptions options, Dictionary<string, 
+        Func<Context, Task>[]> routeHandlers,  IServiceProvider serviceProvider)
     {
-        _pipeName = pipeName;
-        ChunkSize = chunkSize;
-        ReconnectTimeRate = reconnectTimeRate;
-
-        _routeHandlers = routeHandlers;
+        ServerName = options.ServerName;
         Services = serviceProvider;
-        
-        _workers = new ConcurrentDictionary<string, IHostedService>(); 
-        
-        _streamSemaphore  = new SemaphoreSlim(1, 1);
-    }
-    
-    /// <summary>
-    ///  Server of the BIDTP protocol
-    /// </summary>
-    /// <param name="pipeName"> The name of the pipe </param>
-    /// <param name="chunkSize"> The chunk size for the transmission data </param>
-    /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
-    /// <param name="routeHandlers"> The route handlers </param>
-    public Server(string pipeName, int chunkSize, int reconnectTimeRate,
-        Dictionary<string, Func<Context, Task>[]> routeHandlers)
-    {
-        _pipeName = pipeName;
-        ChunkSize = chunkSize;
-        ReconnectTimeRate = reconnectTimeRate;
+        ChunkSize = options.ChunkSize;
+        ReconnectTimeRate = options.ReconnectTimeRate;
+        JsonSerializerOptions = options.JsonSerializerOptions;
 
         _routeHandlers = routeHandlers;
         
@@ -80,12 +72,6 @@ public class Server : IHost
         
         _streamSemaphore  = new SemaphoreSlim(1, 1);
     }
-
-    /// <summary>
-    ///  Get the name of the pipe 
-    /// </summary>
-    /// <returns> The name of the pipe </returns>
-    public string GetPipeName() => _pipeName;
     
     /// <summary>
     ///  Start the server 
@@ -102,7 +88,7 @@ public class Server : IHost
             {
                 if(_serverPipeStream is not null) throw new Exception("Stream already created");
                 
-                _serverPipeStream = new NamedPipeServerStream(_pipeName, PipeDirection.InOut, 
+                _serverPipeStream = new NamedPipeServerStream(ServerName, PipeDirection.InOut, 
                     1, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 
@@ -221,14 +207,15 @@ public class Server : IHost
             var body = requestDictionary["Body"];
             
             var headersString = requestDictionary["Headers"];
-            var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(headersString);
+            // var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(headersString);
+            var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(headersString);
             
             var request = new Request
             {
-                Body = body,
                 Headers = headers
             };
             
+            request.SetBody(body);
             request.Headers.TryGetValue(Constants.Constants.RouteHeaderName, out var route);
             
             if(route is null) throw new Exception("Route key is not found. Add route header in the request!"); 
@@ -298,10 +285,10 @@ public class Server : IHost
             StackTrace = exception.StackTrace
         };
         
-        var errorResponse = new Response(StatusCode.ServerError)
-        {
-            Body = JsonConvert.SerializeObject(error)
-        };
+        var errorBody = JsonSerializer.Serialize(error, JsonSerializerOptions);
+
+        var errorResponse = new Response(StatusCode.ServerError);
+        errorResponse.SetBody(errorBody);
             
         SetGeneralHeaders(errorResponse);
                 
@@ -318,22 +305,24 @@ public class Server : IHost
             ErrorCode = (int) InternalServerErrorType.RouteNotFoundError
         };
         
-        var notExistResponse = new Response(StatusCode.NotFound)
-        {
-            Body = JsonConvert.SerializeObject(error)
-        };
+        var errorBody = JsonSerializer.Serialize(error, JsonSerializerOptions);
+
+        var notExistResponse = new Response(StatusCode.NotFound);
+        notExistResponse.SetBody(errorBody);
                 
         SetGeneralHeaders(notExistResponse);
 
         return ConvertToDictionary(notExistResponse);
     }
 
-    private static Dictionary<string, string> ConvertToDictionary(Response response)
+    private Dictionary<string, string> ConvertToDictionary(Response response)
     {
         var dictionary = new Dictionary<string, string>();
                 
-        var headerString = JsonConvert.SerializeObject(response.Headers);
-        var bodyString = response.Body;
+        // var headerString = JsonConvert.SerializeObject(response.Headers);
+        var headerString = JsonSerializer.Serialize(response.Headers,JsonSerializerOptions);
+        
+        var bodyString = response.GetBody<string>();
                 
         dictionary.Add(nameof(MessageType), response.MessageType.ToString());
         dictionary.Add(nameof(StatusCode), response.StatusCode.ToString());

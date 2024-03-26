@@ -10,21 +10,13 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
-using Example.Server.Providers;
+using Example.Server.Domain.Auth.Providers;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Example.Server.Revit.OwnerProcess.Controllers;
 
-/// <summary>
-///  The message controller
-/// </summary>
 public static class ElementRevitController
 {
-    private static Regex _regex;
-    private static Regex _regex2;
-    private static Regex _regex3;
-
     /// <summary>
     ///  Get elements by category route handler
     /// </summary>
@@ -38,8 +30,7 @@ public static class ElementRevitController
         
         if(!authorizationIsValid) return;
         
-        var requestBody = context.Request.Body;
-        var getElementsByCategoryRequest = JsonConvert.DeserializeObject<GetElementsByCategoryRequest>(requestBody);
+        var getElementsByCategoryRequest = context.Request.GetBody<GetElementsByCategoryRequest>();
         
         await SimpleDimpleExternalApplication
         .AsyncEventHandler.RaiseAsync(application => 
@@ -69,11 +60,11 @@ public static class ElementRevitController
                     return dto;
                 })
                 .ToList();
-    
-            context.Response = new Response(StatusCode.Success)
-            {
-                Body = JsonConvert.SerializeObject(dtos)
-            };
+
+            var response = new Response(StatusCode.Success);
+            response.SetBody( dtos );
+            
+            context.Response = response;
         });
     }
     
@@ -90,8 +81,7 @@ public static class ElementRevitController
         
         if(!authorizationIsValid) return;
         
-        var requestBody = context.Request.Body;
-        var getElementsByCategoryRequest = JsonConvert.DeserializeObject<DeleteElementRequest>(requestBody);
+        var getElementsByCategoryRequest = context.Request.GetBody<DeleteElementRequest>();
         
         await SimpleDimpleExternalApplication
             .AsyncEventHandler.RaiseAsync(_  =>
@@ -109,60 +99,11 @@ public static class ElementRevitController
                     Debug.WriteLine("Deleted");
                 }
             });
+
+        var message = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted";
         
-        context.Response = new Response(StatusCode.Success)
-        {
-            Body = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted"
-        };
-    }
-
-    public static async Task GetParameters(Context context)
-    {
-        var requestDto = context.Request.GetBody<GetParametersRequest>();
-        var familyName = requestDto.FamilyName;
-        
-        var document = Nice3point.Revit.Toolkit.Context.Document;
-        var element = new FilteredElementCollector(document)
-            .OfClass(typeof(Family))
-            .FirstOrDefault(e => e.Name == familyName);
-
-        if (element == null)
-        {
-            var response = new Response(StatusCode.ClientError)
-            {
-                Body = "Family not found",
-            };
-            
-            context.Response = response;
-
-            return;
-        }
-
-        var family = (Family)element;
-        using (var familyDocument = document.EditFamily(family))
-        {
-            var familyManager = familyDocument.FamilyManager;
-            var defaultType = familyManager.CurrentType;
-            var parameters = familyManager.GetParameters();
-
-            _regex = new Regex(@"Section #(\d+)");
-            _regex2 = new Regex(@"Section #(\d+) Length");
-            _regex3 = new Regex(@"Section #(\d+) Height");
-            
-            var familyParameters = parameters
-                .Where(p => requestDto.ParametersMap
-                .Any(map => p.Definition.Name == map.RevitParameterName) || PredicateRegex(p))
-                .ToList();
-            
-        }
-    }
-
-    private static bool PredicateRegex(FamilyParameter familyParameter)
-    {
-        var definitionName = familyParameter.Definition.Name;
-        var match = _regex.Match(definitionName);
-        
-        return match.Success;
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
     }
 }
             

@@ -1,4 +1,4 @@
-﻿namespace Example.Server.Utils;
+﻿namespace Example.Server.Core.Utils;
 
 /// <summary>
 ///  The file utils 

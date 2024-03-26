@@ -6,7 +6,6 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
-using Newtonsoft.Json;
 
 namespace Example.Client.WPF.Views.Tabs;
 
@@ -40,24 +39,22 @@ public partial class GetElementsTab : UserControl
                 Category = CategoryTextBox.Text
             };
         
-            var jsonResponse = JsonConvert.SerializeObject(getCategoryRequest);
-            request.Body = jsonResponse;
+            request.SetBody<GetElementsByCategoryRequest>(getCategoryRequest);
             
             var response = await App.Client.WriteRequestAsync(request);
         
             if (response.StatusCode == StatusCode.Success)
             {
-                var json = response.Body;
-            
-                var elements = JsonConvert.DeserializeObject<ICollection<ElementDto>>(json);
+                var elements = response.GetBody<List<ElementDto>>();
             
                 DataGridElements.ItemsSource = elements;
             }
             else
             {
-                var error = JsonConvert.DeserializeObject<Error>(response.Body);
+                var error = response.GetBody<Error>();
             
-                MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                MessageBox.Show($"Message: {error.Message} " +
+                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }
         catch (Exception exception)
@@ -85,13 +82,12 @@ public partial class GetElementsTab : UserControl
                 Element = selectedItem
             };
         
-            var jsonResponse = JsonConvert.SerializeObject(deleteElementRequest);
-            request.Body = jsonResponse;
+            request.SetBody<DeleteElementRequest>(deleteElementRequest);
             
             var response = await App.Client.WriteRequestAsync(request);
             if (response.StatusCode == StatusCode.Success)
             {
-                var message = response.Body;
+                var message = response.GetBody<string>();
 
                 var newList = new List<ElementDto>();
             
@@ -110,9 +106,10 @@ public partial class GetElementsTab : UserControl
             }
             else
             {
-                var error = JsonConvert.DeserializeObject<Error>(response.Body);
+                var error = response.GetBody<Error>();
             
-                MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                MessageBox.Show($"Message: {error.Message} " +
+                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }
         catch (Exception exception)

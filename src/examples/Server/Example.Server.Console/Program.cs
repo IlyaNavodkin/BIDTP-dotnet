@@ -3,13 +3,15 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Example.Server.Controllers;
-using Example.Server.Providers;
-using Example.Server.Repositories;
-using Example.Server.Workers;
+using Example.Server.Core.Workers;
+using Example.Server.Domain.Auth.Providers;
+using Example.Server.Domain.Colors.Controllers;
+using Example.Server.Domain.Colors.Providers;
+using Example.Server.Domain.Elements.Controllers;
+using Example.Server.Domain.Elements.Repositories;
+using Example.Server.Domain.Messages.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 
 namespace Example.Server.Console
 {
@@ -25,23 +27,24 @@ namespace Example.Server.Console
             var serviceCollection = new ServiceCollection();
 
             serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-            serviceCollection.AddScoped<AuthProvider>();
-            serviceCollection.AddScoped<ColorProvider>();
-            serviceCollection.AddScoped<ElementRepository>();
+            serviceCollection.AddTransient<AuthProvider>();
+            serviceCollection.AddTransient<ColorProvider>();
+            serviceCollection.AddTransient<ElementRepository>();
             
             var serviceProvider = serviceCollection.BuildServiceProvider();
             
             builder.AddDiContainer(serviceProvider);
              
-            builder.AddRoute("PrintMessage", JustChickenGuard, MessageController.PrintMessageHandler);
-            builder.AddRoute("GetElements", MessageController.GetElements);
-            builder.AddRoute("MutateContext", MutateContextMiddleware ,MessageController.GetElements);
-
+            builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
+            builder.AddRoute("GetElements", ElementController.GetElements);
+            
             Task JustChickenGuard(Context context)
             {
                 var request = context.Request;
         
-                var isShitWord = request.Body.Contains("Yes of course");
+                var isShitWord = request
+                    .GetBody<string>()
+                    .Contains("Yes of course");
         
                 if(isShitWord)
                 {
@@ -51,11 +54,10 @@ namespace Example.Server.Console
                         Description = "Exception: Chicken-Bodybuilder detected",
                         ErrorCode = 228
                     };
-            
-                    var response = new Response(StatusCode.ClientError)
-                    {
-                        Body = JsonConvert.SerializeObject(dto)
-                    };
+
+                    var response = new Response(StatusCode.ClientError);
+
+                    response.SetBody(dto);
             
                     context.Response = response;
                 }
@@ -75,15 +77,6 @@ namespace Example.Server.Console
             var cancellationTokenSource = new CancellationTokenSource();
 
             await server.StartAsync(cancellationTokenSource.Token);
-        }
-
-        private static Task MutateContextMiddleware(Context arg)
-        {
-            var request = arg.Request;
-            
-            var body = request.Body;
-            
-            return Task.CompletedTask;
         }
     }
 }
