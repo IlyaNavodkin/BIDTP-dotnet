@@ -28,6 +28,11 @@
                 Content="Get elements"
                 Click="GetElements">
             </Button>
+            <Button
+                Margin="0 12 0 0"
+                Content="Set json"
+                Click="TestJson">
+            </Button>
         </StackPanel>
     </GroupBox>
 

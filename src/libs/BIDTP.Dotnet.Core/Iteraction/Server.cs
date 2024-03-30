@@ -285,11 +285,9 @@ public class Server : IHost
             StackTrace = exception.StackTrace
         };
         
-        var errorBody = JsonSerializer.Serialize(error, JsonSerializerOptions);
-
         var errorResponse = new Response(StatusCode.ServerError);
-        errorResponse.SetBody(errorBody);
-            
+        errorResponse.SetBody(error);
+        
         SetGeneralHeaders(errorResponse);
                 
         var result = ConvertToDictionary(errorResponse);
@@ -331,82 +329,49 @@ public class Server : IHost
                 
         return dictionary;
     }
-
+    
+    public Encoding Encoding { get; set; } = Encoding.Unicode;
+    
     private async Task<Dictionary<string,string>> ReadAsyncInternal(CancellationToken cancellationToken)
     {
         var result = new Dictionary<string, string>();
         
-        var bytesReads = 0;
+        var messageLengthBytes = new byte[4];
+        var messageTypeByteReadCount = await _serverPipeStream
+            .ReadAsync(messageLengthBytes, 
+                0, 
+                messageLengthBytes.Length,
+                cancellationToken
+                );
         
-        var messageLengthBuffer = new byte[4];
-        await _serverPipeStream.ReadAsync(messageLengthBuffer, bytesReads, messageLengthBuffer.Length);
-        var messageLength = BitConverter.ToInt32(messageLengthBuffer, 0);
+        var messageLength = BitConverter.ToInt32(messageLengthBytes, 0);
         
-        bytesReads += messageLengthBuffer.Length;
-
         var contentBuffer = new byte[messageLength];
-        await _serverPipeStream.ReadAsync(contentBuffer, 0, contentBuffer.Length, cancellationToken);
+        var messageLengthByteReadCount = await _serverPipeStream
+            .ReadAsync(
+                contentBuffer, 
+                0, 
+                contentBuffer.Length, 
+                cancellationToken
+                );
         
         using (var memoryStream = new MemoryStream(contentBuffer))
         {
-            var messageType = new byte[4];
-            await memoryStream.ReadAsync(messageType, 0, messageType.Length, cancellationToken);
-            var messageTypeValue = (MessageType) BitConverter.ToInt32(messageType, 0);
+            var binaryReader = new BinaryReader(memoryStream, Encoding);
 
-            result.Add(nameof(MessageType), messageTypeValue.ToString());
+            var messageType = (MessageType)binaryReader.ReadInt32();
+            result.Add(nameof(MessageType), messageType.ToString());
             
-            if(messageTypeValue == MessageType.HealthCheck)
-            {
-                return result;
-            }
+            if(messageType == MessageType.HealthCheck) return result;
             
-            var totalBytes = messageLengthBuffer.Length + messageLength;
+            var headersLength = binaryReader.ReadInt32();
+            var headers = binaryReader.ReadBytes(headersLength);
+            var headersString =  Encoding.GetString(headers);
             
-            bytesReads += messageType.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
+            var bodyLength = binaryReader.ReadInt32();
+            var body = binaryReader.ReadBytes(bodyLength);
+            var bodyString =  Encoding.GetString(body);
             
-            var headersLengthBuffer = new byte[4];
-            await memoryStream.ReadAsync(headersLengthBuffer, 0, headersLengthBuffer.Length, cancellationToken);
-            var headersLength = BitConverter.ToInt32(headersLengthBuffer, 0);
-                
-            bytesReads += headersLengthBuffer.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-
-                
-            var headersBuffer = new byte[headersLength];
-                
-            for (var i = 0; i < headersBuffer.Length; i += ChunkSize)
-            {
-                var bytesToWrite = Math.Min(ChunkSize, headersBuffer.Length - i);
-                await memoryStream.ReadAsync(headersBuffer, 0, bytesToWrite, cancellationToken);
-                
-                bytesReads += bytesToWrite;
-                OnReadProgressChanged(bytesReads, totalBytes);
-
-            }
-                
-            var headersString = Encoding.Unicode.GetString(headersBuffer);
-                
-            var bodyLengthBuffer = new byte[4];
-            await memoryStream.ReadAsync(bodyLengthBuffer, 0, bodyLengthBuffer.Length, cancellationToken);
-            var bodyLength = BitConverter.ToInt32(bodyLengthBuffer, 0);
-                
-            bytesReads += bodyLengthBuffer.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-                
-            var bodyBuffer = new byte[bodyLength];
-                
-            for (var i = 0; i < bodyBuffer.Length; i += ChunkSize)
-            {
-                var bytesToWrite = Math.Min(ChunkSize, bodyBuffer.Length - i);
-                await memoryStream.ReadAsync(bodyBuffer, 0, bytesToWrite, cancellationToken);
-               
-                bytesReads += bytesToWrite;
-                OnReadProgressChanged(bytesReads, totalBytes);
-            }
-                
-            var bodyString = Encoding.Unicode.GetString(bodyBuffer);
-                
             result.Add("Headers", headersString);
             result.Add("Body", bodyString);
                 
@@ -416,85 +381,126 @@ public class Server : IHost
 
     private async Task WriteAsyncInternal(Dictionary<string, string> dictionary, CancellationToken cancellationToken)
     {
-        var bytesWrite = 0;
-
         using (var memoryStream = new MemoryStream())
         {
-            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
-            var messageTypeByte = BitConverter.GetBytes((int)messageType);
-        
-            if (messageType == MessageType.HealthCheck)
+            var binaryWriter = new BinaryWriter(memoryStream, Encoding);
+            
+            var messageType = (MessageType)Enum
+                .Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
+            
+            binaryWriter.Write((int)messageType);
+            
+            if (messageType == MessageType.General)
             {
-                var responseLength = messageTypeByte.Length;
-                var responseLengthBytes = BitConverter.GetBytes(responseLength);
-                
-                await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
-                await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
-            }
-            else
-            {
-                var status = (StatusCode)Enum.Parse(typeof(StatusCode), dictionary[nameof(StatusCode)]);
-                var statusByte = BitConverter.GetBytes((int)status);
-
-                var headerString = dictionary["Headers"];
                 var body = dictionary["Body"];
+                var bodyBytes = Encoding.GetBytes(body);
             
-                var headerBytes = Encoding.Unicode.GetBytes(headerString);
-                var headerBytesLength = BitConverter.GetBytes(headerBytes.Length);
-            
-                var bodyBytes = Encoding.Unicode.GetBytes(body);
-                var bodyBytesLength = BitConverter.GetBytes(bodyBytes.Length);
-            
-                var responseLength = messageTypeByte.Length + statusByte.Length + 
-                                     headerBytesLength.Length + headerBytes.Length + 
-                                     bodyBytesLength.Length + bodyBytes.Length;
+                var headers = dictionary["Headers"];
+                var headersBytes = Encoding.GetBytes(headers);
                 
-                var responseLengthBytes = BitConverter.GetBytes(responseLength);
-                var totalBytes = responseLengthBytes.Length + responseLength;
+                binaryWriter.Write(headersBytes.Length);
+                binaryWriter.Write(headersBytes);
                 
-                await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
-                bytesWrite += responseLengthBytes.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-                
-                await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
-                bytesWrite += messageTypeByte.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-                
-                await memoryStream.WriteAsync(statusByte, 0, statusByte.Length, cancellationToken);
-                bytesWrite += statusByte.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-            
-                await memoryStream.WriteAsync(headerBytesLength, 0, headerBytesLength.Length, cancellationToken);
-                bytesWrite += headerBytesLength.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-            
-                for (var i = 0; i < headerBytes.Length; i += ChunkSize)
-                {
-                    var bytesToWrite = Math.Min(ChunkSize, headerBytes.Length - i);
-                    await memoryStream.WriteAsync(headerBytes, 0, bytesToWrite, cancellationToken);
-                
-                    bytesWrite = i + bytesToWrite;
-                    OnWriteProgressChanged(bytesWrite, totalBytes);
-                }
-
-                await memoryStream.WriteAsync(bodyBytesLength, 0, bodyBytesLength.Length, cancellationToken);
-                bytesWrite += bodyBytesLength.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-            
-                for (var i = 0; i < bodyBytes.Length; i += ChunkSize)
-                {
-                    var bytesToWrite = Math.Min(ChunkSize, bodyBytes.Length - i);
-                    await memoryStream.WriteAsync(bodyBytes, 0, bytesToWrite, cancellationToken);
-                
-                    bytesWrite = i + bytesToWrite;
-                    OnWriteProgressChanged(bytesWrite, totalBytes);
-                }
+                binaryWriter.Write(bodyBytes.Length);
+                binaryWriter.Write(bodyBytes);
             }
-        
+
             var buffer = memoryStream.ToArray();
-            await _serverPipeStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+            var allLength = buffer.Length;
+            var allLengthBuffer = BitConverter.GetBytes(allLength);
+            
+            buffer = allLengthBuffer.Concat(buffer).ToArray();
+            
+            await _serverPipeStream
+                .WriteAsync(
+                    buffer, 
+                    0, 
+                    buffer.Length, 
+                    cancellationToken
+                    );
         }
     }
+    // private async Task WriteAsyncInternal(Dictionary<string, string> dictionary, CancellationToken cancellationToken)
+    // {
+    //     var bytesWrite = 0;
+    //
+    //     using (var memoryStream = new MemoryStream())
+    //     {
+    //         var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
+    //         var messageTypeByte = BitConverter.GetBytes((int)messageType);
+    //     
+    //         if (messageType == MessageType.HealthCheck)
+    //         {
+    //             var responseLength = messageTypeByte.Length;
+    //             var responseLengthBytes = BitConverter.GetBytes(responseLength);
+    //             
+    //             await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
+    //             await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
+    //         }
+    //         else
+    //         {
+    //             var status = (StatusCode)Enum.Parse(typeof(StatusCode), dictionary[nameof(StatusCode)]);
+    //             var statusByte = BitConverter.GetBytes((int)status);
+    //
+    //             var headerString = dictionary["Headers"];
+    //             var body = dictionary["Body"];
+    //         
+    //             var headerBytes = Encoding.Unicode.GetBytes(headerString);
+    //             var headerBytesLength = BitConverter.GetBytes(headerBytes.Length);
+    //         
+    //             var bodyBytes = Encoding.Unicode.GetBytes(body);
+    //             var bodyBytesLength = BitConverter.GetBytes(bodyBytes.Length);
+    //         
+    //             var responseLength = messageTypeByte.Length + statusByte.Length + 
+    //                                  headerBytesLength.Length + headerBytes.Length + 
+    //                                  bodyBytesLength.Length + bodyBytes.Length;
+    //             
+    //             var responseLengthBytes = BitConverter.GetBytes(responseLength);
+    //             var totalBytes = responseLengthBytes.Length + responseLength;
+    //             
+    //             await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
+    //             bytesWrite += responseLengthBytes.Length;
+    //             OnWriteProgressChanged(bytesWrite, totalBytes);
+    //             
+    //             await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
+    //             bytesWrite += messageTypeByte.Length;
+    //             OnWriteProgressChanged(bytesWrite, totalBytes);
+    //             
+    //             await memoryStream.WriteAsync(statusByte, 0, statusByte.Length, cancellationToken);
+    //             bytesWrite += statusByte.Length;
+    //             OnWriteProgressChanged(bytesWrite, totalBytes);
+    //         
+    //             await memoryStream.WriteAsync(headerBytesLength, 0, headerBytesLength.Length, cancellationToken);
+    //             bytesWrite += headerBytesLength.Length;
+    //             OnWriteProgressChanged(bytesWrite, totalBytes);
+    //         
+    //             for (var i = 0; i < headerBytes.Length; i += ChunkSize)
+    //             {
+    //                 var bytesToWrite = Math.Min(ChunkSize, headerBytes.Length - i);
+    //                 await memoryStream.WriteAsync(headerBytes, 0, bytesToWrite, cancellationToken);
+    //             
+    //                 bytesWrite +=  bytesToWrite;
+    //                 OnWriteProgressChanged(bytesWrite, totalBytes);
+    //             }
+    //
+    //             await memoryStream.WriteAsync(bodyBytesLength, 0, bodyBytesLength.Length, cancellationToken);
+    //             bytesWrite += bodyBytesLength.Length;
+    //             OnWriteProgressChanged(bytesWrite, totalBytes);
+    //         
+    //             for (var i = 0; i < bodyBytes.Length; i += ChunkSize)
+    //             {
+    //                 var bytesToWrite = Math.Min(ChunkSize, bodyBytes.Length - i);
+    //                 await memoryStream.WriteAsync(bodyBytes, 0, bytesToWrite, cancellationToken);
+    //             
+    //                 bytesWrite += bytesToWrite;
+    //                 OnWriteProgressChanged(bytesWrite, totalBytes);
+    //             }
+    //         }
+    //     
+    //         var buffer = memoryStream.ToArray();
+    //         await _serverPipeStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+    //     }
+    // }
     
     private void OnWriteProgressChanged(int bytesWrite, int totalBytes)
     {

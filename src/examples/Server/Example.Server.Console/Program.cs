@@ -37,6 +37,7 @@ namespace Example.Server.Console
              
             builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
             builder.AddRoute("GetElements", ElementController.GetElements);
+            builder.AddRoute("GetMappedObjectFromObjectContainer", SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
             
             Task JustChickenGuard(Context context)
             {

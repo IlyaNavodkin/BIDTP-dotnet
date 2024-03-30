@@ -117,4 +117,35 @@ public partial class GetElementsTab : UserControl
             MessageBox.Show(exception.Message);
         }
     }
+
+    private async void TestJson(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            var token = mainWindow.AuthTokenTextBox.Text;
+            
+            var simpleObject = new SimpleObject
+            {
+                Guid = Guid.NewGuid().ToString(),
+                Items = new List<string>  { "Item1", "Item2" },
+                Name = "Test"
+            };
+
+            var request = new Request();
+            
+            request.SetRoute("GetMappedObjectFromObjectContainer");
+            request.SetBody<SimpleObject>(simpleObject);
+            
+            var response = await App.Client.WriteRequestAsync(request);
+
+            var dto = response.GetBody<SimpleObject>();
+
+            MessageBox.Show(response.GetBody<string>());
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message);
+        }
+    }
 }
