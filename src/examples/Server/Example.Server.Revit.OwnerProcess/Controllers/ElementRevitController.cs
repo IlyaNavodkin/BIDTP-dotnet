@@ -1,5 +1,7 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
@@ -8,15 +10,11 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
-using Example.Server.Providers;
+using Example.Server.Domain.Auth.Providers;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Example.Server.Revit.OwnerProcess.Controllers;
 
-/// <summary>
-///  The message controller
-/// </summary>
 public static class ElementRevitController
 {
     /// <summary>
@@ -32,8 +30,7 @@ public static class ElementRevitController
         
         if(!authorizationIsValid) return;
         
-        var requestBody = context.Request.Body;
-        var getElementsByCategoryRequest = JsonConvert.DeserializeObject<GetElementsByCategoryRequest>(requestBody);
+        var getElementsByCategoryRequest = context.Request.GetBody<GetElementsByCategoryRequest>();
         
         await SimpleDimpleExternalApplication
         .AsyncEventHandler.RaiseAsync(application => 
@@ -63,11 +60,11 @@ public static class ElementRevitController
                     return dto;
                 })
                 .ToList();
-    
-            context.Response = new Response(StatusCode.Success)
-            {
-                Body = JsonConvert.SerializeObject(dtos)
-            };
+
+            var response = new Response(StatusCode.Success);
+            response.SetBody( dtos );
+            
+            context.Response = response;
         });
     }
     
@@ -84,8 +81,7 @@ public static class ElementRevitController
         
         if(!authorizationIsValid) return;
         
-        var requestBody = context.Request.Body;
-        var getElementsByCategoryRequest = JsonConvert.DeserializeObject<DeleteElementRequest>(requestBody);
+        var getElementsByCategoryRequest = context.Request.GetBody<DeleteElementRequest>();
         
         await SimpleDimpleExternalApplication
             .AsyncEventHandler.RaiseAsync(_  =>
@@ -103,10 +99,11 @@ public static class ElementRevitController
                     Debug.WriteLine("Deleted");
                 }
             });
+
+        var message = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted";
         
-        context.Response = new Response(StatusCode.Success)
-        {
-            Body = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted"
-        };
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
     }
 }
+            

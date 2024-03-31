@@ -3,6 +3,7 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Module.MockableServer;
+using Example.Schemas.Dtos;
 using NUnit.Framework;
 
 namespace BIDTP.Dotnet.Tests
@@ -46,11 +47,9 @@ namespace BIDTP.Dotnet.Tests
             var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
-            
-            var request = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+
+            var request = new Request();
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             request.SetRoute("GetMessageForAdmin");
             request.Headers.Add("Authorization", "adminToken");
 
@@ -66,10 +65,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
-            var request = new Request
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
+            
             request.SetRoute("GetMessageForAdmin");
 
             var response = await _client.WriteRequestAsync(request);
@@ -84,10 +82,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
-            var request = new Request
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
+            
             request.SetRoute("LaLaLa");
             request.Headers.Add("Authorization", "userToken");
             
@@ -107,10 +104,9 @@ namespace BIDTP.Dotnet.Tests
 
             for (int i = 0; i < 5; i++)
             {
-                var request = new Request
-                {
-                    Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-                };
+                var request = new Request();
+                
+                request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
                 request.SetRoute("LaLaLa");
                 request.Headers.Add("Authorization", "userToken");
                 
@@ -135,25 +131,21 @@ namespace BIDTP.Dotnet.Tests
             
             var tasks = new List<Task<Response>>();
 
-            var messageForAdminRequest = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var messageForAdminRequest = new Request();
+            
+            messageForAdminRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             messageForAdminRequest.SetRoute("GetMessageForAdmin");
             messageForAdminRequest.Headers.Add("Authorization", "adminToken");
 
-            var messageForUserRequest = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var messageForUserRequest = new Request();
             
+            messageForUserRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             messageForUserRequest.SetRoute("GetMessageForUser");
             messageForUserRequest.Headers.Add("Authorization", "userToken");
             
-            var messageForFreeAccessRequest = new Request
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var messageForFreeAccessRequest = new Request();
+            
+            messageForFreeAccessRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             messageForFreeAccessRequest.SetRoute("GetFreeAccessResponse");
             
             tasks.Add(_client.WriteRequestAsync(messageForAdminRequest));
@@ -174,10 +166,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
-            var request = new Request
-            {
-                Body = "internal error",
-            };
+            var request = new Request();
+            
+            request.SetBody<string>("internal error");
             request.SetRoute("GetMessageForAdmin");
             request.Headers.Add("Authorization", "adminToken");
 
@@ -193,10 +184,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
-            var request = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             request.SetRoute("GetMessageForUser");
             request.Headers.Add("Authorization", "userToken");
 
@@ -205,7 +195,7 @@ namespace BIDTP.Dotnet.Tests
             var successMessageString = "{ \"Response\": \"" + "Hello user" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
-            Assert.That(successMessageString == response.Body);
+            Assert.That(successMessageString == response.GetBody<string>());
         }
         
         [Test]
@@ -215,10 +205,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
-            var request = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             request.SetRoute("GetAuthAccessResponse");
             request.Headers.Add("Authorization", "randomToken");
 
@@ -227,7 +216,7 @@ namespace BIDTP.Dotnet.Tests
             var successMessageString = "{ \"Response\": \"" + "Auth access" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
-            Assert.That(successMessageString == response.Body);
+            Assert.That(successMessageString == response.GetBody<string>());
         }
         
         [Test]
@@ -237,10 +226,9 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
-            var request = new Request()
-            {
-                Body = "{ \"Message\": \"" + "Hello World" + "\" }",
-            };
+            var request = new Request();
+            
+            request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
             request.SetRoute("GetFreeAccessResponse");
             
             var response = await _client.WriteRequestAsync(request);
@@ -248,7 +236,37 @@ namespace BIDTP.Dotnet.Tests
             var successMessageString = "{ \"Response\": \"" + "Free access" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
-            Assert.That(successMessageString == response.Body);
+            Assert.That(successMessageString == response.GetBody<string>());
+        }
+        
+        [Test]
+        public async Task WriteRequestAsync_GetMappedObjectWithMetadataFromObjectContainer_MappingMiddlewareMiddleware_SuccessfullyWritesRequest()
+        {
+            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            _client = new Client(clientOptions);
+            await _client.ConnectToServer(_clientCancellationTokenSource);
+
+            var simpleObject = new AdditionalData
+            {
+                Guid = Guid.NewGuid().ToString(),
+                Items = new List<string>  { "Item1", "Item2" },
+                Name = "Test"
+            };
+
+            var request = new Request();
+            
+            request.SetRoute("GetMappedObjectFromObjectContainer");
+            request.SetBody<AdditionalData>(simpleObject);
+            
+            var response = await _client.WriteRequestAsync(request);
+
+            var dto = response.GetBody<AdditionalData>();
+            
+            Assert.That(dto.Name, Is.EqualTo(simpleObject.Name));
+            Assert.That(dto.Items, Is.EqualTo(simpleObject.Items));
+            Assert.That(dto.Guid, Is.EqualTo(simpleObject.Guid));
+            
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
         }
     }
 }

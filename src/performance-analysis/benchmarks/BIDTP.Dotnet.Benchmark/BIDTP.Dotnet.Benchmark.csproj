@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFrameworks>net48; net6.0</TargetFrameworks>
+        <RootNamespace>BIDTP.Dotnet.Benchmark</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\modules\BIDTP.Dotnet.Module.MockableServer\BIDTP.Dotnet.Module.MockableServer.csproj" />
+    </ItemGroup>
+    
+</Project>

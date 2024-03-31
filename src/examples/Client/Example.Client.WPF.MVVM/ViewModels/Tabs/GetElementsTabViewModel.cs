@@ -11,7 +11,6 @@ using CommunityToolkit.Mvvm.Input;
 using Example.Client.WPF.MVVM.Services;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
-using Newtonsoft.Json;
 
 namespace Example.Client.WPF.MVVM.ViewModels.Tabs;
 
@@ -66,14 +65,13 @@ public class GetElementsTabViewModel : ObservableObject
             {
                 Element = selectedItem
             };
-        
-            var jsonResponse = JsonConvert.SerializeObject(deleteElementRequest);
-            request.Body = jsonResponse;
+            
+            request.SetBody<DeleteElementRequest>(deleteElementRequest); 
             
             var response = await App.Client.WriteRequestAsync(request);
             if (response.StatusCode == StatusCode.Success)
             {
-                var message = response.Body;
+                var message = response.GetBody<string>();
 
                 var newList = new List<ElementDto>();
             
@@ -90,7 +88,7 @@ public class GetElementsTabViewModel : ObservableObject
             }
             else
             {
-                var error = JsonConvert.DeserializeObject<Error>(response.Body);
+                var error = response.GetBody<Error>();
             
                 MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
@@ -118,25 +116,23 @@ public class GetElementsTabViewModel : ObservableObject
             {
                 Category = category
             };
-        
-            var jsonResponse = JsonConvert.SerializeObject(getCategoryRequest);
-            request.Body = jsonResponse;
+
+            request.SetBody<GetElementsByCategoryRequest>(getCategoryRequest);
             
             var response = await App.Client.WriteRequestAsync(request);
         
             if (response.StatusCode == StatusCode.Success)
             {
-                var json = response.Body;
-            
-                var elements = JsonConvert.DeserializeObject<ICollection<ElementDto>>(json);
+                var elements = response.GetBody<List<ElementDto>>();
             
                 Elements = new ObservableCollection<ElementDto>(elements);
             }
             else
             {
-                var error = JsonConvert.DeserializeObject<Error>(response.Body);
+                var error = response.GetBody<Error>();
             
-                MessageBox.Show($"Message: {error.Message} \nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                MessageBox.Show($"Message: {error.Message} " +
+                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
             }
         }
         catch (Exception exception)

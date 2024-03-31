@@ -5,9 +5,8 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <TargetFramework>net48</TargetFramework>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Example.Server</RootNamespace>
+        <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Core\" />
       <Folder Include="Properties\" />
     </ItemGroup>
 
@@ -28,6 +28,4 @@
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
       <ProjectReference Include="..\Example.Schemas\Example.Schemas.csproj" />
     </ItemGroup>
-    
-
 </Project>

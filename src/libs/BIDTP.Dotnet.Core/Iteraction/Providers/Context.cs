@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Providers;
@@ -19,7 +20,11 @@ public class Context
     /// <summary>
     ///  The service provider of the server
     /// </summary>
-    public IServiceProvider ServiceProvider { get; }
+    public IServiceProvider ServiceProvider { get; }    
+    /// <summary>
+    ///  Additional data of the request for mutation 
+    /// </summary>
+    public ObjectContainer ObjectContainer { get; } = new ObjectContainer();
 
     /// <summary>
     ///  Constructor
@@ -30,6 +35,6 @@ public class Context
     public Context(Request request, IServiceProvider serviceProvider)
     {
         Request = request ?? throw new ArgumentNullException(nameof(request));
-        ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        ServiceProvider = serviceProvider;
     }
 }

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using Example.Client.WPF.MVVM.ViewModels.Tabs;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Example.Client.WPF.MVVM.Views.Tabs;
 

@@ -5,20 +5,25 @@
         <TargetFramework>net6.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>Example.Client.WPF</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     
 
     <ItemGroup>
+      <Reference Include="System.Net.Http" />
+    </ItemGroup>
+    
+
+    <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
       <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
     </ItemGroup>
+    
 
     <ItemGroup>
-      <Reference Include="System.Net.Http" />
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
     </ItemGroup>
 
 </Project>

@@ -62,20 +62,12 @@ public class ServerBuilder
     /// <exception cref="InvalidOperationException"> PipeStream must be provided. </exception>
     public Server Build()
     {
-        if (_routeHandlers.Count == 0) throw new InvalidOperationException("Route handlers must be provided");
+        if (_options == null)
+        {
+            throw new InvalidOperationException("Server options must be provided");
+        }
         
-        Server result;
-
-        if (_serviceProvider is not null)
-        {
-            result =  new Server(_options.PipeName, _options.ChunkSize, 
-                _options.ReconnectTimeRate, _routeHandlers, _serviceProvider);
-        }
-        else
-        {
-            result =  new Server(_options.PipeName, _options.ChunkSize, 
-                _options.ReconnectTimeRate, _routeHandlers);
-        }
+        var result = new Server(_options, _routeHandlers, _serviceProvider);
         
         return result;
     }

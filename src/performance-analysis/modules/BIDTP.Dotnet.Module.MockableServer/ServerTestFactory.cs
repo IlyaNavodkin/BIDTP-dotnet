@@ -1,7 +1,8 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Module.MockableServer.Controllers;
-using BIDTP.Dotnet.Module.MockableServer.Middlewares;
+using Example.Server.Domain.Auth.Middlewares;
+using Example.Server.Domain.Messages.Controllers;
+using Example.Server.Domain.Messages.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -28,6 +29,8 @@ public static class ServerTestFactory
         builder.AddRoute("GetMessageForUser", AuthMiddleware.Handle, SendMessageController.GetMessageForUser);
         builder.AddRoute("GetAuthAccessResponse", AuthMiddleware.Handle,SendMessageController.GetAuthAccessResponse);
         builder.AddRoute("GetFreeAccessResponse", SendMessageController.GetFreeAccessResponse);
+        builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle, 
+            SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
         
         var server = builder.Build();
 

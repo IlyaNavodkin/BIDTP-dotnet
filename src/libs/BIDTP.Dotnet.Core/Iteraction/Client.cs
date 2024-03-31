@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using Newtonsoft.Json;
+using BIDTP.Dotnet.Core.Iteraction.Utils;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 /// <summary>
@@ -21,7 +24,16 @@ public class Client
     private readonly SemaphoreSlim _pipeSemaphore;
     private NamedPipeClientStream _clientPipeStream;
     private CancellationTokenSource _cancellationTokenSource;
-    private string PipeName { get; }
+    
+    /// <summary>
+    ///  The name of the server for connection
+    /// </summary>
+    private string ServerName { get; }
+    
+    /// <summary>
+    ///  Json serializer options
+    /// </summary>
+    private JsonSerializerOptions JsonSerializerOptions { get; }
     
     /// <summary>
     ///  Connection is starting
@@ -36,7 +48,7 @@ public class Client
     /// <summary>
     ///  The time rate of the life check 
     /// </summary>
-    public int LifeCheckTimeRate { get; }
+    private int LifeCheckTimeRate { get; }
     
     /// <summary>
     ///  The time rate of the reconnect 
@@ -46,12 +58,17 @@ public class Client
     /// <summary>
     ///  The timeout of the connect 
     /// </summary>
-    public int ConnectTimeout { get; }
+    private int ConnectTimeout { get; }
     
     /// <summary>
     ///  The status of the connection 
     /// </summary>
     public bool IsHealthCheckConnected;
+    
+    /// <summary>
+    ///  Currently used encoding for sending and receiving
+    /// </summary>
+    public Encoding Encoding { get; }
     
     /// <summary>
     ///  Create a new SIDTPClient 
@@ -61,12 +78,15 @@ public class Client
     {
         _pipeSemaphore = new SemaphoreSlim(1, 1);
         
-        PipeName = options.PipeName;
+        JsonSerializerOptions = options.JsonSerializerOptions;
+        ServerName = options.ServerName;
         ChunkSize = options.ChunkSize;
         LifeCheckTimeRate = options.LifeCheckTimeRate;
         ReconnectTimeRate = options.ReconnectTimeRate;
         ConnectTimeout = options.ConnectTimeout;
+        Encoding = options.Encoding;
     }
+
 
     /// <summary>
     ///  Connect to the server and check the health time to connect
@@ -84,7 +104,7 @@ public class Client
         {
             if(_clientPipeStream is not null) throw new Exception("Stream already created");
                 
-            _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
+            _clientPipeStream = new NamedPipeClientStream(".", ServerName, PipeDirection.InOut);
 
             await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
 
@@ -132,15 +152,11 @@ public class Client
             dictionary.Add(nameof(MessageType), MessageType.HealthCheck.ToString());
 
             await WriteAsyncInternal(dictionary, _cancellationTokenSource.Token);
-
-            Debug.WriteLine($"[CLIENT: LifeCheck Request]: ping");
-                
+            
             var response = await ReadAsyncInternal(_cancellationTokenSource.Token);
                 
             IsHealthCheckConnected = !string.IsNullOrEmpty(response[nameof(MessageType)]);
-            IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
-                
-            Debug.WriteLine($"[CLIENT: LifeCheck Response]: pong");
+            
         }
         catch (Exception exception)
         {
@@ -150,6 +166,8 @@ public class Client
         finally
         {
             _pipeSemaphore.Release();
+            
+            IsLifeCheckConnectedChanged ?.Invoke(this, IsHealthCheckConnected);
         }
     }
 
@@ -177,22 +195,25 @@ public class Client
 
             dictionary.Add(nameof(MessageType), request.MessageType.ToString());
             
-            var headersJsonString = JsonConvert.SerializeObject(request.Headers);
+            var headersJsonString = JsonSerializer.Serialize(request.Headers, JsonSerializerOptions);
+            
             dictionary.Add("Headers", headersJsonString);
             
-            dictionary.Add("Body", request.Body);
+            dictionary.Add("Body", request.GetBody<string>());
             
             await WriteAsyncInternal(dictionary, cancellationToken);
             
             var result = await ReadAsyncInternal(cancellationToken);
             
-            var headers = JsonConvert.DeserializeObject<Dictionary<string, string>>(result["Headers"]);
+            var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(result["Headers"]);
             var statusCode = (StatusCode) Enum.Parse(typeof(StatusCode), result[nameof(StatusCode)]);
+            
             var response = new Response(statusCode)
             {
-                Body = result["Body"],
                 Headers = headers
             };
+            
+            response.SetBody(result["Body"]);
             
             return response;
 
@@ -220,161 +241,138 @@ public class Client
     {
         var result = new Dictionary<string, string>();
         
-        var bytesReads = 0;
-        
         var messageLengthBuffer = new byte[4];
-        await _clientPipeStream.ReadAsync(messageLengthBuffer, bytesReads, messageLengthBuffer.Length);
+        var messageTypeByteReadCount = await _clientPipeStream.ReadAsync(
+            messageLengthBuffer, 
+            0, 
+            messageLengthBuffer.Length, 
+            cancellationToken
+        );
+
         var messageLength = BitConverter.ToInt32(messageLengthBuffer, 0);
         
-        bytesReads += messageLengthBuffer.Length;
-
         var contentBuffer = new byte[messageLength];
-        await _clientPipeStream.ReadAsync(contentBuffer, 0, contentBuffer.Length, cancellationToken);
-        
+        var messageLengthByteReadCount = await _clientPipeStream.ReadAsync(
+            contentBuffer, 
+            0, 
+            contentBuffer.Length, 
+            cancellationToken
+        );
+
         using (var memoryStream = new MemoryStream(contentBuffer))
         {
-            var messageType = new byte[4];
-            await memoryStream.ReadAsync(messageType, 0, messageType.Length, cancellationToken);
-            var messageTypeValue = (MessageType) BitConverter.ToInt32(messageType, 0);
+            var binaryReader = new BinaryReader(memoryStream);
             
-            result.Add(nameof(MessageType), messageTypeValue.ToString());
+            var messageTypeBuffer = (MessageType) binaryReader.ReadInt32();
             
-            if(messageTypeValue == MessageType.HealthCheck)
-            {
-                return result;
-            }
+            result.Add(nameof(MessageType), messageTypeBuffer.ToString());
+        
+            if (messageTypeBuffer is MessageType.HealthCheck) return result;
             
-            var totalBytes = messageLengthBuffer.Length + messageLength;
+            var statusCode = (StatusCode) binaryReader.ReadInt32();
             
-            bytesReads += messageType.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-            
-            var statusCodeLengthBuffer = new byte[4];
-            await memoryStream.ReadAsync(statusCodeLengthBuffer, 0, statusCodeLengthBuffer.Length, cancellationToken);
-            var statusCode = (StatusCode) BitConverter.ToInt32(statusCodeLengthBuffer, 0);
-                
-            bytesReads += statusCodeLengthBuffer.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-                
-            var headersLengthBuffer = new byte[4];
-            await memoryStream.ReadAsync(headersLengthBuffer, 0, headersLengthBuffer.Length, cancellationToken);
-            var headersLength = BitConverter.ToInt32(headersLengthBuffer, 0);
-                
-            bytesReads += headersLengthBuffer.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-                
-            var headersBuffer = new byte[headersLength];
-                
-            for (var i = 0; i < headersBuffer.Length; i += ChunkSize)
-            {
-                var bytesToWrite = Math.Min(ChunkSize, headersBuffer.Length - i);
-                await memoryStream.ReadAsync(headersBuffer, 0, bytesToWrite, cancellationToken);
-                
-                bytesReads += bytesToWrite;
-                OnReadProgressChanged(bytesReads, totalBytes);
-            }
-                
-            var headersString = Encoding.Unicode.GetString(headersBuffer);
-                
-            var bodyLengthBuffer = new byte[4];
-            await memoryStream.ReadAsync(bodyLengthBuffer, 0, bodyLengthBuffer.Length, cancellationToken);
-            var bodyLength = BitConverter.ToInt32(bodyLengthBuffer, 0);
-                
-            bytesReads += bodyLengthBuffer.Length;
-            OnReadProgressChanged(bytesReads, totalBytes);
-                
-            var bodyBuffer = new byte[bodyLength];
-                
-            for (var i = 0; i < bodyBuffer.Length; i += ChunkSize)
-            {
-                var bytesToWrite = Math.Min(ChunkSize, bodyBuffer.Length - i);
-                await memoryStream.ReadAsync(bodyBuffer, 0, bytesToWrite, cancellationToken);
-                
-                bytesReads += bytesToWrite;
-                OnReadProgressChanged(bytesReads, totalBytes);
-            }
-                
-            var bodyString = Encoding.Unicode.GetString(bodyBuffer);
-                
             result.Add(nameof(StatusCode), statusCode.ToString());
-            result.Add("Headers", headersString);
-            result.Add("Body", bodyString);
-                
+            
+            var bytesRead = 0;
+            messageLengthByteReadCount -= 8;
+            
+            var headerString = BytesConvertUtil.ReadStringBytes(
+                cancellationToken,
+                binaryReader,
+                ref bytesRead,
+                messageLengthByteReadCount,
+                Encoding, 
+                ChunkSize,
+                OnReadProgressChanged
+                );
+            
+            result.Add("Headers",headerString);
+            
+            var bodyString = BytesConvertUtil.ReadStringBytes(
+                cancellationToken,
+                binaryReader,
+                ref bytesRead,
+                messageLengthByteReadCount,
+                Encoding, 
+                ChunkSize,
+                OnReadProgressChanged
+                );
+            
+            result.Add("Body",bodyString);
+            
+            ReadCompleted?.Invoke(this, EventArgs.Empty);
+            
             return result;
-        } 
+        }
     }
-    
+
     private async Task WriteAsyncInternal(Dictionary<string, string> dictionary, CancellationToken cancellationToken)
     {
-        var bytesWrite = 0;
-
         using (var memoryStream = new MemoryStream())
         {
+            var binaryWriter = new BinaryWriter(memoryStream, Encoding);
+            
             var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
-            var messageTypeByte = BitConverter.GetBytes((int)messageType);
-        
-            if (messageType == MessageType.HealthCheck)
+            binaryWriter.Write((int)messageType);
+           
+            if (messageType == MessageType.General)
             {
-                var responseLength = messageTypeByte.Length;
-                var responseLengthBytes = BitConverter.GetBytes(responseLength);
+                var bytesWriteCount = 0;
                 
-                await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
-                await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
-            }
-            else
-            {
                 var headerString = dictionary["Headers"];
-                var body = dictionary["Body"];
-            
-                var headerBytes = Encoding.Unicode.GetBytes(headerString);
-                var headerBytesLength = BitConverter.GetBytes(headerBytes.Length);
-            
-                var bodyBytes = Encoding.Unicode.GetBytes(body);
-                var bodyBytesLength = BitConverter.GetBytes(bodyBytes.Length);
-            
-                var responseLength = messageTypeByte.Length + headerBytesLength.Length + headerBytes.Length + bodyBytesLength.Length + bodyBytes.Length;
-                var responseLengthBytes = BitConverter.GetBytes(responseLength);
-                var totalBytes = responseLengthBytes.Length + responseLength;
+                var headerBuffer = Encoding.GetBytes(headerString);
                 
-                await memoryStream.WriteAsync(responseLengthBytes, 0, responseLengthBytes.Length, cancellationToken);
-                bytesWrite += responseLengthBytes.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-
-                await memoryStream.WriteAsync(messageTypeByte, 0, messageTypeByte.Length, cancellationToken);
-                bytesWrite += messageTypeByte.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
+                var bodyString = dictionary["Body"];
+                var bodyBuffer = Encoding.GetBytes(bodyString);
                 
-                await memoryStream.WriteAsync(headerBytesLength, 0, headerBytesLength.Length, cancellationToken);
-                bytesWrite += headerBytesLength.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
-            
-                for (var i = 0; i < headerBytes.Length; i += ChunkSize)
-                {
-                    var bytesToWrite = Math.Min(ChunkSize, headerBytes.Length - i);
-                    await memoryStream.WriteAsync(headerBytes, 0, bytesToWrite, cancellationToken);
+                var totalBytesWriteCount = 
+                    headerBuffer.Length + bodyBuffer.Length;
                 
-                    bytesWrite += bytesToWrite;
-                    OnWriteProgressChanged(bytesWrite, totalBytes);
-                }
+                BytesConvertUtil.WriteStringBytes(
+                    cancellationToken, 
+                    binaryWriter, 
+                    headerBuffer, 
+                    ref bytesWriteCount, 
+                    totalBytesWriteCount, 
+                    ChunkSize,
+                    OnWriteProgressChanged
+                    );
                 
-                await memoryStream.WriteAsync(bodyBytesLength, 0, bodyBytesLength.Length, cancellationToken);
-                bytesWrite += bodyBytesLength.Length;
-                OnWriteProgressChanged(bytesWrite, totalBytes);
+                var dateTimeStart = DateTime.Now;
+                Debug.WriteLine($"Start read body {DateTime.Now}");
                 
-                for (var i = 0; i < bodyBytes.Length; i += ChunkSize)
-                {
-                    var bytesToWrite = Math.Min(ChunkSize, bodyBytes.Length - i);
-                    await memoryStream.WriteAsync(bodyBytes, 0, bytesToWrite, cancellationToken);
+                BytesConvertUtil.WriteStringBytes(
+                    cancellationToken, 
+                    binaryWriter, 
+                    bodyBuffer, 
+                    ref bytesWriteCount, 
+                    totalBytesWriteCount, 
+                    ChunkSize,
+                    OnWriteProgressChanged
+                    );
                 
-                    bytesWrite += bytesToWrite;
-                    OnWriteProgressChanged(bytesWrite, totalBytes);
-                }
+                var writeTime = DateTime.Now - dateTimeStart;
+                
+                Debug.WriteLine($"Write time: {writeTime}");
             }
         
             var buffer = memoryStream.ToArray();
-            await _clientPipeStream.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+            
+            var allLength = buffer.Length;
+            var allLengthBuffer = BitConverter.GetBytes(allLength);
+            
+            buffer = allLengthBuffer.Concat(buffer).ToArray();
+            
+            await _clientPipeStream.WriteAsync(buffer, 
+                0, 
+                buffer.Length, 
+                cancellationToken
+                );
+            
+            WriteCompleted?.Invoke(this, EventArgs.Empty);
         }
     }
+
 
     private void OnWriteProgressChanged(int bytesWrite, int totalBytes)
     {
@@ -402,6 +400,14 @@ public class Client
         Console.WriteLine($"[CLIENT: Dispose stream]: Disposed client resources.");
     }
     
+    /// <summary>
+    ///  Occurs when write progress
+    /// </summary>
+    public event EventHandler<EventArgs> WriteCompleted;    
+    /// <summary>
+    ///  Occurs when read progress
+    /// </summary>
+    public event EventHandler<EventArgs> ReadCompleted;
     /// <summary>
     ///  Occurs when read progress
     /// </summary>
