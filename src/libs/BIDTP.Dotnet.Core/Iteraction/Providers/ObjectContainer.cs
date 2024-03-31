@@ -31,21 +31,6 @@ public class ObjectContainer
     }
 
     /// <summary>
-    /// Add an object to the container 
-    /// </summary>
-    /// <param name="type"> The type of the object. </param>
-    /// <param name="obj"> The object. </param>
-    public void AddObject(Type type, object obj)
-    {
-        if (Objects.ContainsKey(type))
-        {
-            throw new ArgumentException($"An object of type '{type}' already exists in the container.");
-        }
-
-        Objects.Add(type, obj);
-    }
-    
-    /// <summary>
     /// Get an object from the container 
     /// </summary>
     /// <typeparam name="T"> The type of the object.</typeparam>

@@ -2,11 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.2] - 2024-31-03
+
+### Added
+
+-   add "ServerName" in Server\Client options
+
+### Changed
+
+-   change Readme.md
+
+### Fixed
+
 ## [1.3.1] - 2024-31-03
 
 ### Added
 
--   add ObjectContainer in Context class 
+-   add ObjectContainer in Context class
 -   add new Test case for ObjectContainer
 -   add Encoding properties for server and client
 -   add end of write\read events

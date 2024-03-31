@@ -16,6 +16,10 @@ public class ServerOptions
     /// <summary>
     ///  The name of the pipe 
     /// </summary>
+    public readonly string PipeName;
+    /// <summary>
+    ///  The name of the server
+    /// </summary>
     public readonly string ServerName;
     /// <summary>
     ///  The chunk size for the transmission data
@@ -34,12 +38,13 @@ public class ServerOptions
     ///  Create a new instance of the ServerOptions
     /// </summary>
     /// <param name="serverName"> The name of the server </param>
+    /// <param name="pipeName"> The name of the server </param>
     /// <param name="chunkSize"> The chunk size for the transmission data </param>
     /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
     /// <param name="jsonSerializerOptions"> The json serializer options </param>
     /// <param name="encoding"> The encoding </param>
-    public ServerOptions(
-        string serverName = "defaultServerName", 
+    public ServerOptions(string serverName = "*", 
+        string pipeName = "defaultServerName", 
         int chunkSize = 1024, 
         int reconnectTimeRate = 5000, 
         JsonSerializerOptions jsonSerializerOptions = null,
@@ -47,6 +52,7 @@ public class ServerOptions
         )
     {
         ServerName = serverName;
+        PipeName = pipeName;
         ChunkSize = chunkSize;
         ReconnectTimeRate = reconnectTimeRate;
         JsonSerializerOptions = jsonSerializerOptions 

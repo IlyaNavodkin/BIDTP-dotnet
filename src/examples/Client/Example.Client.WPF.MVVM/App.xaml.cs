@@ -14,7 +14,7 @@ namespace Example.Client.WPF.MVVM
         
         protected override void OnStartup(StartupEventArgs e)
         {
-            var options = new ClientOptions("testpipe", 
+            var options = new ClientOptions("*","testpipe", 
                 1024, 9000, 
                 1000, 5000);
             

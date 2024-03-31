@@ -14,7 +14,7 @@ public static class ServerTestFactory
     {
         var builder = new ServerBuilder();
 
-        var options = new ServerOptions("testpipe", 1024,  5000);
+        var options = new ServerOptions("*","testpipe", 1024,  5000);
         builder.SetGeneralOptions(options);
 
         var serviceCollection = new ServiceCollection();

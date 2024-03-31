@@ -64,7 +64,8 @@ public sealed partial class App
         OwnerProcess.EnableRaisingEvents = true;
         OwnerProcess.Exited += OnOwnerProcessExited;
         
-        var options = new ClientOptions(CommandLineArguments.PipeName, 1024, 9000, 
+        var options = new ClientOptions("*",
+            CommandLineArguments.PipeName, 1024, 9000, 
             1000, 5000);
         
         Client = new BIDTP.Dotnet.Core.Iteraction.Client(options);

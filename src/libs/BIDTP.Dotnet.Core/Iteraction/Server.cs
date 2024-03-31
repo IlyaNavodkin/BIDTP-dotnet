@@ -7,7 +7,6 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
@@ -38,9 +37,14 @@ public class Server : IHost
     public int ReconnectTimeRate { get; }
     
     /// <summary>
-    ///  The name of the server for connection
+    ///  The name of the pipe for connection
     /// </summary>
-    public string ServerName { get; }
+    public string PipeName { get; }
+    
+    /// <summary>
+    ///  The name of the server
+    /// </summary>
+    public readonly string ServerName;
     
     /// <summary>
     ///  Json serializer options for request\response serialization
@@ -66,12 +70,13 @@ public class Server : IHost
     public Server(ServerOptions options, Dictionary<string, 
         Func<Context, Task>[]> routeHandlers,  IServiceProvider serviceProvider)
     {
-        ServerName = options.ServerName;
+        PipeName = options.PipeName;
         Services = serviceProvider;
         ChunkSize = options.ChunkSize;
         ReconnectTimeRate = options.ReconnectTimeRate;
         JsonSerializerOptions = options.JsonSerializerOptions;
         Encoding = options.Encoding;
+        ServerName = options.ServerName;
 
         _routeHandlers = routeHandlers;
         
@@ -95,7 +100,7 @@ public class Server : IHost
             {
                 if(_serverPipeStream is not null) throw new Exception("Stream already created");
                 
-                _serverPipeStream = new NamedPipeServerStream(ServerName, PipeDirection.InOut, 
+                _serverPipeStream = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 
                     NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Message);
                 await _serverPipeStream.WaitForConnectionAsync(cancellationToken);
                 

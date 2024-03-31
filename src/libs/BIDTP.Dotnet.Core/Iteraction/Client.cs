@@ -28,7 +28,12 @@ public class Client
     /// <summary>
     ///  The name of the server for connection
     /// </summary>
-    private string ServerName { get; }
+    private string PipeName { get; }
+    
+    /// <summary>
+    ///  The name of the server
+    /// </summary>
+    public readonly string ServerName;
     
     /// <summary>
     ///  Json serializer options
@@ -79,15 +84,15 @@ public class Client
         _pipeSemaphore = new SemaphoreSlim(1, 1);
         
         JsonSerializerOptions = options.JsonSerializerOptions;
-        ServerName = options.ServerName;
+        PipeName = options.PipeName;
         ChunkSize = options.ChunkSize;
         LifeCheckTimeRate = options.LifeCheckTimeRate;
         ReconnectTimeRate = options.ReconnectTimeRate;
         ConnectTimeout = options.ConnectTimeout;
         Encoding = options.Encoding;
+        ServerName = options.ServerName;
     }
-
-
+    
     /// <summary>
     ///  Connect to the server and check the health time to connect
     /// </summary>
@@ -104,7 +109,7 @@ public class Client
         {
             if(_clientPipeStream is not null) throw new Exception("Stream already created");
                 
-            _clientPipeStream = new NamedPipeClientStream(".", ServerName, PipeDirection.InOut);
+            _clientPipeStream = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut);
 
             await _clientPipeStream.ConnectAsync(ConnectTimeout, _cancellationTokenSource.Token);
 

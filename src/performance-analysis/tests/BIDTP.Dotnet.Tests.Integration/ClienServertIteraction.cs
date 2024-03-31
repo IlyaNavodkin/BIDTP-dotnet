@@ -44,7 +44,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
@@ -61,7 +69,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_UnauthorizedWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
@@ -78,7 +94,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_RouteNotExist()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
@@ -96,7 +120,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_Spam_RouteNotExist()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
@@ -125,7 +157,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_Spam_AllMessagesRoute()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
             
@@ -162,7 +202,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_InternalErrorWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
@@ -180,7 +228,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetMessageForUser_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
@@ -201,7 +257,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetAuthAccessResponse_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
@@ -222,7 +286,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetFreeAccessResponse_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+            );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
@@ -242,7 +314,15 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_GetMappedObjectWithMetadataFromObjectContainer_MappingMiddlewareMiddleware_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+            var clientOptions = new ClientOptions(
+                "*", 
+                PipeName, 
+                ChunkSize, 
+                LifeCheckTimeRate, 
+                ReconnectTimeRate, 
+                ConnectTimeout
+                );
+            
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
