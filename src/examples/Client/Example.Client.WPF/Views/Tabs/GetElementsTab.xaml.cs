@@ -122,9 +122,6 @@ public partial class GetElementsTab : UserControl
     {
         try
         {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            var token = mainWindow.AuthTokenTextBox.Text;
-            
             var simpleObject = new AdditionalData
             {
                 Guid = Guid.NewGuid().ToString(),
@@ -142,8 +139,10 @@ public partial class GetElementsTab : UserControl
             if (response.StatusCode is StatusCode.Success)
             {
                 var dto = response.GetBody<AdditionalData>();
+                
+                var jsonStringDto = response.GetBody<string>();
 
-                MessageBox.Show(response.GetBody<string>());
+                MessageBox.Show(jsonStringDto);
             }
             else
             {

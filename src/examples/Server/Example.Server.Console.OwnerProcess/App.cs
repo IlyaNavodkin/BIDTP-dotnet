@@ -21,7 +21,11 @@ Process childProcess = null;
 
 try
 {
-    var options = new ServerOptions("testpipe", 1024,  5000);
+    var options = new ServerOptions(
+        "*",
+        "testpipe", 
+        1024,  
+        5000);
     var builder = new ServerBuilder();
 
     builder.SetGeneralOptions(options);
@@ -73,7 +77,7 @@ try
     server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
     server.AddBackgroundService<LoggingWorker>("BackgroundWorker2");
 
-    var serverName = server.ServerName;
+    var serverName = server.PipeName;
     
     childProcess = RunClientProcess(serverName);
 

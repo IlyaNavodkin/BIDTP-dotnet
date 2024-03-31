@@ -106,6 +106,64 @@ The status code is a specific code (classification) of responses from the server
 | NotFound     | 202 - Not successful Server response - route not found            |
 | ServerError  | 300 - Not successful Server response - error on server side       |
 
+## Request class
+
+The Request class allows you to conveniently retrieve and store information not only in the form of primitive data types but also as complex objects. Additionally, you can include the required information as headers to provide necessary additional details to your Request. Moreover, you can use it to define routes.
+
+```c#
+# Create request class
+var requestClass = new Request();
+
+# Add custom headers
+requestClass.Headers.Add("Authorizartion", "token");
+
+# Set route
+requestClass.SetRoute("AnyRouteOfUrServer");
+
+# Set body like a object
+requestClass.SetBody<AdditionalData>(additionalData);
+
+# or
+
+# Set body like a string
+requestClass.SetBody<string>("Any string");
+
+# Get body like a object
+AdditionalData dto = requestClass.GetBody<AdditionalData>();
+
+# or
+
+# Get body like a string
+string stringJsonDto = requestClass.GetBody<string>();
+```
+
+## Response class
+
+The Response class allows you to conveniently retrieve and write information not only in the form of primitive data types but also in the form of complex objects. Additionally, you can write the required information as headers to provide necessary additional details to your Response. It is also essential to specify the response status code.
+
+```c#
+# Create response class and set StatusCode
+var responseClass = new Response(StatusCode.Success);
+
+responseClass.Headers.Add("AnyHeader", "AnyValue");
+
+# Set body like a object
+responseClass.SetBody<AdditionalData>(additionalData);
+
+# or
+
+# Set body like a string
+responseClass.SetBody<string>("Any string");
+
+# Get body like a object
+AdditionalData dto = responseClass.GetBody<AdditionalData>();
+
+# or
+
+# Get body like a string
+string stringJsonDto = responseClass.GetBody<string>();
+```
+
 # Server connection
 
 The main task of implementing the server was to create the fundamental infrastructure for easy server management and handling of its dependencies.
@@ -119,7 +177,7 @@ Setting up and connecting a server using the BIDTP protocol is very simple!
 var builder = new ServerBuilder();
 
 # Create and set generic options
-var options = new ServerOptions("testpipe", 1024,  5000);
+var options = new ServerOptions("*", "testpipe" ... );
 builder.SetGeneralOptions(options);
 
 # U can use any DI container
@@ -163,7 +221,11 @@ U can use ur custom DI container, implemet IServiceProvider and do it!
 
 ## Flexible routing system
 
-The server also features a flexible routing system. You can create chains of handlers to process different routes, which will be executed sequentially:
+The server also features a flexible routing system. You can use different combinations to achieve your goals for implementing the business logic of the application. See below for the main features.
+
+### Handlers chain
+
+You can create chains of **Func<Context, Task>** handlers (ur custom local function, handlers, methods) to process different routes, which will be executed sequentially:
 
 ```c#
 # Add for "PrintMessage" route many handlers\middlewares\guards
@@ -175,6 +237,7 @@ builder.AddRoute("GetElements", MessageController.GetElements);
 # Local handler or middleware or guard
 Task JustChickenGuard(Context context)
 {
+    # Get the client Request
     var request = context.Request;
 
     var isShitWord = request.Body.Contains("Yes of course");
@@ -188,10 +251,9 @@ Task JustChickenGuard(Context context)
             ErrorCode = 228
         };
 
-        var response = new Response(StatusCode.ClientError)
-        {
-            Body = JsonConvert.SerializeObject(dto)
-        };
+        var response = new Response(StatusCode.ClientError);
+
+        response.SetBody(dto);
 
         context.Response = response;
     }
@@ -202,54 +264,9 @@ Task JustChickenGuard(Context context)
 
 Exactly - you can use your custom middleware\guards to effectively manage the lifecycle of messages, providing flexibility and efficiency. All you need to do is utilize the Context as a parameter in your method.
 
-## Background services
+### Custom attributes
 
-If you need the server to utilize the functionality of background services (workers) that will operate asynchronously, you can make use of adding custom components and connect them to the server:
-
-```c#
-# Set custom name for services
-server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
-server.AddBackgroundService<LoggingWorker>("BackgroundWorker2");
-
-or
-
-# Or leave it to the server
-server.AddBackgroundService<LoggingWorker>();
-```
-
-## Write\read events
-
-You can use your data transfer events (write and read) to use this information to more accurately display progress of server:
-
-```c#
-# Read event
-App.Server.ReadProgress += OnProgress;
-
-# Write event
-App.Server.WriteProgress += OnProgress;
-
-# Handle!
-private void OnProgress(object? sender, ProgressEventArgs e)
-{
-    var bytesWritten = e.BytesWritten;
-    var totalBytes = e.TotalBytes;
-    var progressPercentage = (int)((double)bytesWritten / totalBytes * 100);
-
-    if (totalBytes == bytesWritten)
-    {
-        Console.WriteLine("Completed");
-    }
-    else if (progressPercentage >= 0 && progressPercentage <= 100)
-    {
-        var message = $"{e.ProgressOperationType.ToString()} progress: {progressPercentage}%";
-        Console.WriteLine(message);
-    }
-}
-```
-
-## Custom attributes
-
-You can create custom attributes that you can use to create Guard or Middleware components that will execute BEFORE the method.
+You can create custom attributes that you can use to create Guard or Middleware components that will execute BEFORE the method. Implement **IMethodScopedPreInvokable** for ur attribute.
 
 ```c#
 # Create custom attribute and implement IMethodScopedPreInvokable interface
@@ -340,6 +357,93 @@ public class SendMessageController
         return Task.CompletedTask;
     }
 }
+
+```
+
+## ObjectContainer
+
+You can use the ObjectContainer property in the Context class. ObjectContainer allows you to embed objects or additional information into it so that, during the Request lifecycle in the server's routing system, you can access them in any Func<Context, Task> or IMethodScopedPreInvokable in the routing chain.
+
+For example, you can store authentication data, map data, collect and record metrics, and more there.
+
+```c#
+# First handler
+public static Task Handle(Context context)
+{
+    var request = context.Request;
+
+    var additionalData = request.GetBody<AdditionalData>();
+
+    # Add object to container
+    context.ObjectContainer.AddObject<AdditionalData>(additionalData);
+
+    return Task.CompletedTask;
+}
+
+# Second handler
+public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
+{
+    var objectContainer = context.ObjectContainer;
+
+    # Try get it from container
+    var additionalData = objectContainer.GetObject<AdditionalData>();
+
+    if (additionalData is null) throw new Exception("No object in object container");
+
+    var response = new Response(StatusCode.Success);
+
+    response.SetBody(additionalData);
+
+    context.Response = response;
+
+    return Task.CompletedTask;
+}
+
+```
+
+## Background services
+
+If you need the server to utilize the functionality of background services (workers) that will operate asynchronously, you can make use of adding custom components and connect them to the server:
+
+```c#
+# Set custom name for services
+server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
+server.AddBackgroundService<LoggingWorker>("BackgroundWorker2");
+
+or
+
+# Or leave it to the server
+server.AddBackgroundService<LoggingWorker>();
+```
+
+## Write\read events
+
+You can use your data transfer events (write and read) to use this information to more accurately display progress of server:
+
+```c#
+# Read event
+App.Server.ReadProgress += OnProgress;
+
+# Write event
+App.Server.WriteProgress += OnProgress;
+
+# Handle!
+private void OnProgress(object? sender, ProgressEventArgs e)
+{
+    var bytesWritten = e.BytesWritten;
+    var totalBytes = e.TotalBytes;
+    var progressPercentage = (int)((double)bytesWritten / totalBytes * 100);
+
+    if (totalBytes == bytesWritten)
+    {
+        Console.WriteLine("Completed");
+    }
+    else if (progressPercentage >= 0 && progressPercentage <= 100)
+    {
+        var message = $"{e.ProgressOperationType.ToString()} progress: {progressPercentage}%";
+        Console.WriteLine(message);
+    }
+}
 ```
 
 # Client connection
@@ -356,9 +460,7 @@ public partial class App
     protected override void OnStartup(StartupEventArgs e)
     {
         # Create options
-        var options = new ClientOptions("testpipe",
-            1024, 9000,
-            1000, 5000);
+        var options = new ClientOptions("*", "testpipe" ...);
 
         # Create client
         Client = new Client(options);
@@ -369,44 +471,59 @@ public partial class App
 For sending messages, you can create a class (Request) and send it, then wait to receive a response from it (Response):
 
 ```c#
-# Use it anywhere
-private async void SendMessageButton_OnClick(object sender, RoutedEventArgs e)
+
+private async void GetElements(object sender, RoutedEventArgs e)
 {
     try
     {
         var mainWindow = (MainWindow)Application.Current.MainWindow;
-
-        # Create request
-        var request = new Request
-        {
-            Body = MessageInputTextBox.Text,
-            Headers = new Dictionary<string, string>()
-        };
-
         var token = mainWindow.AuthTokenTextBox.Text;
 
-        # Set custom header
+        # Create Request object
+        var request = new Request();
+
+        # Add custom header
         request.Headers.Add("Authorization", token);
 
         # Set route
-        request.SetRoute("PrintMessage");
+        request.SetRoute("GetElements");
 
-        # Set response
+        var getCategoryRequest = new GetElementsByCategoryRequest
+        {
+            Category = CategoryTextBox.Text
+        };
+
+        # Set dto to json string body
+        request.SetBody<GetElementsByCategoryRequest>(getCategoryRequest);
+
+        # Send Request to server
         var response = await App.Client.WriteRequestAsync(request);
 
-        var formattedResponseText = JToken.Parse(response.Body)
-            .ToString(Newtonsoft.Json.Formatting.Indented);
+        # Check status code from server
+        if (response.StatusCode == StatusCode.Success)
+        {
+            # Get dto from body
+            var elements = response.GetBody<List<ElementDto>>();
 
-        OutPutTextBlock.Text = formattedResponseText;
+            # Add Elements to ur UI
+            DataGridElements.ItemsSource = elements;
+        }
+        # If u have invalid status code
+        else
+        {
+            # Get error dto
+            var error = response.GetBody<Error>();
 
-        MessageBox.Show(formattedResponseText);
+            # Handle it!
+            MessageBox.Show($"Message: {error.Message} " +
+                            $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+        }
     }
     catch (Exception exception)
     {
         MessageBox.Show(exception.Message);
     }
 }
-
 
 ```
 
@@ -424,12 +541,18 @@ App.Client.WriteProgress += OnProgress;
 # Handle it!
 private async void OnProgress(object? sender, ProgressEventArgs e)
 {
+    var bytesWritten = e.BytesWritten;
+    var totalBytes = e.TotalBytes;
+    var progressPercentage = (int)((double)bytesWritten / totalBytes * 100);
+
+    if (progressPercentage % 5 != 0) return;
+
+    var message = $"{e.ProgressOperationType.ToString()} progress: {progressPercentage}%";
+
+    Debug.WriteLine(message);
+
     await Dispatcher.InvokeAsync(() =>
     {
-        var bytesWritten = e.BytesWritten;
-        var totalBytes = e.TotalBytes;
-        var progressPercentage = (int)((double)bytesWritten / totalBytes * 100);
-
         if (totalBytes == bytesWritten)
         {
             ProgressBarTextBlock.Text = "Completed";
@@ -437,15 +560,12 @@ private async void OnProgress(object? sender, ProgressEventArgs e)
         }
         else if (progressPercentage >= 0 && progressPercentage <= 100)
         {
-            var message = $"{e.ProgressOperationType.ToString()} progress: {progressPercentage}%";
-
-            Debug.WriteLine(message);
-
             ProgressBarTextBlock.Text = message;
             ProgressBar.Value = progressPercentage;
         }
-    });
-}
+    }, System.Windows.Threading.DispatcherPriority.Background);
+});
+
 ```
 
 ## Health-checking
@@ -485,10 +605,12 @@ var isConnected = App.Client.IsHealthCheckConnected;
 
 In the repository, there are examples of .NET applications:
 
-1. Example.Client.WPF - A reconnectable client application based on the .NET Core 6 framework.
-2. Example.Client.WPF.MVVM - A reconnectable client application based on the .NET Core 6 framework with MVVM
-3. Example.Client.WPF.ChildProcess - A client application based on the .NET Core 6 framework. It needs to be run by the server (owner process).
+1. Example.Client.WPF - A reconnectable client application based on the .NET Core 6.
+2. Example.Client.WPF.MVVM - A reconnectable client application based on the .NET Core 6 with MVVM
+3. Example.Client.WPF.ChildProcess - A client application based on the .NET Core 6. It needs to be run by the server (owner process).
 4. Example.Server.Console - A server application based on the .NET Framework 4.8, presented as a console application.
 5. Example.Server.Console.OwnerProcess - A server application based on the .NET Framework 4.8, which runs another client-child process.
 6. Example.Server.Revit.OwnerProcess - A server application based on the .NET Framework 4.8 and Revit API, also running another client-child process.
 7. Example.Schemas - Declaration of generic DTO schemas for client-server communication.
+
+More examples in BIDTP.Dotnet.Tests.Integration

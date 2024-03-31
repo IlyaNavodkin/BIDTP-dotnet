@@ -80,7 +80,12 @@ public class RunAboutProgramExternalCommand: ExternalCommand
 
                 var pipeName = AppDomain.CurrentDomain.GetHashedPipeName();
                 
-                var options = new ServerOptions(pipeName, 1024,  5000);
+                var options = new ServerOptions(
+                    "*", 
+                    pipeName, 
+                    1024,  
+                    5000);
+                
                 var builder = new ServerBuilder();
         
                 builder.SetGeneralOptions(options);
@@ -130,7 +135,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 
                 server.AddBackgroundService<LoggingWorker>();
                
-                childProcess = RunClientProcess(options.ServerName, filename);
+                childProcess = RunClientProcess(options.PipeName, filename);
                 
                 await server.StartAsync(cancellationTokenSource.Token);
             }

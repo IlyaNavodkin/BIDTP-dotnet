@@ -72,7 +72,7 @@ namespace Example.Client.WPF.Views
                     ProgressBarTextBlock.Text = message;
                     ProgressBar.Value = progressPercentage;
                 }
-            }, System.Windows.Threading.DispatcherPriority.Background); // Указываем приоритет Dispatcher
+            }, System.Windows.Threading.DispatcherPriority.Background); 
         }
 
         private async void ConnectToServer(object sender, RoutedEventArgs e)

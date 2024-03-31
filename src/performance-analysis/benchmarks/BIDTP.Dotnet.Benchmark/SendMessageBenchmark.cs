@@ -38,7 +38,8 @@ namespace BIDTP.Dotnet.Benchmark
             _server.StartAsync(_serverCancellationTokenSource.Token);
 
             var clientOptions =
-                new ClientOptions(PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
+                new ClientOptions("*",
+                    PipeName, ChunkSize, LifeCheckTimeRate, ReconnectTimeRate, ConnectTimeout);
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
         }
