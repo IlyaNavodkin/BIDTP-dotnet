@@ -246,7 +246,7 @@ namespace BIDTP.Dotnet.Tests
             _client = new Client(clientOptions);
             await _client.ConnectToServer(_clientCancellationTokenSource);
 
-            var simpleObject = new SimpleObject
+            var simpleObject = new AdditionalData
             {
                 Guid = Guid.NewGuid().ToString(),
                 Items = new List<string>  { "Item1", "Item2" },
@@ -256,17 +256,17 @@ namespace BIDTP.Dotnet.Tests
             var request = new Request();
             
             request.SetRoute("GetMappedObjectFromObjectContainer");
-            request.SetBody<SimpleObject>(simpleObject);
+            request.SetBody<AdditionalData>(simpleObject);
             
             var response = await _client.WriteRequestAsync(request);
 
-            var dto = response.GetBody<SimpleObject>();
+            var dto = response.GetBody<AdditionalData>();
             
-            // Assert.That(dto.Name, Is.EqualTo(simpleObject.Name));
-            // Assert.That(dto.Items, Is.EqualTo(simpleObject.Items));
-            // Assert.That(dto.Guid, Is.EqualTo(simpleObject.Guid));
-            //
-            // Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
+            Assert.That(dto.Name, Is.EqualTo(simpleObject.Name));
+            Assert.That(dto.Items, Is.EqualTo(simpleObject.Items));
+            Assert.That(dto.Guid, Is.EqualTo(simpleObject.Guid));
+            
+            Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
         }
     }
 }

@@ -57,6 +57,6 @@ public class ObjectContainer
             return (T)obj;
         }
 
-        throw new KeyNotFoundException($"Object of type '{typeof(T)}' not found in the container.");
+        return default;
     }
 }

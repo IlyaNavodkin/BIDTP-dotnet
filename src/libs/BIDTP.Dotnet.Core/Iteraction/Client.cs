@@ -13,7 +13,7 @@ using BIDTP.Dotnet.Core.Iteraction.Dtos;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Core.Iteraction.Utills;
+using BIDTP.Dotnet.Core.Iteraction.Utils;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 /// <summary>
@@ -68,7 +68,7 @@ public class Client
     /// <summary>
     ///  Currently used encoding for sending and receiving
     /// </summary>
-    public Encoding Encoding { get; set; } = Encoding.Unicode;
+    public Encoding Encoding { get; }
     
     /// <summary>
     ///  Create a new SIDTPClient 
@@ -84,6 +84,7 @@ public class Client
         LifeCheckTimeRate = options.LifeCheckTimeRate;
         ReconnectTimeRate = options.ReconnectTimeRate;
         ConnectTimeout = options.ConnectTimeout;
+        Encoding = options.Encoding;
     }
 
 
@@ -275,7 +276,7 @@ public class Client
             var bytesRead = 0;
             messageLengthByteReadCount -= 8;
             
-            var headerString = BytesConvertUtills.ReadStringBytes(
+            var headerString = BytesConvertUtil.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
                 ref bytesRead,
@@ -287,7 +288,7 @@ public class Client
             
             result.Add("Headers",headerString);
             
-            var bodyString = BytesConvertUtills.ReadStringBytes(
+            var bodyString = BytesConvertUtil.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
                 ref bytesRead,
@@ -327,7 +328,7 @@ public class Client
                 var totalBytesWriteCount = 
                     headerBuffer.Length + bodyBuffer.Length;
                 
-                BytesConvertUtills.WriteStringBytes(
+                BytesConvertUtil.WriteStringBytes(
                     cancellationToken, 
                     binaryWriter, 
                     headerBuffer, 
@@ -340,7 +341,7 @@ public class Client
                 var dateTimeStart = DateTime.Now;
                 Debug.WriteLine($"Start read body {DateTime.Now}");
                 
-                BytesConvertUtills.WriteStringBytes(
+                BytesConvertUtil.WriteStringBytes(
                     cancellationToken, 
                     binaryWriter, 
                     bodyBuffer, 

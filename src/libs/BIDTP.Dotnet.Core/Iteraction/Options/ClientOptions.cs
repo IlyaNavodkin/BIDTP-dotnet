@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using BIDTP.Dotnet.Core.Iteraction.Helpers;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Options;
@@ -32,6 +33,10 @@ public class ClientOptions
     ///  The timeout of the connect
     /// </summary>
     public readonly int ConnectTimeout;
+    /// <summary>
+    ///  The encoding send and receive
+    /// </summary>
+    public readonly Encoding Encoding;
 
     /// <summary>
     ///  Create a new SIDTPClientOptions
@@ -42,12 +47,14 @@ public class ClientOptions
     /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
     /// <param name="connectTimeout"> The timeout of the connect </param>
     /// <param name="jsonSerializerOptions"> The json serializer options </param>
+    /// <param name="encoding"> The encoding </param>
     public ClientOptions(string serverName = "defaultPipeName", 
         int chunkSize = 1024, 
         int lifeCheckTimeRate = 1000, 
         int reconnectTimeRate = 5000,
         int connectTimeout = 30000,
-        JsonSerializerOptions jsonSerializerOptions = null)
+        JsonSerializerOptions jsonSerializerOptions = null,
+        Encoding encoding = null)
     {
         JsonSerializerOptions = jsonSerializerOptions ?? JsonHelper.GetDefaultJsonSerializerOptions();
         ServerName = serverName;
@@ -55,5 +62,6 @@ public class ClientOptions
         LifeCheckTimeRate = lifeCheckTimeRate;
         ReconnectTimeRate = reconnectTimeRate;
         ConnectTimeout = connectTimeout;
+        Encoding = encoding ?? Encoding.Unicode;
     }
 }

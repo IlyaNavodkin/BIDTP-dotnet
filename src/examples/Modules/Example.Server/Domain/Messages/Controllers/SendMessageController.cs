@@ -47,6 +47,7 @@ public class SendMessageController
         return Task.CompletedTask;
     }
     
+    
     public static Task GetFreeAccessResponse(Context context)
     {
         var response = new Response(StatusCode.Success);
@@ -61,14 +62,14 @@ public class SendMessageController
     public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
     {
         var objectContainer = context.ObjectContainer;
-        var simpleObject = objectContainer.GetObject<SimpleObject>();
+
         var additionalData = objectContainer.GetObject<AdditionalData>();
         
-        if (simpleObject is null || additionalData is null) throw new Exception("No object in object container");
+        if (additionalData is null) throw new Exception("No object in object container");
 
         var response = new Response(StatusCode.Success);
         
-        response.SetBody(simpleObject);
+        response.SetBody(additionalData);
         
         context.Response = response;
         

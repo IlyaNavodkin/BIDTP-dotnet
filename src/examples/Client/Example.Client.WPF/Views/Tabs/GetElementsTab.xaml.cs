@@ -125,7 +125,7 @@ public partial class GetElementsTab : UserControl
             var mainWindow = (MainWindow)Application.Current.MainWindow;
             var token = mainWindow.AuthTokenTextBox.Text;
             
-            var simpleObject = new SimpleObject
+            var simpleObject = new AdditionalData
             {
                 Guid = Guid.NewGuid().ToString(),
                 Items = new List<string>  { "Item1", "Item2" },
@@ -135,13 +135,13 @@ public partial class GetElementsTab : UserControl
             var request = new Request();
             
             request.SetRoute("GetMappedObjectFromObjectContainer");
-            request.SetBody<SimpleObject>(simpleObject);
+            request.SetBody<AdditionalData>(simpleObject);
             
             var response = await App.Client.WriteRequestAsync(request);
 
             if (response.StatusCode is StatusCode.Success)
             {
-                var dto = response.GetBody<SimpleObject>();
+                var dto = response.GetBody<AdditionalData>();
 
                 MessageBox.Show(response.GetBody<string>());
             }

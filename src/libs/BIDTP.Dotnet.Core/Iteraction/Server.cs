@@ -16,7 +16,7 @@ using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Interfaces;
 using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Core.Iteraction.Providers;
-using BIDTP.Dotnet.Core.Iteraction.Utills;
+using BIDTP.Dotnet.Core.Iteraction.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -55,7 +55,7 @@ public class Server : IHost
     /// <summary>
     ///  Currently used encoding for sending and receiving
     /// </summary>
-    public Encoding Encoding { get; set; } = Encoding.Unicode;
+    public Encoding Encoding { get; }
     
     /// <summary>
     ///  Server of the BIDTP protocol
@@ -71,6 +71,7 @@ public class Server : IHost
         ChunkSize = options.ChunkSize;
         ReconnectTimeRate = options.ReconnectTimeRate;
         JsonSerializerOptions = options.JsonSerializerOptions;
+        Encoding = options.Encoding;
 
         _routeHandlers = routeHandlers;
         
@@ -323,7 +324,6 @@ public class Server : IHost
     {
         var dictionary = new Dictionary<string, string>();
                 
-        // var headerString = JsonConvert.SerializeObject(response.Headers);
         var headerString = JsonSerializer.Serialize(response.Headers,JsonSerializerOptions);
         
         var bodyString = response.GetBody<string>();
@@ -371,7 +371,7 @@ public class Server : IHost
             
             if(messageType == MessageType.HealthCheck) return result;
             
-            var headerString = BytesConvertUtills.ReadStringBytes(
+            var headerString = BytesConvertUtil.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
                  ref bytesRead,
@@ -383,7 +383,7 @@ public class Server : IHost
             
             result.Add("Headers",headerString);
             
-            var bodyString = BytesConvertUtills.ReadStringBytes(
+            var bodyString = BytesConvertUtil.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
                 ref bytesRead,
@@ -428,7 +428,7 @@ public class Server : IHost
                 var totalBytesWriteCount =
                     headerBuffer.Length + bodyBuffer.Length;
                 
-                BytesConvertUtills.WriteStringBytes(
+                BytesConvertUtil.WriteStringBytes(
                     cancellationToken, 
                     binaryWriter, 
                     headerBuffer, 
@@ -438,7 +438,7 @@ public class Server : IHost
                     OnWriteProgressChanged
                 );
                 
-                BytesConvertUtills.WriteStringBytes(
+                BytesConvertUtil.WriteStringBytes(
                     cancellationToken, 
                     binaryWriter, 
                     bodyBuffer, 

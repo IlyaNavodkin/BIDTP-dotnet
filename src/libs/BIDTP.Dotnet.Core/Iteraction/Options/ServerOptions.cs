@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using BIDTP.Dotnet.Core.Iteraction.Helpers;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Options;
@@ -24,6 +25,10 @@ public class ServerOptions
     ///  The time rate of the life check 
     /// </summary>
     public readonly int ReconnectTimeRate;
+    /// <summary>
+    ///  The encoding send and receive
+    /// </summary>
+    public readonly Encoding Encoding;
 
     /// <summary>
     ///  Create a new instance of the ServerOptions
@@ -32,11 +37,13 @@ public class ServerOptions
     /// <param name="chunkSize"> The chunk size for the transmission data </param>
     /// <param name="reconnectTimeRate"> The time rate of the reconnect </param>
     /// <param name="jsonSerializerOptions"> The json serializer options </param>
+    /// <param name="encoding"> The encoding </param>
     public ServerOptions(
         string serverName = "defaultServerName", 
         int chunkSize = 1024, 
         int reconnectTimeRate = 5000, 
-        JsonSerializerOptions jsonSerializerOptions = null
+        JsonSerializerOptions jsonSerializerOptions = null,
+        Encoding encoding = null
         )
     {
         ServerName = serverName;
@@ -44,5 +51,6 @@ public class ServerOptions
         ReconnectTimeRate = reconnectTimeRate;
         JsonSerializerOptions = jsonSerializerOptions 
         ?? JsonHelper.GetDefaultJsonSerializerOptions();
+        Encoding = encoding ?? Encoding.Unicode;
     }
 }

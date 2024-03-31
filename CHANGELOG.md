@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2024-31-03
+
+### Added
+
+-   add ObjectContainer in Context class 
+-   add new Test case for ObjectContainer
+-   add Encoding properties for server and client
+-   add end of write\read events
+
+### Changed
+
+-   change write\read byte logic and classes
+
+### Fixed
+
+-   fix bug with write\read and json convert
+-   change byte write\read progress events
+
 ## [1.2.1] - 2024-24-03
 
 Update to 1.2.1

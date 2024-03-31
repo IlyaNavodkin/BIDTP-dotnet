@@ -1,13 +1,26 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
 
-namespace BIDTP.Dotnet.Core.Iteraction.Utills;
+namespace BIDTP.Dotnet.Core.Iteraction.Utils;
 
-public static class BytesConvertUtills
+/// <summary>
+///  Convert bytes to string
+/// </summary>
+public static class BytesConvertUtil
 {
+    /// <summary>
+    ///  Read string bytes from the stream
+    /// </summary>
+    /// <param name="cancellationToken"> The cancellation token. </param>
+    /// <param name="binaryReader"> The binary reader. </param>
+    /// <param name="bytesReadsCount"> The bytes read count. </param>
+    /// <param name="totalBytesReadCount"> The total bytes read count. </param>
+    /// <param name="encoding"> The encoding. </param>
+    /// <param name="chunkSize"> The chunk size. </param>
+    /// <param name="progressReadChangeAction"> The progress read change action. </param>
+    /// <returns></returns>
     public static string ReadStringBytes(CancellationToken cancellationToken,
         BinaryReader binaryReader,
         ref int bytesReadsCount,
@@ -43,6 +56,16 @@ public static class BytesConvertUtills
         return result;
     }
 
+    /// <summary>
+    ///  Write string bytes to the stream 
+    /// </summary>
+    /// <param name="cancellationToken"> The token to monitor for cancellation requests. </param>
+    /// <param name="binaryWriter"> The binary writer. </param>
+    /// <param name="bytesToWrite"> The bytes to write. </param>
+    /// <param name="bytesWriteCount"> The bytes write count. </param>
+    /// <param name="totalBytesWriteCount"> The total bytes write count. </param>
+    /// <param name="chunkSize"> The chunk size. </param>
+    /// <param name="progressWriteChangeAction"> The progress write change action. </param>
     public static void WriteStringBytes(
         CancellationToken cancellationToken,
         BinaryWriter binaryWriter,
