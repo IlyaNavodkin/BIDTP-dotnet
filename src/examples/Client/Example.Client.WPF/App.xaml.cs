@@ -22,7 +22,6 @@ namespace Example.Client.WPF
             
             Client = new BIDTP.Dotnet.Core.Iteraction.Client(options);
 
-            await Client.ConnectToServer(new CancellationTokenSource());
             var view = new MainWindow();
 
             view.ShowDialog();

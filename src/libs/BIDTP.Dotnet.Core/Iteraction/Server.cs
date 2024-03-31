@@ -51,7 +51,12 @@ public class Server : IHost
     ///  The chunk size for the transmission data
     /// </summary>
     private int ChunkSize { get; set; }
-
+    
+    /// <summary>
+    ///  Currently used encoding for sending and receiving
+    /// </summary>
+    public Encoding Encoding { get; set; } = Encoding.Unicode;
+    
     /// <summary>
     ///  Server of the BIDTP protocol
     /// </summary>
@@ -331,13 +336,9 @@ public class Server : IHost
         return dictionary;
     }
     
-    public Encoding Encoding { get; set; } = Encoding.Unicode;
-    
     private async Task<Dictionary<string,string>> ReadAsyncInternal(CancellationToken cancellationToken)
     {
         var result = new Dictionary<string, string>();
-        
-        var bytesRead = 0;
         
         var messageLengthBytes = new byte[4];
         var messageTypeByteReadCount = await _serverPipeStream
@@ -360,6 +361,9 @@ public class Server : IHost
         
         using (var memoryStream = new MemoryStream(contentBuffer))
         {
+            var bytesRead = 0;
+            messageLengthByteReadCount -= 8;
+            
             var binaryReader = new BinaryReader(memoryStream, Encoding);
 
             var messageType = (MessageType)binaryReader.ReadInt32();
@@ -370,8 +374,8 @@ public class Server : IHost
             var headerString = BytesConvertUtills.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
-                bytesRead,
-                messageLengthByteReadCount,
+                 ref bytesRead,
+                 messageLengthByteReadCount,
                 Encoding, 
                 ChunkSize,
                 OnReadProgressChanged
@@ -382,7 +386,7 @@ public class Server : IHost
             var bodyString = BytesConvertUtills.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
-                bytesRead,
+                ref bytesRead,
                 messageLengthByteReadCount,
                 Encoding, 
                 ChunkSize,

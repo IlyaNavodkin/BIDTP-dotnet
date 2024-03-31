@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
@@ -13,28 +15,63 @@ public partial class SendMessageTab : UserControl
         InitializeComponent();
     }
 
-    private async void SendMessageButton_OnClick(object sender, RoutedEventArgs e)
+    private void SendMessageButton_OnClick(object sender, RoutedEventArgs e)
     {
         try
         {
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            var taskRun = Task.Run(async () =>
+            {
+                MainWindow mainWindow = null;
 
-            var request = new Request();
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    mainWindow = (MainWindow)Application.Current.MainWindow;
+                });
+
+                var request = new Request();
+
+                string multipleValueString = null;
+                string messageValue = null;
+                string token = null;
+                
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    messageValue = MessageInputTextBox.Text;
+                    multipleValueString = MultipleSymbolsTextBox.Text;
+                    token = mainWindow.AuthTokenTextBox.Text;
+                });
+                
+                var multilpleValue = 0;
             
-            request.SetBody(MessageInputTextBox.Text);
-        
-            var token = mainWindow.AuthTokenTextBox.Text;
-        
-            request.Headers.Add("Authorization", token);
-            request.SetRoute("PrintMessage");
-        
-            var response = await App.Client.WriteRequestAsync(request);
-        
-            var formattedResponseText = response.GetBody<string>();
+                if(multipleValueString is null || !int.TryParse(multipleValueString, out multilpleValue))
+                {
+                    multilpleValue = 1;
+                }
             
-            OutPutTextBlock.Text = formattedResponseText;
+                var stringBuilder = new StringBuilder();
+            
+                for (var i = 0; i < multilpleValue; i++)
+                {
+                    stringBuilder.Append(messageValue);
+                }
+            
+                request.SetBody(stringBuilder.ToString());
+        
+                request.Headers.Add("Authorization", token);
+                request.SetRoute("PrintMessage");
+        
+                var response = await App.Client.WriteRequestAsync(request);
+        
+                var formattedResponseText = response.GetBody<string>();
+                
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    OutPutTextBlock.Text = formattedResponseText;
+                });
     
-            MessageBox.Show(formattedResponseText);
+                MessageBox.Show(formattedResponseText);
+            });
+            
         }
         catch (Exception exception)
         {

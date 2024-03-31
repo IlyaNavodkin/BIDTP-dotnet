@@ -44,6 +44,7 @@
                                  HorizontalAlignment="Left"
                                  Width="100"
                                  Text="1024"
+                                 TextChanged="ChunkSizeTextBox_OnTextChanged"
                                  Margin="0 10 0 0"/>
                     </StackPanel>
                 </StackPanel>

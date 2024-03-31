@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -9,14 +10,18 @@ public static class BytesConvertUtills
 {
     public static string ReadStringBytes(CancellationToken cancellationToken,
         BinaryReader binaryReader,
-        int bytesReadsCount,
+        ref int bytesReadsCount,
         int totalBytesReadCount,
         Encoding encoding,
         int chunkSize, 
         Action<int, int> progressReadChangeAction)
     {
-        var bytesToReadLength = binaryReader.ReadInt32();
         var stringBuilder = new StringBuilder();
+        
+        var bytesToReadLength = binaryReader.ReadInt32();
+        
+        bytesReadsCount += 4;
+        progressReadChangeAction(bytesReadsCount, totalBytesReadCount);
         
         for (var i = 0; i < bytesToReadLength; i += chunkSize)
         {
@@ -49,11 +54,15 @@ public static class BytesConvertUtills
     {
         binaryWriter.Write(bytesToWrite.Length);
 
+        bytesWriteCount += 4;
+        progressWriteChangeAction(bytesWriteCount, totalBytesWriteCount);
+        
         for (var i = 0; i < bytesToWrite.Length; i += chunkSize)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var wroteBytes = Math.Min(chunkSize, bytesToWrite.Length - i);
+            
             binaryWriter.Write(bytesToWrite, i, wroteBytes);
 
             bytesWriteCount += wroteBytes;

@@ -43,7 +43,7 @@ public class Client
     /// <summary>
     ///  The chunk size for the transmission data
     /// </summary>
-    private int ChunkSize { get; set; }
+    public int ChunkSize { get; set; }
     
     /// <summary>
     ///  The time rate of the life check 
@@ -63,7 +63,12 @@ public class Client
     /// <summary>
     ///  The status of the connection 
     /// </summary>
-    public bool IsHealthCheckConnected = true;
+    public bool IsHealthCheckConnected;
+    
+    /// <summary>
+    ///  Currently used encoding for sending and receiving
+    /// </summary>
+    public Encoding Encoding { get; set; } = Encoding.Unicode;
     
     /// <summary>
     ///  Create a new SIDTPClient 
@@ -104,14 +109,14 @@ public class Client
 
             await CheckConnection();
             
-            // _ = CheckConnectionBackground();
+            _ = CheckConnectionBackground();
         }
         catch (Exception)
         {
             DisposeStream();
         }
         
-        // IsConnectionStarting = false;
+        IsConnectionStarting = false;
     }
     
     private async Task CheckConnectionBackground()
@@ -235,8 +240,6 @@ public class Client
     {
         var result = new Dictionary<string, string>();
         
-        var bytesRead = 0;
-        
         var messageLengthBuffer = new byte[4];
         var messageTypeByteReadCount = await _clientPipeStream.ReadAsync(
             messageLengthBuffer, 
@@ -269,10 +272,13 @@ public class Client
             
             result.Add(nameof(StatusCode), statusCode.ToString());
             
+            var bytesRead = 0;
+            messageLengthByteReadCount -= 8;
+            
             var headerString = BytesConvertUtills.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
-                bytesRead,
+                ref bytesRead,
                 messageLengthByteReadCount,
                 Encoding, 
                 ChunkSize,
@@ -284,7 +290,7 @@ public class Client
             var bodyString = BytesConvertUtills.ReadStringBytes(
                 cancellationToken,
                 binaryReader,
-                bytesRead,
+                ref bytesRead,
                 messageLengthByteReadCount,
                 Encoding, 
                 ChunkSize,
@@ -298,8 +304,7 @@ public class Client
             return result;
         }
     }
-    
-    public Encoding Encoding { get; set; } = Encoding.Unicode;
+
     private async Task WriteAsyncInternal(Dictionary<string, string> dictionary, CancellationToken cancellationToken)
     {
         using (var memoryStream = new MemoryStream())
@@ -332,6 +337,9 @@ public class Client
                     OnWriteProgressChanged
                     );
                 
+                var dateTimeStart = DateTime.Now;
+                Debug.WriteLine($"Start read body {DateTime.Now}");
+                
                 BytesConvertUtills.WriteStringBytes(
                     cancellationToken, 
                     binaryWriter, 
@@ -341,6 +349,10 @@ public class Client
                     ChunkSize,
                     OnWriteProgressChanged
                     );
+                
+                var writeTime = DateTime.Now - dateTimeStart;
+                
+                Debug.WriteLine($"Write time: {writeTime}");
             }
         
             var buffer = memoryStream.ToArray();
