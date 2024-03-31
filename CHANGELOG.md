@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 -   change write\read byte logic and classes
+-   include NewtoneJson lib to System.Text.Json
 
 ### Fixed
 
