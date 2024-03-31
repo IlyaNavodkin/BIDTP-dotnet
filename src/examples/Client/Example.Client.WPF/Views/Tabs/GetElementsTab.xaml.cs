@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Windows;
 using System.Windows.Controls;
 using BIDTP.Dotnet.Core.Iteraction.Dtos;
@@ -118,7 +119,7 @@ public partial class GetElementsTab : UserControl
         }
     }
 
-    private async void TestJson(object sender, RoutedEventArgs e)
+    private async void SetGetAdditionalData(object sender, RoutedEventArgs e)
     {
         try
         {
@@ -139,6 +140,53 @@ public partial class GetElementsTab : UserControl
             if (response.StatusCode is StatusCode.Success)
             {
                 var dto = response.GetBody<AdditionalData>();
+                
+                var jsonStringDto = response.GetBody<string>();
+
+                MessageBox.Show(jsonStringDto);
+            }
+            else
+            {
+                var error = response.GetBody<Error>();
+            
+                MessageBox.Show($"Message: {error.Message} " +
+                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+            }
+
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message);
+        }
+    }
+
+    /// <summary>
+    ///  This is not work))) System.Text.Json.JsonSerializer cant serialize and deserialize System.Data.DataTable 
+    /// </summary>
+    private async void SetGetDataTable(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var dataTable = new DataTable();
+            
+            dataTable.Columns.Add("Name", typeof(string));
+            dataTable.Columns.Add("Age", typeof(int));
+            dataTable.Columns.Add("IsAdult", typeof(bool));
+            
+            dataTable.Rows.Add("John", 30, true);
+            dataTable.Rows.Add("Jane", 25, false);
+            dataTable.Rows.Add("Bob", 40, true);
+            
+            var request = new Request();
+            
+            request.SetRoute("MutateUrTable");
+            request.SetBody<DataTable>(dataTable);
+            
+            var response = await App.Client.WriteRequestAsync(request);
+            
+            if (response.StatusCode is StatusCode.Success)
+            {
+                var dto = response.GetBody<DataTable>();
                 
                 var jsonStringDto = response.GetBody<string>();
 

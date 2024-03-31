@@ -9,17 +9,9 @@
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
     
-
     <ItemGroup>
       <Reference Include="System.Net.Http" />
     </ItemGroup>
-    
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
-    </ItemGroup>
-    
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />

@@ -8,6 +8,7 @@ using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
+using Example.Server.Domain.DataTable;
 using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
 using Example.Server.Domain.Messages.Controllers;
@@ -39,6 +40,7 @@ namespace Example.Server.Console
              
             builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
             builder.AddRoute("GetElements", ElementController.GetElements);
+            builder.AddRoute("MutateUrTable", DataTableController.MutateUrTable);
             builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle,
                 SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
             

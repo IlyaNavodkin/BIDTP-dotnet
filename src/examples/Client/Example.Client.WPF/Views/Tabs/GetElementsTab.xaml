@@ -30,8 +30,13 @@
             </Button>
             <Button
                 Margin="0 12 0 0"
-                Content="Set json"
-                Click="TestJson">
+                Content="Set and get additional data"
+                Click="SetGetAdditionalData">
+            </Button>
+            <Button
+                Margin="0 12 0 0"
+                Content="Send data table object and get sorted with added column"
+                Click="SetGetDataTable">
             </Button>
         </StackPanel>
     </GroupBox>

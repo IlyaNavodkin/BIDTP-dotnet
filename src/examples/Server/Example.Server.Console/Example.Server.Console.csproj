@@ -5,7 +5,6 @@
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <TargetFrameworks> net6.0; net48</TargetFrameworks>
-        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <RootNamespace>Example.Server.Console</RootNamespace>
     </PropertyGroup>
 
