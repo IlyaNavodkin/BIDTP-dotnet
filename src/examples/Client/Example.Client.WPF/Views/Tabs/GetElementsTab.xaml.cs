@@ -139,9 +139,20 @@ public partial class GetElementsTab : UserControl
             
             var response = await App.Client.WriteRequestAsync(request);
 
-            var dto = response.GetBody<SimpleObject>();
+            if (response.StatusCode is StatusCode.Success)
+            {
+                var dto = response.GetBody<SimpleObject>();
 
-            MessageBox.Show(response.GetBody<string>());
+                MessageBox.Show(response.GetBody<string>());
+            }
+            else
+            {
+                var error = response.GetBody<Error>();
+            
+                MessageBox.Show($"Message: {error.Message} " +
+                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+            }
+
         }
         catch (Exception exception)
         {

@@ -13,94 +13,188 @@ namespace Testsss
 {
     internal class Program
     {
-        public static void Main(string[] args)
-        {
-        var dictionary = new Dictionary<string, string>();
-
-        dictionary.Add(nameof(MessageType), MessageType.General.ToString());
-        dictionary.Add("Headers", "Папа123");
-        // dictionary.Add("Body", "Мама228");
-
+        private const int ChunkSize = 1024;
         
+    
+    static async Task Main(string[] args)
+    {
+        var pipeStreamA = new NamedPipeServerStream("mypipe1", PipeDirection.InOut, 2);
+        var pipeStreamB = new NamedPipeServerStream("mypipe1", PipeDirection.InOut, 2);
+        
+        // Подключаемся к серверу асинхронно с тремя клиентами
+        // Task client1 = ConnectToServer("Client 1");
+        // Task client2 = ConnectToServer("Client 2");
+        // Task client3 = ConnectToServer("Client 3");
+        //
+        // // Ожидаем завершения всех клиентских задач
+        // await Task.WhenAll(client1, client2, client3);
+    }
+
+    static async Task StartServer()
+    {
+        // Создаем именованный канал
+        var pipeServer = new NamedPipeServerStream("my_pipe", PipeDirection.InOut,
+           1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+        var pipeServer2 = new NamedPipeServerStream("my_pipe", PipeDirection.InOut,
+           1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+
+        Console.WriteLine("Ожидание подключения клиентов...");
+
+
+    }
+
+    static async Task ConnectToServer(string clientName)
+    {
+        using (var pipeClient = new NamedPipeClientStream(".", "my_pipe", PipeDirection.InOut))
+        {
+            Console.WriteLine("Подключение к серверу...");
+            await pipeClient.ConnectAsync();
+
+            Console.WriteLine($"Клиент {clientName} подключен.");
+
+            // Отправка и получение данных с сервера
+            using (var reader = new StreamReader(pipeClient))
+            using (var writer = new StreamWriter(pipeClient))
+            {
+                // Отправляем сообщения серверу и читаем ответы
+                for (int i = 0; i < 5; i++)
+                {
+                    // Отправляем сообщение серверу
+                    await writer.WriteLineAsync($"{clientName}: Message {i}");
+                    await writer.FlushAsync();
+
+                    // Читаем ответ от сервера
+                    string response = await reader.ReadLineAsync();
+                    Console.WriteLine($"Ответ от сервера для {clientName}: {response}");
+                }
+            }
+        }
+    }
+
+    static async Task HandleClient(NamedPipeServerStream pipeServer)
+    {
         try
         {
-            dictionary.Add("Headers", "ewdwewe");
-        }
-        catch (Exception e)
-        {
-            dictionary.Add("Body", e.StackTrace);
-        }
-        
-        var encoding = Encoding.UTF8;
-        var decoding = Encoding.UTF8;
-
-        using (var memoryStream = new MemoryStream())
-        {
-            var binaryWriter = new BinaryWriter(memoryStream, encoding);
-
-            var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
-            binaryWriter.Write((int)messageType);
-
-            Console.WriteLine($"==========[ЗАПИСЬ БАЙТОВ]========");
-
-            Console.WriteLine($"Тип сообщения|{messageType.ToString()}");
-
-            if (messageType == MessageType.General)
+            using (var reader = new StreamReader(pipeServer))
+            using (var writer = new StreamWriter(pipeServer))
             {
-                var headerString = dictionary["Headers"];
-                var bodyString = dictionary["Body"];
+                while (true)
+                {
+                    // Чтение данных от клиента
+                    string request = await reader.ReadLineAsync();
+                    if (request == null)
+                        break; // Клиент отключился
 
-                var headerBuffer = encoding.GetBytes(headerString);
-                var bodyBuffer = encoding.GetBytes(bodyString);
-                
-                binaryWriter.Write(headerBuffer.Length);
-                Console.WriteLine($"Header length|{headerBuffer.Length}");
+                    Console.WriteLine("Получено сообщение от клиента: " + request);
 
-                binaryWriter.Write(headerBuffer);
-                Console.WriteLine($"Header string|{headerString}");
-
-                binaryWriter.Write(bodyBuffer.Length);
-                Console.WriteLine($"Body length|{bodyBuffer.Length}");
-
-                binaryWriter.Write(bodyBuffer);
-                Console.WriteLine($"Body string|{bodyString}");
+                    // Отправка ответа клиенту
+                    string response = "Сообщение получено: " + request;
+                    await writer.WriteLineAsync(response);
+                    await writer.FlushAsync();
+                }
             }
-
-            var buffer = memoryStream.ToArray();
-
-            var allLength = buffer.Length;
-            var allLengthBuffer = BitConverter.GetBytes(allLength);
-
-            buffer = allLengthBuffer.Concat(buffer).ToArray();
-
-            Console.WriteLine($"==========[ЧТЕНИЕ ИЗ БАЙТОВ]========");
-
-            using (var memoryStream1 = new MemoryStream(buffer))
-            using (var binaryReader = new BinaryReader(memoryStream1, decoding))
-            {
-                var allLengthFromReader = binaryReader.ReadInt32(); // Считываем общую длину
-                var messageTypeFromReader = (MessageType)binaryReader.ReadInt32();
-
-                Console.WriteLine($"Тип сообщения|{messageTypeFromReader.ToString()}");
-
-                var headerContentLengthFromReader = binaryReader.ReadInt32(); // Считываем длину заголовка
-                Console.WriteLine($"Header length|{headerContentLengthFromReader.ToString()}");
-                
-                var headerBufferFromReader = binaryReader.ReadBytes(headerContentLengthFromReader); // Читаем байты заголовка
-                var headerFromFromReader = decoding.GetString(headerBufferFromReader); // Декодируем в строку
-                
-                Console.WriteLine($"Header string|{headerFromFromReader}");
-
-                var bodyLengthFromReader = binaryReader.ReadInt32(); // Считываем длину тела
-                Console.WriteLine($"Body length|{bodyLengthFromReader.ToString()}");
-                
-                var bodyBufferFromReader = binaryReader.ReadBytes(bodyLengthFromReader); // Читаем байты тела
-                var bodyFromReader = decoding.GetString(bodyBufferFromReader); // Декодируем в строку
-                
-                Console.WriteLine($"Body string|{bodyFromReader}");
-            }
-        }        
         }
+        catch (IOException)
+        {
+            // Клиент отключился
+            Console.WriteLine("Клиент отключился.");
+        }
+        finally
+        {
+            // Закрытие канала
+            pipeServer.Close();
+        }
+    }
+
+        // public static void Main(string[] args)
+        // {
+        //     var dictionary = new Dictionary<string, string>();
+        //     
+        //     dictionary.Add(nameof(MessageType), MessageType.General.ToString());
+        //     dictionary.Add("Headers", "Папа123");
+        //     // dictionary.Add("Body", "Мама228");
+        //     
+        //     
+        //     try
+        //     {
+        //         dictionary.Add("Headers", "ewdwewe");
+        //     }
+        //     catch (Exception e)
+        //     {
+        //         dictionary.Add("Body", e.StackTrace);
+        //     }
+        //     
+        //     var encoding = Encoding.UTF8;
+        //     var decoding = Encoding.UTF8;
+        //     
+        //     using (var memoryStream = new MemoryStream())
+        //     {
+        //         var binaryWriter = new BinaryWriter(memoryStream, encoding);
+        //     
+        //         var messageType = (MessageType)Enum.Parse(typeof(MessageType), dictionary[nameof(MessageType)]);
+        //         binaryWriter.Write((int)messageType);
+        //     
+        //         Console.WriteLine($"==========[ЗАПИСЬ БАЙТОВ]========");
+        //     
+        //         Console.WriteLine($"Тип сообщения|{messageType.ToString()}");
+        //     
+        //         if (messageType == MessageType.General)
+        //         {
+        //             var headerString = dictionary["Headers"];
+        //             var bodyString = dictionary["Body"];
+        //     
+        //             var headerBuffer = encoding.GetBytes(headerString);
+        //             var bodyBuffer = encoding.GetBytes(bodyString);
+        //             
+        //             binaryWriter.Write(headerBuffer.Length);
+        //             Console.WriteLine($"Header length|{headerBuffer.Length}");
+        //     
+        //             binaryWriter.Write(headerBuffer);
+        //             Console.WriteLine($"Header string|{headerString}");
+        //     
+        //             binaryWriter.Write(bodyBuffer.Length);
+        //             Console.WriteLine($"Body length|{bodyBuffer.Length}");
+        //     
+        //             binaryWriter.Write(bodyBuffer);
+        //             Console.WriteLine($"Body string|{bodyString}");
+        //         }
+        //     
+        //         var buffer = memoryStream.ToArray();
+        //     
+        //         var allLength = buffer.Length;
+        //         var allLengthBuffer = BitConverter.GetBytes(allLength);
+        //     
+        //         buffer = allLengthBuffer.Concat(buffer).ToArray();
+        //     
+        //         Console.WriteLine($"==========[ЧТЕНИЕ ИЗ БАЙТОВ]========");
+        //     
+        //         using (var memoryStream1 = new MemoryStream(buffer))
+        //         using (var binaryReader = new BinaryReader(memoryStream1, decoding))
+        //         {
+        //             var allLengthFromReader = binaryReader.ReadInt32(); // Считываем общую длину
+        //             var messageTypeFromReader = (MessageType)binaryReader.ReadInt32();
+        //     
+        //             Console.WriteLine($"Тип сообщения|{messageTypeFromReader.ToString()}");
+        //     
+        //             var headerContentLengthFromReader = binaryReader.ReadInt32(); // Считываем длину заголовка
+        //             Console.WriteLine($"Header length|{headerContentLengthFromReader.ToString()}");
+        //             
+        //             var headerBufferFromReader = binaryReader.ReadBytes(headerContentLengthFromReader); // Читаем байты заголовка
+        //             var headerFromFromReader = decoding.GetString(headerBufferFromReader); // Декодируем в строку
+        //             
+        //             Console.WriteLine($"Header string|{headerFromFromReader}");
+        //     
+        //             var bodyLengthFromReader = binaryReader.ReadInt32(); // Считываем длину тела
+        //             Console.WriteLine($"Body length|{bodyLengthFromReader.ToString()}");
+        //             
+        //             var bodyBufferFromReader = binaryReader.ReadBytes(bodyLengthFromReader); // Читаем байты тела
+        //             var bodyFromReader = decoding.GetString(bodyBufferFromReader); // Декодируем в строку
+        //             
+        //             Console.WriteLine($"Body string|{bodyFromReader}");
+        //         }
+        //     }        
+        // }
         
         private static async Task WriteServer(Dictionary<string, string> dictionary, NamedPipeServerStream _serverPipeStream, CancellationToken cancellationToken)
         {
