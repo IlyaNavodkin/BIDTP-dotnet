@@ -62,37 +62,37 @@ The BIDTP protocol is based on client-server interaction. Communication between 
 
 Below are listed the main data types:
 
-| Data type      | Size (bytes) |
-| -------------- | ------------ |
-| int (32 bit)   | 4            |
-| char (unicode) | 2            |
+| Data type    | Size (bytes) |
+| ------------ | ------------ |
+| int (32 bit) | 4            |
+| char         | 2            |
 
 ## Requirements to request
 
 The request object has the following structure:
 
-| Field name     | Type             | Size (bytes) |
-| -------------- | ---------------- | ------------ |
-| MessageLength  | int              | 4            |
-| MessageType    | enum (int )      | 4            |
-| HeadersLength  | int              | 4            |
-| HeadersContent | string (unicode) | var          |
-| BodyLength     | int              | 4            |
-| BodyContent    | string (unicode) | var          |
+| Field name     | Type        | Size (bytes) |
+| -------------- | ----------- | ------------ |
+| MessageLength  | int         | 4            |
+| MessageType    | enum (int ) | 4            |
+| HeadersLength  | int         | 4            |
+| HeadersContent | string      | var          |
+| BodyLength     | int         | 4            |
+| BodyContent    | string      | var          |
 
 ## Requirements to response
 
 The response object has the following structure:
 
-| Field name     | Type             | Size (bytes) |
-| -------------- | ---------------- | ------------ |
-| MessageLength  | int              | 4            |
-| MessageType    | enum (int )      | 4            |
-| StatusCode     | enum (int )      | 4            |
-| HeadersLength  | int              | 4            |
-| HeadersContent | string (unicode) | var          |
-| BodyLength     | int              | 4            |
-| BodyContent    | string (unicode) | var          |
+| Field name     | Type        | Size (bytes) |
+| -------------- | ----------- | ------------ |
+| MessageLength  | int         | 4            |
+| MessageType    | enum (int ) | 4            |
+| StatusCode     | enum (int ) | 4            |
+| HeadersLength  | int         | 4            |
+| HeadersContent | string      | var          |
+| BodyLength     | int         | 4            |
+| BodyContent    | string      | var          |
 
 ## Status code
 
@@ -456,6 +456,7 @@ public partial class App
 {
     # Or set in DI\Singleton\other place
     public static Client? Client;
+    private CancellationTokenSource _cancelTokenSource;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -464,6 +465,15 @@ public partial class App
 
         # Create client
         Client = new Client(options);
+
+        _cancelTokenSource = new CancellationTokenSource();
+
+        # Connect to the server
+        await Client.ConnectToServer(_cancelTokenSource);
+
+        var view = new MainWindow();
+
+        view.ShowDialog();
     }
 }
 ```
