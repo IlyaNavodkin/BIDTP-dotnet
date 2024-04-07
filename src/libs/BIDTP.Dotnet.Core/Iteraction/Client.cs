@@ -17,7 +17,7 @@ using BIDTP.Dotnet.Core.Iteraction.Utils;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 /// <summary>
-///  Client 
+///  Iteraction 
 /// </summary>
 public class Client
 {

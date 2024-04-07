@@ -158,7 +158,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
     {
         var fileIsExist = File.Exists(clientPath);
         
-        if (!fileIsExist) throw new FileNotFoundException($"Client file not found at { clientPath }.");
+        if (!fileIsExist) throw new FileNotFoundException($"Iteraction file not found at { clientPath }.");
         
         var processId = Process.GetCurrentProcess().Id.ToString();
     

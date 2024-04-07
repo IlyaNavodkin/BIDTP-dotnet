@@ -15,7 +15,7 @@ namespace Example.Client.WPF.ChildProcess.Views
         private CancellationTokenSource _cancelTokenSource;
 
         /// <summary>
-        ///  Client window
+        ///  Iteraction window
         /// </summary>
         public MainWindow()
         {

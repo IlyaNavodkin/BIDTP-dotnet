@@ -14,7 +14,7 @@ namespace Example.Client.WPF.MVVM.Views
     public partial class MainWindow
     {
         /// <summary>
-        ///  Client window
+        ///  Iteraction window
         /// </summary>
         public MainWindow()
         {

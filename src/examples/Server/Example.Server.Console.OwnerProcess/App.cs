@@ -96,7 +96,7 @@ Process RunClientProcess(string pipeName)
     var currentDirectory = new DirectoryInfo (Directory.GetCurrentDirectory());
     var parentDirectory = currentDirectory.Parent.Parent.Parent;
     
-    var fileName = FileUtils.SearchFile(parentDirectory.FullName, "Example.Client.WPF.ChildProcess.exe");
+    var fileName = FileUtils.SearchFile(parentDirectory.FullName, "Example.Iteraction.WPF.ChildProcess.exe");
     
     var processId = Process.GetCurrentProcess().Id.ToString();
     
