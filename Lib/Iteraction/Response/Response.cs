@@ -1,4 +1,6 @@
-﻿using System.Text.Json;
+﻿using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Lib.Iteraction.Response;
 
@@ -15,7 +17,7 @@ public class Response : ResponseBase
             return (T)(object)Body;
         }
 
-        return JsonSerializer.Deserialize<T>(Body);
+        return JsonConvert.DeserializeObject<T>(Body);
     }
 
     public override void SetBody<T>(T body)

@@ -15,21 +15,21 @@ public class ServerBase
     private readonly ISerializer _serializer;
     private readonly IByteWriter _byteWriter;
     private readonly IByteReader _byteReader;
-    private readonly IRequestServer _requestServer;
+    private readonly IRequestHandler _requestHandler;
     private NamedPipeServerStream _serverPipeStream;
     private string PipeName { get; }
     private bool _isConnected;
 
     public ServerBase(IValidator validator, 
         IPreparer preparer, ISerializer serializer, 
-        IByteWriter byteWriter, IByteReader byteReader, IRequestServer requestServer)
+        IByteWriter byteWriter, IByteReader byteReader, IRequestHandler requestHandler)
     {
         _validator = validator;
         _preparer = preparer;
         _serializer = serializer;
         _byteWriter = byteWriter;
         _byteReader = byteReader;
-        _requestServer = requestServer;
+        _requestHandler = requestHandler;
 
         PipeName = "testpipe";
     }
@@ -53,13 +53,15 @@ public class ServerBase
         {
             var deserializeRequest = await _byteReader.Read(_serverPipeStream);
             var request = await _serializer.DeserializeRequest(deserializeRequest);
-            var response = await _requestServer.ServeRequest(request);
+            var response = await _requestHandler.ServeRequest(request);
             
             var validateResponse = _validator.ValidateResponse(response);
             var preparedResponse = _preparer.PrepareResponse(validateResponse);
             var serializeRequest = await _serializer.SerializeResponse(preparedResponse);
             
             await _byteWriter.Write(serializeRequest, _serverPipeStream);
+
+            _isConnected = false;
         }
     }
 

@@ -3,7 +3,7 @@ using Lib.Iteraction.Response;
 
 namespace Lib.Iteraction.RequestServer;
 
-public interface IRequestServer
+public interface IRequestHandler
 {
     Task<ResponseBase> ServeRequest(RequestBase request);
 }
