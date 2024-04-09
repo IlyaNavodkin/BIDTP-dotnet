@@ -5,7 +5,6 @@ using Lib;
 using Lib.Iteraction.Request;
 using Lib.Iteraction.RequestServer;
 using Lib.Iteraction.Response;
-using Newtonsoft.Json;
 
 namespace Schemas;
 
@@ -52,7 +51,7 @@ public class RequestHandler : IRequestHandler
         
         var response = new Response(StatusCode.Success)
         {
-            Body = JsonConvert.SerializeObject(result)
+            Body = JsonSerializer.Serialize(result)
         };
         
         return response;

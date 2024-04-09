@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using Chamion.Newtonsoft.Json.DataTable.Converters;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+using Lib.Iteraction.Converters;
 
 namespace Schemas;
 

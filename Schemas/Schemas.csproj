@@ -16,13 +16,4 @@
       <ProjectReference Include="..\Lib\Lib.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\Lib\Lib.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Chamion.Newtonsoft.Json.DataTable" Version="1.1.0" />
-    </ItemGroup>
-
-
 </Project>

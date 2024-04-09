@@ -11,10 +11,5 @@
       <ProjectReference Include="..\Lib\Lib.csproj" />
       <ProjectReference Include="..\Schemas\Schemas.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Chamion.Newtonsoft.Json.DataTable" Version="1.1.0" />
-      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    </ItemGroup>
-
+    
 </Project>
