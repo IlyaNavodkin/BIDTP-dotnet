@@ -2,5 +2,5 @@
 
 public interface IByteWriter
 {
-     Task Write(MemoryStream stream, Stream streamToWrite);
+     Task Write(byte[] stream, Stream streamToWrite);
 }

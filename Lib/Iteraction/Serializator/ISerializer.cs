@@ -6,9 +6,11 @@ namespace Lib.Iteraction.Serializator;
 
 public interface ISerializer
 {
-    Task<MemoryStream> SerializeRequest(RequestBase request);
-    Task<RequestBase> DeserializeRequest(MemoryStream request);
-    Task<MemoryStream> SerializeResponse(ResponseBase response);
-    Task<ResponseBase> DeserializeResponse(MemoryStream response);
+    Task<byte[]> SerializeRequest(RequestBase request);
+    Task<RequestBase> DeserializeRequest(byte[] request);
+
+    Task<byte[]> SerializeResponse(ResponseBase response);
+    Task<ResponseBase> DeserializeResponse(byte[] response);
+
     public event EventHandler<ProgressEventArgs> ByteProgress;
 }

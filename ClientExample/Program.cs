@@ -11,22 +11,27 @@ using Lib.Iteraction.Serializator;
 using Lib.Iteraction.Validator;
 using Schemas;
 
+await CreateAndSend();
 
-var btw = new ByteWriter();
-var btr = new ByteReader();
-var ser = new Serializer( Encoding.Unicode);
-var val = new Validator();
-var prep = new Preparer();
 
-var client = new ClientBase( val, prep, ser, btw, btr);
 
-await client.ConnectToServer();
+Console.ReadKey();
 
-var body = new Computer
+static async Task CreateAndSend()
 {
-    Id = 1,
-    Name = "MSI zalupa",
-    Components = new List<Component>
+    var btw = new ByteWriter();
+    var btr = new ByteReader();
+    var ser = new Serializer(Encoding.Unicode);
+    var val = new Validator();
+    var prep = new Preparer();
+
+    var client = new ClientBase(val, prep, ser, btw, btr);
+
+    var body = new Computer
+    {
+        Id = 1,
+        Name = Guid.NewGuid().ToString(),
+        Components = new List<Component>
     {
         new Component
         {
@@ -34,23 +39,21 @@ var body = new Computer
             Name = "Rtx 3060"
         }
     }
-};
+    };
 
-var request = new Request
-{
-    Headers = new Dictionary<string, string>
+    var request = new Request
     {
-        ["Route"] = "getNewComponents"
-    },
-    Body =  JsonSerializer.Serialize(body)
-};
+        Headers = new Dictionary<string, string>
+        {
+            ["Route"] = "getNewComponents"
+        },
+        Body = JsonSerializer.Serialize(body)
+    };
 
 
-var response = await client.Send(request);
+    await client.Send(request);
 
-var responseBody = response.GetBody<Result>();
+    //var responseBody = response.GetBody<Result>();
 
-Console.WriteLine(response.StatusCode.ToString());
-
-
-
+    //Console.WriteLine(response.GetBody<string>());
+}

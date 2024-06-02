@@ -2,5 +2,5 @@
 
 public interface IByteReader
 {
-    Task<MemoryStream> Read(Stream stream);
+    Task<byte[]> Read(Stream stream);
 }

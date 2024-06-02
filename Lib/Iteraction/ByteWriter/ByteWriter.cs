@@ -2,10 +2,8 @@
 
 public class ByteWriter : IByteWriter
 {
-    public async Task Write(MemoryStream stream, Stream clientPipeStream)
-    {
-        var buffer = stream.ToArray();
-        
-        await clientPipeStream.WriteAsync(buffer);
+    public async Task Write(byte[] bytes, Stream clientPipeStream)
+    {        
+        await clientPipeStream.WriteAsync(bytes);
     }
 }

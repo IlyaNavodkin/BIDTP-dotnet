@@ -15,12 +15,14 @@ public class Serializer : ISerializer
         _encoding = encoding;
     }
 
-    public Task<MemoryStream> SerializeRequest(RequestBase request)
+    public Task<byte[]> SerializeRequest(RequestBase request)
     {
-         var requestMemoryStream = new MemoryStream();
+         using var requestMemoryStream = new MemoryStream();
+
          var binaryWriter = new BinaryWriter(requestMemoryStream, _encoding);
          
          var headers = request.Headers;
+
          var headersJsonString = JsonSerializer.Serialize(headers);
          var headersJsonStringBytes = _encoding.GetBytes(headersJsonString);
          var headersJsonStringLength = headersJsonStringBytes.Length;
@@ -40,13 +42,17 @@ public class Serializer : ISerializer
          binaryWriter.Write( headersJsonStringBytes );
          binaryWriter.Write( bodyJsonStringLength );
          binaryWriter.Write( bodyJsonStringBytes );
-         
-         return Task.FromResult(requestMemoryStream);
+
+        var result = requestMemoryStream.ToArray();
+
+        return Task.FromResult(result);
     }
     
-    public Task<RequestBase> DeserializeRequest(MemoryStream request)
+    public Task<RequestBase> DeserializeRequest(byte[] request)
     {
-        var streamWriter = new BinaryReader(request, _encoding);
+        using var requestMemoryStream = new MemoryStream(request);
+
+        var streamWriter = new BinaryReader(requestMemoryStream, _encoding);
         
         var headersByteLength = streamWriter.ReadInt32();
         var headersStringJsonBytes = streamWriter.ReadBytes(headersByteLength);
@@ -67,9 +73,9 @@ public class Serializer : ISerializer
         return Task.FromResult<RequestBase>(requestBase);
     }
 
-    public Task<MemoryStream> SerializeResponse(ResponseBase response)
+    public Task<byte[]> SerializeResponse(ResponseBase response)
     {
-        var requestMemoryStream = new MemoryStream();
+        using var requestMemoryStream = new MemoryStream();
         var binaryWriter = new BinaryWriter(requestMemoryStream, _encoding);
         
         var statusCode = (int)response.StatusCode;
@@ -99,13 +105,17 @@ public class Serializer : ISerializer
         
         binaryWriter.Write(bodyJsonStringLength);
         binaryWriter.Write(bodyJsonStringBytes);
-        
-        return Task.FromResult(requestMemoryStream);
+
+        var result = requestMemoryStream.ToArray();
+
+        return Task.FromResult(result);
     }
 
-    public Task<ResponseBase> DeserializeResponse(MemoryStream response)
+    public Task<ResponseBase> DeserializeResponse(byte[] response)
     {
-        var streamWriter = new BinaryReader(response, _encoding);
+        using var requestMemoryStream = new MemoryStream(response);
+
+        var streamWriter = new BinaryReader(requestMemoryStream, _encoding);
         
         var statusCode = (StatusCode)streamWriter.ReadInt32();
         
