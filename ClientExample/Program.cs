@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Lib.Iteraction;
@@ -11,11 +12,31 @@ using Lib.Iteraction.Serializator;
 using Lib.Iteraction.Validator;
 using Schemas;
 
-await CreateAndSend();
+async Task Main()
+{
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
 
+    var tasks = new List<Task>();
 
+    for (int i = 0; i < 10000; i++)
+    {
+        tasks.Add(CreateAndSend());
+    }
 
-Console.ReadKey();
+    await Task.WhenAll(tasks);
+
+    //for (int i = 0; i < 5000; i++)
+    //{
+    //    await CreateAndSend();
+    //}
+
+    stopwatch.Stop();
+
+    Console.WriteLine($"Total time taken: {stopwatch.ElapsedMilliseconds} ms");
+
+    Console.ReadKey();
+}
 
 static async Task CreateAndSend()
 {
@@ -32,13 +53,13 @@ static async Task CreateAndSend()
         Id = 1,
         Name = Guid.NewGuid().ToString(),
         Components = new List<Component>
-    {
-        new Component
         {
-            Id = 1,
-            Name = "Rtx 3060"
+            new Component
+            {
+                Id = 1,
+                Name = "Rtx 3060"
+            }
         }
-    }
     };
 
     var request = new Request
@@ -50,10 +71,41 @@ static async Task CreateAndSend()
         Body = JsonSerializer.Serialize(body)
     };
 
+    var response = await client.Send(request);
+    var responseBody = response.GetBody<Result>();
 
-    await client.Send(request);
+    Console.WriteLine(response.GetBody<string>());
 
-    //var responseBody = response.GetBody<Result>();
 
-    //Console.WriteLine(response.GetBody<string>());
+    var body2 = new Computer
+    {
+        Id = 2,
+        Name = Guid.NewGuid().ToString(),
+        Components = new List<Component>
+        {
+            new Component
+            {
+                Id = 1,
+                Name = "Rtx 6060"
+            }
+        }
+    };
+
+    var request2 = new Request
+    {
+        Headers = new Dictionary<string, string>
+        {
+            ["Route"] = "getNewComponents"
+        },
+        Body = JsonSerializer.Serialize(body2)
+    };
+
+    var response2 = await client.Send(request2);
+    var responseBody2 = response2.GetBody<Result>();
+
+    Console.WriteLine(response2.GetBody<string>());
+
+
 }
+
+await Main();
