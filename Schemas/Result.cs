@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using System.Text.Json.Serialization;
-using Lib.Iteraction.Converters;
+using Lib.Iteraction.Convert;
 
 namespace Schemas;
 

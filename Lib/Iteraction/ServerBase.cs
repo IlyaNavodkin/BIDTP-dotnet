@@ -4,14 +4,33 @@ using System.Threading.Tasks;
 using Lib.Iteraction.ByteReader;
 using Lib.Iteraction.ByteWriter;
 using Lib.Iteraction.Preparer;
-using Lib.Iteraction.RequestServer;
 using Lib.Iteraction.Serializator;
 using Lib.Iteraction.Validator;
+using Microsoft.Extensions.Logging;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using Lib;
+using Lib.Iteraction;
+using Lib.Iteraction.ByteReader;
+using Lib.Iteraction.ByteWriter;
+using Lib.Iteraction.Preparer;
+using Lib.Iteraction.Response;
+using Lib.Iteraction.Validation;
+using Lib.Iteraction.Preparers;
+using Lib.Iteraction.Bytes;
+using Lib.Iteraction.Serialization;
+using Lib.Iteraction.Convert;
+using Lib.Iteraction.Mutation;
+using Lib.Iteraction.Handle.Contracts;
+using Lib.Iteraction.Mutation.Contracts;
+using Lib.Iteraction.Serialization.Contracts;
+using Lib.Iteraction.Validation.Contracts;
+using Lib.Iteraction.Bytes.Contracts;
+
 
 namespace Lib.Iteraction
 {
-    public delegate void DelegateMessage(string Reply);
-
     public class ServerBase
     {
         private readonly IValidator _validator;
@@ -20,24 +39,25 @@ namespace Lib.Iteraction
         private readonly IByteWriter _byteWriter;
         private readonly IByteReader _byteReader;
         private readonly IRequestHandler _requestHandler;
+        private readonly ILogger _logger;
 
         private string PipeName { get; }
+
         private bool _isRunning;
         private int _processPipeQueueDelayTime = 100;
 
-        public ServerBase(IValidator validator,
-            IPreparer preparer, ISerializer serializer,
-            IByteWriter byteWriter, IByteReader byteReader, 
-            IRequestHandler requestHandler)
+        public ServerBase()
         {
-            _validator = validator;
-            _preparer = preparer;
-            _serializer = serializer;
-            _byteWriter = byteWriter;
-            _byteReader = byteReader;
-            _requestHandler = requestHandler;
+            _validator = new Validator();
+            _preparer = new Preparer();
+            _serializer = new Serializer(Encoding.UTF8);
+            _byteWriter = new ByteWriter();
+            _byteReader = new ByteReader();
+            _requestHandler = new RequestHa;
+            
+            _processPipeQueueDelayTime = processPipeQueueDelayTime;
 
-            PipeName = "testpipe";
+            PipeName = pipeName ?? "testpipe";
         }
 
         public async Task Start()

@@ -1,23 +1,23 @@
 ﻿using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using Lib;
 using Lib.Iteraction;
-using Lib.Iteraction.ByteReader;
-using Lib.Iteraction.ByteWriter;
-using Lib.Iteraction.Preparer;
-using Lib.Iteraction.RequestServer;
-using Lib.Iteraction.Response;
-using Lib.Iteraction.Serializator;
-using Lib.Iteraction.Validator;
+using Lib.Iteraction.Bytes;
+using Lib.Iteraction.Enums;
+using Lib.Iteraction.Handle;
+using Lib.Iteraction.Mutation;
+using Lib.Iteraction.Serialization;
+using Lib.Iteraction.Validation;
 using Schemas;
 
 var btw = new ByteWriter();
 var btr = new ByteReader();
 var ser = new Serializer(Encoding.Unicode);
+
 var val = new Validator();
 var prep = new Preparer();
 var sreq = new RequestHandler(val, prep);
+
 
 sreq.AddRoute("getNewComponents", JustChickenGuard);
 

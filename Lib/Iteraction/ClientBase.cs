@@ -3,10 +3,11 @@ using System.IO.Pipes;
 using System.Text;
 using Lib.Iteraction.ByteReader;
 using Lib.Iteraction.ByteWriter;
+using Lib.Iteraction.Contracts;
 using Lib.Iteraction.Preparer;
 using Lib.Iteraction.Request;
 using Lib.Iteraction.Response;
-using Lib.Iteraction.Serializator;
+using Lib.Iteraction.Serialization.Contracts;
 using Lib.Iteraction.Validator;
 
 namespace Lib.Iteraction;
