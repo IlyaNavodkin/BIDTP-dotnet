@@ -4,12 +4,10 @@ using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Lib.Iteraction;
-using Lib.Iteraction.ByteReader;
-using Lib.Iteraction.ByteWriter;
-using Lib.Iteraction.Preparer;
-using Lib.Iteraction.Request;
-using Lib.Iteraction.Serializator;
-using Lib.Iteraction.Validator;
+using Lib.Iteraction.Bytes;
+using Lib.Iteraction.Mutation;
+using Lib.Iteraction.Serialization;
+using Lib.Iteraction.Validation;
 using Schemas;
 
 async Task Main()
@@ -46,7 +44,9 @@ static async Task CreateAndSend()
     var val = new Validator();
     var prep = new Preparer();
 
-    var client = new ClientBase(val, prep, ser, btw, btr);
+    var client = new ClientBase();
+
+    client.SetPipeName("testPipe");
 
     var body = new Computer
     {

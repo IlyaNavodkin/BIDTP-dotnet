@@ -21,7 +21,10 @@ var sreq = new RequestHandler(val, prep);
 
 sreq.AddRoute("getNewComponents", JustChickenGuard);
 
-var server = new ServerBase( val, prep, ser, btw, btr, sreq); 
+var server = new ServerBase(); 
+
+server.SetPipeName("testPipe");
+server.SetProcessPipeQueueDelayTime(1000);
 
 await server.Start();
 

@@ -1,4 +1,4 @@
-﻿namespace Schemas;
+﻿namespace Lib.Iteraction.Schema;
 
 public class Error
 {

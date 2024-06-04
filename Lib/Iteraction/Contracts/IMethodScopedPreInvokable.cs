@@ -1,4 +1,6 @@
-﻿namespace Schemas;
+﻿using Lib.Iteraction.Handle;
+
+namespace Lib.Iteraction.Contracts;
 
 /// <summary>
 ///  Pre-invokable method of the server 

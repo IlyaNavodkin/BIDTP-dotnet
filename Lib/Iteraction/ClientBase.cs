@@ -1,43 +1,83 @@
-﻿using System.Diagnostics;
+﻿using Lib.Iteraction.Bytes;
+using Lib.Iteraction.Bytes.Contracts;
+using Lib.Iteraction.Contracts;
+using Lib.Iteraction.Handle;
+using Lib.Iteraction.Handle.Contracts;
+using Lib.Iteraction.Mutation;
+using Lib.Iteraction.Mutation.Contracts;
+using Lib.Iteraction.Serialization;
+using Lib.Iteraction.Serialization.Contracts;
+using Lib.Iteraction.Validation;
+using Lib.Iteraction.Validation.Contracts;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
-using Lib.Iteraction.ByteReader;
-using Lib.Iteraction.ByteWriter;
-using Lib.Iteraction.Contracts;
-using Lib.Iteraction.Preparer;
-using Lib.Iteraction.Request;
-using Lib.Iteraction.Response;
-using Lib.Iteraction.Serialization.Contracts;
-using Lib.Iteraction.Validator;
 
 namespace Lib.Iteraction;
 
-public class ClientBase
+public class ClientBase : IClientBase
 {
-    private readonly IValidator _validator;
-    private readonly IPreparer _preparer;
-    private readonly ISerializer _serializer;
-    private readonly IByteWriter _byteWriter;
-    private readonly IByteReader _byteReader;
+    private IValidator _validator;
+    private IPreparer _preparer;
+    private ISerializer _serializer;
+    private IByteWriter _byteWriter;
+    private IByteReader _byteReader;
+    private ILogger _logger;
 
-    private string PipeName = "testpipe";
+    private string _pipeName;
     private bool _isConnected;
-    
-    public ClientBase(IValidator validator, 
-        IPreparer preparer, ISerializer serializer, 
-        IByteWriter byteWriter, IByteReader byteReader)
+
+    public ClientBase()
+    {
+        _validator = new Validator();
+        _preparer = new Preparer();
+        _serializer = new Serializer(Encoding.UTF8);
+        _byteWriter = new ByteWriter();
+        _byteReader = new ByteReader();
+
+        _pipeName = "DefaultPipeName";
+    }
+
+    public void AddValidator(IValidator validator)
     {
         _validator = validator;
+    }
+
+    public void AddPreparer(IPreparer preparer)
+    {
         _preparer = preparer;
+    }
+
+    public void AddSerializer(ISerializer serializer)
+    {
         _serializer = serializer;
+    }
+
+    public void AddByteWriter(IByteWriter byteWriter)
+    {
         _byteWriter = byteWriter;
+    }
+
+    public void AddByteReader(IByteReader byteReader)
+    {
         _byteReader = byteReader;
+    }
+
+    public void AddLogger(ILogger logger)
+    {
+        _logger = logger;
+    }
+
+    public void SetPipeName(string pipeName)
+    {
+        _pipeName = pipeName;
     }
 
     private async Task<NamedPipeClientStream> TryToConnect()
     {
         var clientPipeStream = new NamedPipeClientStream
-        (".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+        (".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
         await clientPipeStream.ConnectAsync();
 
@@ -49,26 +89,17 @@ public class ClientBase
         var pipeStream = await TryToConnect();
 
         var validRequest = _validator.ValidateRequest(request);
+
         var preparedRequest = _preparer.PrepareRequest(validRequest);
+
         var serializeRequest = await _serializer.SerializeRequest(preparedRequest);
 
         await _byteWriter.Write(serializeRequest, pipeStream);
-        WriteCompleted?.Invoke(this, EventArgs.Empty);
 
         var deserializeResponse = await _byteReader.Read(pipeStream);
-        ReadCompleted?.Invoke(this, EventArgs.Empty);
 
         var response = await _serializer.DeserializeResponse(deserializeResponse);
 
         return response;
     }
-
-    /// <summary>
-    ///  Occurs when write progress
-    /// </summary>
-    public event EventHandler<EventArgs> WriteCompleted;
-    /// <summary>
-    ///  Occurs when read progress
-    /// </summary>
-    public event EventHandler<EventArgs> ReadCompleted;
 }
