@@ -19,7 +19,7 @@ async Task Main()
 
     var tasks = new List<Task>();
 
-    for (int i = 0; i <4000; i++)
+    for (int i = 0; i <1; i++)
     {
         tasks.Add(CreateAndSend());
     }
@@ -72,38 +72,38 @@ static async Task CreateAndSend()
     };
 
     var response = await client.Send(request);
-    var responseBody = response.GetBody<Result>();
+    var responseBody = response.GetBody<string>();
 
-    Console.WriteLine(response.GetBody<string>());
+    Console.WriteLine(responseBody);
 
 
-    var body2 = new Computer
-    {
-        Id = 2,
-        Name = Guid.NewGuid().ToString(),
-        Components = new List<Component>
-        {
-            new Component
-            {
-                Id = 1,
-                Name = "Rtx 6060"
-            }
-        }
-    };
+    //var body2 = new Computer
+    //{
+    //    Id = 2,
+    //    Name = Guid.NewGuid().ToString(),
+    //    Components = new List<Component>
+    //    {
+    //        new Component
+    //        {
+    //            Id = 1,
+    //            Name = "Rtx 6060"
+    //        }
+    //    }
+    //};
 
-    var request2 = new Request
-    {
-        Headers = new Dictionary<string, string>
-        {
-            ["Route"] = "getNewComponents"
-        },
-        Body = JsonSerializer.Serialize(body2)
-    };
+    //var request2 = new Request
+    //{
+    //    Headers = new Dictionary<string, string>
+    //    {
+    //        ["Route"] = "getNewComponents"
+    //    },
+    //    Body = JsonSerializer.Serialize(body2)
+    //};
 
-    var response2 = await client.Send(request2);
-    var responseBody2 = response2.GetBody<Result>();
+    //var response2 = await client.Send(request2);
+    //var responseBody2 = response2.GetBody<Result>();
 
-    Console.WriteLine(response2.GetBody<string>());
+    //Console.WriteLine(response2.GetBody<string>());
 
 
 }

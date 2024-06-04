@@ -21,13 +21,14 @@ namespace Lib.Iteraction
         private readonly IByteReader _byteReader;
         private readonly IRequestHandler _requestHandler;
 
-        private readonly ConcurrentQueue<NamedPipeServerStream> _pipeQueue;
         private string PipeName { get; }
         private bool _isRunning;
+        private int _processPipeQueueDelayTime = 100;
 
         public ServerBase(IValidator validator,
             IPreparer preparer, ISerializer serializer,
-            IByteWriter byteWriter, IByteReader byteReader, IRequestHandler requestHandler)
+            IByteWriter byteWriter, IByteReader byteReader, 
+            IRequestHandler requestHandler)
         {
             _validator = validator;
             _preparer = preparer;
@@ -37,20 +38,22 @@ namespace Lib.Iteraction
             _requestHandler = requestHandler;
 
             PipeName = "testpipe";
-            _pipeQueue = new ConcurrentQueue<NamedPipeServerStream>();
         }
 
         public async Task Start()
         {
             _isRunning = true;
 
-            // Запуск процесса обработки пайпов
             await Task.WhenAll(ProcessPipeQueue(), ListenForNewConnections());
         }
 
         private NamedPipeServerStream CreatePipeServer()
         {
-            return new NamedPipeServerStream(PipeName, PipeDirection.InOut, NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+            var result = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 
+                NamedPipeServerStream.MaxAllowedServerInstances, PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous);
+
+            return result;
         }
 
         private async Task ListenForNewConnections()
@@ -59,10 +62,8 @@ namespace Lib.Iteraction
             {
                 var pipeServer = CreatePipeServer();
 
-                // Ожидание подключения клиента
                 await pipeServer.WaitForConnectionAsync();
 
-                // Обработка подключения в отдельной задаче
                 _ = Task.Run(async () => await HandleClient(pipeServer));
             }
         }
@@ -99,7 +100,7 @@ namespace Lib.Iteraction
         {
             while (_isRunning)
             {
-                await Task.Delay(100); // Небольшая задержка, чтобы предотвратить чрезмерное использование процессора
+                await Task.Delay(_processPipeQueueDelayTime); 
             }
         }
 

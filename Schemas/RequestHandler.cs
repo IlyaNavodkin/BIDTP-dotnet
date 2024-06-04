@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Concurrent;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Text.Json;
 using Lib;
@@ -7,14 +8,19 @@ using Lib.Iteraction.Request;
 using Lib.Iteraction.RequestServer;
 using Lib.Iteraction.Response;
 using Lib.Iteraction.Validator;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Schemas;
 
 public class RequestHandler : IRequestHandler
 {
-    private readonly Dictionary<string, Func<Context, Task>[]> _routeHandlers = new();
     private readonly IValidator _validator;
     private readonly IPreparer _preparer;
+    private readonly ILogger<RequestHandler> _logger;
+
+    private readonly Dictionary<string, Func<Context, Task>[]> _routeHandlers = new();
+    private readonly ConcurrentDictionary<string, IHostedService> _workers = new();
 
     public IServiceProvider Services { get; }
 
@@ -61,7 +67,9 @@ public class RequestHandler : IRequestHandler
 
         }
         catch (Exception ex) 
-        { 
+        {
+            _logger?.LogCritical(ex, "Internal server error!");
+
             var errorResponse = await HandleServerInternalErrorResponse(ex);
 
             return errorResponse;
