@@ -72,6 +72,8 @@ namespace Lib.Iteraction
         {
             try
             {
+                RequestRecieved?.Invoke(this, EventArgs.Empty);
+
                 var deserializeRequest = await _byteReader.Read(pipeServer);
 
                 var request = await _serializer.DeserializeRequest(deserializeRequest);
@@ -81,6 +83,8 @@ namespace Lib.Iteraction
                 var serializeRequest = await _serializer.SerializeResponse(response);
 
                 await _byteWriter.Write(serializeRequest, pipeServer);
+
+                RequestRecieved?.Invoke(this, EventArgs.Empty);
 
                 Console.WriteLine("Response sent");
                 Console.WriteLine(response.GetBody<string>());
@@ -93,6 +97,8 @@ namespace Lib.Iteraction
             {
                 pipeServer.Disconnect();
                 pipeServer.Dispose();
+
+                RequestRecieved?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -108,5 +114,28 @@ namespace Lib.Iteraction
         {
             _isRunning = false;
         }
+
+        /// <summary>
+        ///  Occurs when write progress
+        /// </summary>
+        public event EventHandler<EventArgs> WriteCompleted;
+        /// <summary>
+        ///  Occurs when read progress
+        /// </summary>
+        public event EventHandler<EventArgs> ReadCompleted;
+
+        /// <summary>
+        ///  Occurs when message recived
+        /// </summary>
+        public event EventHandler<EventArgs> RequestRecieved;
+        /// <summary>
+        ///  Occurs when response pushed
+        /// </summary>
+        public event EventHandler<EventArgs> ResponsePushed;
+        /// <summary>
+        ///  Occurs when response pushed
+        /// </summary>
+        public event EventHandler<EventArgs> RequestIsCompleted;
+
     }
 }
