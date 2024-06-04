@@ -19,7 +19,6 @@ public class ClientBase
     private readonly IByteWriter _byteWriter;
     private readonly IByteReader _byteReader;
 
-    private NamedPipeClientStream _clientPipeStream;
     private string PipeName = "testpipe";
     private bool _isConnected;
     
@@ -34,26 +33,41 @@ public class ClientBase
         _byteReader = byteReader;
     }
 
-    private async Task TryToConnect()
+    private async Task<NamedPipeClientStream> TryToConnect()
     {
-        _clientPipeStream = new NamedPipeClientStream
+        var clientPipeStream = new NamedPipeClientStream
         (".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
-        await _clientPipeStream.ConnectAsync();
+        await clientPipeStream.ConnectAsync();
+
+        return clientPipeStream;
     }
 
     public async Task<ResponseBase> Send(RequestBase request)
     {
-        await TryToConnect();
+        var pipeStream = await TryToConnect();
 
         var validRequest = _validator.ValidateRequest(request);
         var preparedRequest = _preparer.PrepareRequest(validRequest);
         var serializeRequest = await _serializer.SerializeRequest(preparedRequest);
-        await _byteWriter.Write(serializeRequest, _clientPipeStream);
 
-        var deserializeResponse = await _byteReader.Read(_clientPipeStream);
+        await _byteWriter.Write(serializeRequest, pipeStream);
+        WriteCompleted?.Invoke(this, EventArgs.Empty);
+
+        var deserializeResponse = await _byteReader.Read(pipeStream);
+        ReadCompleted?.Invoke(this, EventArgs.Empty);
+
         var response = await _serializer.DeserializeResponse(deserializeResponse);
 
         return response;
     }
+
+    /// <summary>
+    ///  Occurs when write progress
+    /// </summary>
+    public event EventHandler<EventArgs> WriteCompleted;
+    /// <summary>
+    ///  Occurs when read progress
+    /// </summary>
+    public event EventHandler<EventArgs> ReadCompleted;
 }

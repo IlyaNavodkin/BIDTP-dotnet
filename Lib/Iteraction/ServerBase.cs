@@ -74,18 +74,15 @@ namespace Lib.Iteraction
                 var deserializeRequest = await _byteReader.Read(pipeServer);
 
                 var request = await _serializer.DeserializeRequest(deserializeRequest);
+
                 var response = await _requestHandler.ServeRequest(request);
 
-                Console.WriteLine("Response get");
-
-                var validateResponse = _validator.ValidateResponse(response);
-                var preparedResponse = _preparer.PrepareResponse(validateResponse);
-                var serializeRequest = await _serializer.SerializeResponse(preparedResponse);
+                var serializeRequest = await _serializer.SerializeResponse(response);
 
                 await _byteWriter.Write(serializeRequest, pipeServer);
 
                 Console.WriteLine("Response sent");
-                Console.WriteLine(preparedResponse.GetBody<string>());
+                Console.WriteLine(response.GetBody<string>());
             }
             catch (Exception ex)
             {
