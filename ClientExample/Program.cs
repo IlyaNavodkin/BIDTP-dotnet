@@ -44,7 +44,7 @@ static async Task CreateAndSend()
     var val = new Validator();
     var prep = new Preparer();
 
-    var client = new ClientBase();
+    var client = new BidtpClient();
 
     client.SetPipeName("testPipe");
 

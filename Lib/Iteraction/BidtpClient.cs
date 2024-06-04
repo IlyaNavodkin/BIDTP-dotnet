@@ -16,7 +16,7 @@ using System.Text;
 
 namespace Lib.Iteraction;
 
-public class ClientBase : IClientBase
+public class BidtpClient : IBidtpClient
 {
     private IValidator _validator;
     private IPreparer _preparer;
@@ -28,7 +28,7 @@ public class ClientBase : IClientBase
     private string _pipeName;
     private bool _isConnected;
 
-    public ClientBase()
+    public BidtpClient()
     {
         _validator = new Validator();
         _preparer = new Preparer();
@@ -74,19 +74,19 @@ public class ClientBase : IClientBase
         _pipeName = pipeName;
     }
 
-    private async Task<NamedPipeClientStream> TryToConnect()
+    private async Task<NamedPipeClientStream> TryToConnect(CancellationToken cancellationToken = default)
     {
         var clientPipeStream = new NamedPipeClientStream
         (".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
-        await clientPipeStream.ConnectAsync();
+        await clientPipeStream.ConnectAsync(cancellationToken);
 
         return clientPipeStream;
     }
 
-    public async Task<ResponseBase> Send(RequestBase request)
+    public async Task<ResponseBase> Send(RequestBase request, CancellationToken cancellationToken = default)
     {
-        var pipeStream = await TryToConnect();
+        var pipeStream = await TryToConnect(cancellationToken);
 
         var validRequest = _validator.ValidateRequest(request);
 

@@ -19,10 +19,9 @@ using Lib.Iteraction.Bytes.Contracts;
 using Lib.Iteraction.Handle;
 using Lib.Iteraction.Contracts;
 
-
 namespace Lib.Iteraction
 {
-    public class ServerBase : IServerBase
+    public class BidtpServer : IBidtpServer
     {
         private IValidator _validator;
         private IPreparer _preparer;
@@ -32,12 +31,14 @@ namespace Lib.Iteraction
         private IRequestHandler _requestHandler;
         private ILogger _logger;
 
-        private bool _isRunning;
+        private CancellationTokenSource _cancellationTokenSource;
 
         private string _pipeName;
         private int _processPipeQueueDelayTime;
 
-        public ServerBase()
+        public bool IsRunning => _cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested;
+
+        public BidtpServer()
         {
             _validator = new Validator();
             _preparer = new Preparer();
@@ -96,16 +97,21 @@ namespace Lib.Iteraction
             _processPipeQueueDelayTime = processPipeQueueDelayTime;
         }
 
-        public async Task Start()
+        public async Task Start(CancellationToken cancellationToken = default)
         {
-            _isRunning = true;
+            if (_cancellationTokenSource != null)
+            {
+                throw new InvalidOperationException("The server is already running.");
+            }
 
-            await Task.WhenAll(ProcessPipeQueue(), ListenForNewConnections());
+            _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+
+            await Task.WhenAll(ProcessPipeQueue(_cancellationTokenSource.Token), ListenForNewConnections(_cancellationTokenSource.Token));
         }
 
         public void Stop()
         {
-            _isRunning = false;
+            _cancellationTokenSource?.Cancel();
         }
 
         private NamedPipeServerStream CreatePipeServer()
@@ -117,19 +123,25 @@ namespace Lib.Iteraction
             return result;
         }
 
-        private async Task ListenForNewConnections()
+        private async Task ListenForNewConnections(CancellationToken cancellationToken)
         {
-            while (_isRunning)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var pipeServer = CreatePipeServer();
 
-                await pipeServer.WaitForConnectionAsync();
+                try
+                {
+                    await pipeServer.WaitForConnectionAsync(cancellationToken);
 
-                _ = Task.Run(async () => await HandleClient(pipeServer));
+                    _ = Task.Run(async () => await HandleClient(pipeServer, cancellationToken), cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
             }
         }
-
-        private async Task HandleClient(NamedPipeServerStream pipeServer)
+        private async Task HandleClient(NamedPipeServerStream pipeServer, CancellationToken cancellationToken)
         {
             try
             {
@@ -143,13 +155,12 @@ namespace Lib.Iteraction
 
                 await _byteWriter.Write(serializeRequest, pipeServer);
 
-
-                Console.WriteLine("Response sent");
-                Console.WriteLine(response.GetBody<string>());
+                _logger?.LogInformation("Response sent");
+                _logger?.LogInformation(response.GetBody<string>());
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                _logger?.LogError($"Error: {ex.Message}");
             }
             finally
             {
@@ -158,11 +169,18 @@ namespace Lib.Iteraction
             }
         }
 
-        private async Task ProcessPipeQueue()
+        private async Task ProcessPipeQueue(CancellationToken cancellationToken)
         {
-            while (_isRunning)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                await Task.Delay(_processPipeQueueDelayTime);
+                try
+                {
+                    await Task.Delay(_processPipeQueueDelayTime, cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
             }
         }
     }

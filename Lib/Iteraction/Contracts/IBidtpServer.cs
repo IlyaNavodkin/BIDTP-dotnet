@@ -7,8 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Lib.Iteraction.Contracts
 {
-    public interface IServerBase
+    public interface IBidtpServer
     {
+        bool IsRunning { get; }
         void AddByteReader(IByteReader byteReader);
         void AddByteWriter(IByteWriter byteWriter);
         void AddLogger(ILogger logger);
@@ -18,7 +19,7 @@ namespace Lib.Iteraction.Contracts
         void AddValidator(IValidator validator);
         void SetPipeName(string pipeName);
         void SetProcessPipeQueueDelayTime(int processPipeQueueDelayTime);
-        Task Start();
+        Task Start(CancellationToken cancellationToken = default);
         void Stop();
     }
 }
