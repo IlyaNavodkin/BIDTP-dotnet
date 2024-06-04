@@ -2,9 +2,6 @@
 using System.Text.Json;
 using Lib.Iteraction.Contracts;
 using Lib.Iteraction.Enums;
-using Lib.Iteraction.EventArgs;
-using Lib.Iteraction.Request;
-using Lib.Iteraction.Response;
 using Lib.Iteraction.Serialization.Contracts;
 
 namespace Lib.Iteraction.Serialization;
@@ -67,7 +64,7 @@ public class Serializer : ISerializer
 
         var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(headersJsonString);
 
-        var requestBase = new Request.Request
+        var requestBase = new Request
         {
             Headers = headers,
             Body = bodyStringJson
@@ -132,7 +129,7 @@ public class Serializer : ISerializer
 
         var headers = JsonSerializer.Deserialize<Dictionary<string, string>>(headersJsonString);
 
-        var requestBase = new Response.Response(statusCode)
+        var requestBase = new Response(statusCode)
         {
             Headers = headers,
             Body = bodyStringJson
@@ -140,16 +137,4 @@ public class Serializer : ISerializer
 
         return Task.FromResult<ResponseBase>(requestBase);
     }
-
-    private void OnProgressChange(
-        int bytesWriteCount,
-        int totalBytesWriteCount,
-        ProgressOperationType operationType
-        )
-    {
-        ByteProgress?.Invoke(this,
-            new ProgressEventArgs(bytesWriteCount, totalBytesWriteCount, operationType));
-    }
-
-    public event EventHandler<ProgressEventArgs>? ByteProgress;
 }

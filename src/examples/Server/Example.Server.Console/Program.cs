@@ -29,6 +29,8 @@ namespace Example.Server.Console
             
             var serviceCollection = new ServiceCollection();
 
+            serviceCollection.AddHostedService<LoggingWorker>();
+
             serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
             serviceCollection.AddTransient<AuthProvider>();
             serviceCollection.AddTransient<ColorProvider>();

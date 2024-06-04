@@ -18,74 +18,40 @@ public class RequestHandler : IRequestHandler
 {
     private readonly IValidator _validator;
     private readonly IPreparer _preparer;
-    private readonly ILogger<RequestHandler> _logger;
+    private readonly ILogger _logger;
 
-    private readonly Dictionary<string, Func<Context, Task>[]> _routeHandlers = new();
-    private readonly ConcurrentDictionary<string, IHostedService> _workers = new();
+    public IServiceProvider Services;
+    public Dictionary<string, Func<Context, Task>[]> Routes;
 
-    public IServiceProvider Services { get; }
-
-    public RequestHandler(IValidator validator, IPreparer preparer)
+    public RequestHandler(IValidator validator, 
+        IPreparer preparer, ILogger logger)
     {
         _validator = validator;
         _preparer = preparer;
+        _logger = logger;
     }
 
-    /// <summary>
-    ///  Add a route handler or a group of handlers to the server
-    /// </summary>
-    /// <param name="route"> The route. </param>
-    /// <param name="handlers"> The handler or array of handlers.</param>
-    /// <returns> The server builder. </returns>
-    public void AddRoute(string route, params Func<Context, Task>[] handlers)
+    public void AddServiceContainer(IServiceProvider serviceProvider)
     {
-        _routeHandlers.Add(route, handlers);
+        Services = serviceProvider;
     }
 
-
-    /// <summary>
-    ///  Add a background service to the server
-    /// </summary>
-    /// <param name="workerName"> The name of the worker. </param>
-    /// <typeparam name="T"> The type of the worker. </typeparam>
-    public void AddBackgroundService<T>(string workerName = null) where T : BackgroundService
+    public void AddRoutes(Dictionary<string, Func<Context, Task>[]> routes)
     {
-        var backgroundServiceInstance = ActivatorUtilities.CreateInstance<T>(Services);
-
-        workerName ??= typeof(T).Name;
-
-        if (_workers.TryAdd(workerName, backgroundServiceInstance))
-        {
-            backgroundServiceInstance.StartAsync(CancellationToken.None);
-        }
-    }
-
-    /// <summary>
-    ///  Stop a background service from the server
-    /// </summary>
-    /// <param name="workerName"> The name of the worker. </param>
-    /// <typeparam name="T"> The type of the worker. </typeparam>
-    public void StopBackgroundService<T>(string workerName) where T : BackgroundService
-    {
-        workerName ??= typeof(T).Name;
-
-        if (_workers.TryRemove(workerName, out var worker))
-        {
-            worker.StopAsync(CancellationToken.None);
-        }
+        Routes = routes;
     }
 
     public async Task<ResponseBase> ServeRequest(RequestBase request)
     {
         try
         {
-            if (_routeHandlers.Count == 0) throw new Exception("No routes added to the server!");
+            if (Routes.Count == 0) throw new Exception("No routes added to the server!");
 
             var route = request.Headers["Route"];
 
             if (route is null) throw new Exception("Route key is not found. Add route header in the request!");
 
-            var serverRouteNotExist = !_routeHandlers.TryGetValue(route, out var handlers);
+            var serverRouteNotExist = !Routes.TryGetValue(route, out var handlers);
 
             if (serverRouteNotExist)
             {

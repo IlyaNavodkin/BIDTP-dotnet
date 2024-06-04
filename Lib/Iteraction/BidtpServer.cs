@@ -18,6 +18,8 @@ using Lib.Iteraction.Validation.Contracts;
 using Lib.Iteraction.Bytes.Contracts;
 using Lib.Iteraction.Handle;
 using Lib.Iteraction.Contracts;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Lib.Iteraction
 {
@@ -30,6 +32,10 @@ namespace Lib.Iteraction
         private IByteReader _byteReader;
         private IRequestHandler _requestHandler;
         private ILogger _logger;
+
+        private IServiceProvider _services;
+        private Dictionary<string, Func<Context, Task>[]> _routeHandlers;
+        private ConcurrentDictionary<string, IHostedService> _workers;
 
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -45,11 +51,38 @@ namespace Lib.Iteraction
             _serializer = new Serializer(Encoding.UTF8);
             _byteWriter = new ByteWriter();
             _byteReader = new ByteReader();
-            _requestHandler = new RequestHandler(_validator, _preparer);
+            _requestHandler = new RequestHandler(_validator, _preparer, _logger);
 
             _processPipeQueueDelayTime = 100;
 
             _pipeName = "DefaultPipeName";
+
+            _workers = new();
+            _routeHandlers = new();
+        }
+
+        /// <summary>
+        ///  Add a route handler or a group of handlers to the server
+        /// </summary>
+        /// <param name="route"> The route. </param>
+        /// <param name="handlers"> The handler or array of handlers.</param>
+        /// <returns> The server builder. </returns>
+        public void AddRoute(string route, params Func<Context, Task>[] handlers)
+        {
+            _routeHandlers.Add(route, handlers);
+
+            _requestHandler.AddRoutes(_routeHandlers);
+        }
+
+        /// <summary>
+        ///  Add a service to the server
+        /// </summary>
+        /// <typeparam name="T"> The type of the service. </typeparam>
+        public void AddServiceContainer(IServiceProvider serviceProvider)
+        {
+            _services = serviceProvider;
+
+            _requestHandler.AddServiceContainer(_services);
         }
 
         public void AddValidator(IValidator validator)
