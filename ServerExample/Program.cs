@@ -1,30 +1,27 @@
-﻿using System.Reflection;
-using System.Text;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Lib.Iteraction;
-using Lib.Iteraction.Bytes;
+using Lib.Iteraction.Build;
 using Lib.Iteraction.Enums;
 using Lib.Iteraction.Handle;
-using Lib.Iteraction.Mutation;
-using Lib.Iteraction.Serialization;
-using Lib.Iteraction.Validation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Schemas;
 
-var btw = new ByteWriter();
-var btr = new ByteReader();
-var ser = new Serializer(Encoding.Unicode);
+var builder = new BidtpServerBuilder();
 
-var val = new Validator();
-var prep = new Preparer();
-var sreq = new RequestHandler();
+var serviceContainer = new ServiceCollection();
 
+builder.WithPipeName("testPipe");
+builder.WithProcessPipeQueueDelayTime(100);
 
-var server = new BidtpServer(); 
+builder.AddRoute("check", JustChickenGuard);
+builder.AddRoute("m", GetRequestFullInfo);
 
-server.SetPipeName("testPipe");
-server.SetProcessPipeQueueDelayTime(1000);
+var server = builder.Build();
 
-await server.Start();
+var cancelTokenSource = new CancellationTokenSource();
+
+await server.Start(cancelTokenSource.Token);
 
 Console.ReadKey();
 
@@ -44,6 +41,32 @@ Task JustChickenGuard(Context context)
     var response = new Response(StatusCode.Success)
     {
         Body = JsonSerializer.Serialize(result)
+    };
+
+    context.Response = response;
+
+    return Task.CompletedTask;
+}
+
+Task GetRequestFullInfo(Context context)
+{
+    var server = context.ServiceProvider;
+
+    var logger = server.GetRequiredService<ILogger>();
+
+    logger.LogInformation("Off called");
+
+    var request = context.Request;
+
+    var jsonHeaders = JsonSerializer.Serialize(request.Headers, new JsonSerializerOptions { WriteIndented = true });
+    var jsonBody = JsonSerializer.Serialize(request.Body, new JsonSerializerOptions { WriteIndented = true });
+
+    logger.LogInformation("Headers: {Headers}", jsonHeaders);
+    logger.LogInformation("Body: {Body}", jsonBody);
+
+    var response = new Response(StatusCode.Success)
+    {
+        Body = "Hello World"
     };
 
     context.Response = response;

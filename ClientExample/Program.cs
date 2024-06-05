@@ -19,7 +19,7 @@ async Task Main()
 
     for (int i = 0; i <1; i++)
     {
-        tasks.Add(CreateAndSend());
+        tasks.Add(CreateAndSendFromConsole());
     }
 
     await Task.WhenAll(tasks);
@@ -66,7 +66,7 @@ static async Task CreateAndSend()
     {
         Headers = new Dictionary<string, string>
         {
-            ["Route"] = "getNewComponents"
+            ["Route"] = "check"
         },
         Body = JsonSerializer.Serialize(body)
     };
@@ -75,37 +75,53 @@ static async Task CreateAndSend()
     var responseBody = response.GetBody<string>();
 
     Console.WriteLine(responseBody);
+}
 
+static async Task CreateAndSendFromConsole()
+{
+    var btw = new ByteWriter();
+    var btr = new ByteReader();
+    var ser = new Serializer(Encoding.Unicode);
+    var val = new Validator();
+    var prep = new Preparer();
 
-    //var body2 = new Computer
-    //{
-    //    Id = 2,
-    //    Name = Guid.NewGuid().ToString(),
-    //    Components = new List<Component>
-    //    {
-    //        new Component
-    //        {
-    //            Id = 1,
-    //            Name = "Rtx 6060"
-    //        }
-    //    }
-    //};
+    var client = new BidtpClient();
 
-    //var request2 = new Request
-    //{
-    //    Headers = new Dictionary<string, string>
-    //    {
-    //        ["Route"] = "getNewComponents"
-    //    },
-    //    Body = JsonSerializer.Serialize(body2)
-    //};
+    client.SetPipeName("testPipe");
 
-    //var response2 = await client.Send(request2);
-    //var responseBody2 = response2.GetBody<Result>();
+    while (true) // Бесконечный цикл
+    {
+        Console.WriteLine("Enter the route (or 'exit' to quit):");
+        var route = Console.ReadLine(); // Считываем ввод с консоли
 
-    //Console.WriteLine(response2.GetBody<string>());
+        var body = new Computer
+        {
+            Id = 1,
+            Name = Guid.NewGuid().ToString(),
+            Components = new List<Component>
+            {
+                new Component
+                {
+                    Id = 1,
+                    Name = "Rtx 3060"
+                }
+            }
+        };
 
+        var request = new Request
+        {
+            Headers = new Dictionary<string, string>
+            {
+                ["Route"] = route // Устанавливаем значение маршрута из ввода с консоли
+            },
+            Body = JsonSerializer.Serialize(body)
+        };
 
+        var response = await client.Send(request);
+        var responseBody = response.GetBody<string>();
+
+        Console.WriteLine(responseBody);
+    }
 }
 
 await Main();
