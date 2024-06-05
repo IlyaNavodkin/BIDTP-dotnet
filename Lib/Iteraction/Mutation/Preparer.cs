@@ -42,6 +42,10 @@ public static class Constants
     ///  The name of the "ResponseProcessId" header
     /// </summary>
     public const string ResponseProcessIdHeaderName = "ResponseProcessId";
+    /// <summary>
+    ///  The name of the "ResponseProcessId" header
+    /// </summary>
+    public const string RequestResponseGuidHeaderName = "Guid";
 }
 
 public class Preparer : IPreparer
@@ -52,13 +56,18 @@ public class Preparer : IPreparer
         request.Headers.Add(Constants.ProtocolFullNameHeaderName, Constants.ProtocolFullName);
         request.Headers.Add(Constants.ProtocolVersionHeaderName, Constants.ProtocolVersion);
         request.Headers.Add(Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
+        request.Headers.Add(Constants.RequestResponseGuidHeaderName, Guid.NewGuid().ToString());
 
         return request;
     }
 
     public ResponseBase PrepareResponse(ResponseBase response)
     {
-        response.Headers.Add("Prepared", "true");
+        response.Headers.Add(Constants.ProtocolHeaderName, Constants.ProtocolName);
+        response.Headers.Add(Constants.ProtocolFullNameHeaderName, Constants.ProtocolFullName);
+        response.Headers.Add(Constants.ProtocolVersionHeaderName, Constants.ProtocolVersion);
+        response.Headers.Add(Constants.ResponseProcessIdHeaderName, Process.GetCurrentProcess().Id.ToString());
+        response.Headers.Add(Constants.RequestResponseGuidHeaderName, Guid.NewGuid().ToString());
 
         return response;
     }

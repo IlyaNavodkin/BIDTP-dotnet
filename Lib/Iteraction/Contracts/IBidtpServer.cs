@@ -10,13 +10,13 @@ namespace Lib.Iteraction.Contracts
     public interface IBidtpServer
     {
         bool IsRunning { get; }
-        void AddByteReader(IByteReader byteReader);
-        void AddByteWriter(IByteWriter byteWriter);
-        void AddLogger(ILogger logger);
-        void AddPreparer(IPreparer preparer);
-        void AddRequestHandler(IRequestHandler requestHandler);
-        void AddSerializer(ISerializer serializer);
-        void AddValidator(IValidator validator);
+        void SetByteReader(IByteReader byteReader);
+        void SetByteWriter(IByteWriter byteWriter);
+        void SetLogger(ILogger logger);
+        void SetPreparer(IPreparer preparer);
+        void SetRequestHandler(IRequestHandler requestHandler);
+        void SetSerializer(ISerializer serializer);
+        void SetValidator(IValidator validator);
         void SetPipeName(string pipeName);
         void SetProcessPipeQueueDelayTime(int processPipeQueueDelayTime);
         Task Start(CancellationToken cancellationToken = default);

@@ -9,7 +9,6 @@ using Lib;
 using Lib.Iteraction.Validation;
 using Lib.Iteraction.Bytes;
 using Lib.Iteraction.Serialization;
-using Lib.Iteraction.Convert;
 using Lib.Iteraction.Mutation;
 using Lib.Iteraction.Handle.Contracts;
 using Lib.Iteraction.Mutation.Contracts;
@@ -35,7 +34,6 @@ namespace Lib.Iteraction
 
         private IServiceProvider _services;
         private Dictionary<string, Func<Context, Task>[]> _routeHandlers;
-        private ConcurrentDictionary<string, IHostedService> _workers;
 
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -57,7 +55,6 @@ namespace Lib.Iteraction
 
             _pipeName = "DefaultPipeName";
 
-            _workers = new();
             _routeHandlers = new();
         }
 
@@ -71,7 +68,7 @@ namespace Lib.Iteraction
         {
             _routeHandlers.Add(route, handlers);
 
-            _requestHandler.AddRoutes(_routeHandlers);
+            _requestHandler.SetRoutes(_routeHandlers);
         }
 
         /// <summary>
@@ -82,53 +79,36 @@ namespace Lib.Iteraction
         {
             _services = serviceProvider;
 
-            _requestHandler.AddServiceContainer(_services);
+            _requestHandler.SetServices(_services);
         }
 
-        public void AddValidator(IValidator validator)
-        {
-            _validator = validator;
-        }
-
-        public void AddPreparer(IPreparer preparer)
-        {
-            _preparer = preparer;
-        }
-
-        public void AddSerializer(ISerializer serializer)
-        {
-            _serializer = serializer;
-        }
-
-        public void AddByteWriter(IByteWriter byteWriter)
-        {
-            _byteWriter = byteWriter;
-        }
-
-        public void AddByteReader(IByteReader byteReader)
-        {
-            _byteReader = byteReader;
-        }
-
-        public void AddRequestHandler(IRequestHandler requestHandler)
+        public void SetRequestHandler(IRequestHandler requestHandler)
         {
             _requestHandler = requestHandler;
+
+            _requestHandler.SetRoutes(_routeHandlers);
         }
 
-        public void AddLogger(ILogger logger)
+        public void SetValidator(IValidator validator) => _validator = validator;
+
+        public void SetPreparer(IPreparer preparer) => _preparer = preparer;
+
+        public void SetSerializer(ISerializer serializer) =>  _serializer = serializer;
+
+        public void SetByteWriter(IByteWriter byteWriter) => _byteWriter = byteWriter;
+
+        public void SetByteReader(IByteReader byteReader) => _byteReader = byteReader;
+
+        public void SetLogger(ILogger logger)
         {
             _logger = logger;
+
+            _requestHandler.SetLogger(logger);
         }
 
-        public void SetPipeName(string pipeName)
-        {
-            _pipeName = pipeName;
-        }
+        public void SetPipeName(string pipeName) => _pipeName = pipeName;
 
-        public void SetProcessPipeQueueDelayTime(int processPipeQueueDelayTime)
-        {
-            _processPipeQueueDelayTime = processPipeQueueDelayTime;
-        }
+        public void SetProcessPipeQueueDelayTime(int processPipeQueueDelayTime) => _processPipeQueueDelayTime = processPipeQueueDelayTime;
 
         public async Task Start(CancellationToken cancellationToken = default)
         {

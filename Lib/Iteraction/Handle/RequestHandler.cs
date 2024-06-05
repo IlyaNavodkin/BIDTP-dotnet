@@ -16,42 +16,39 @@ namespace Lib.Iteraction.Handle;
 
 public class RequestHandler : IRequestHandler
 {
-    private readonly IValidator _validator;
-    private readonly IPreparer _preparer;
-    private readonly ILogger _logger;
+    private IValidator _validator;
+    private IPreparer _preparer;
+    private ILogger _logger;
 
-    public IServiceProvider Services;
-    public Dictionary<string, Func<Context, Task>[]> Routes;
+    private IServiceProvider _services;
+    private Dictionary<string, Func<Context, Task>[]> _routes;
 
-    public RequestHandler(IValidator validator, 
-        IPreparer preparer, ILogger logger)
+    public void SetServices(IServiceProvider serviceProvider)
     {
-        _validator = validator;
-        _preparer = preparer;
+        _services = serviceProvider;
+    }
+
+    public void SetRoutes(Dictionary<string, Func<Context, Task>[]> routes)
+    {
+        _routes = routes;
+    }
+
+    public void SetLogger(ILogger logger)
+    {
         _logger = logger;
-    }
-
-    public void AddServiceContainer(IServiceProvider serviceProvider)
-    {
-        Services = serviceProvider;
-    }
-
-    public void AddRoutes(Dictionary<string, Func<Context, Task>[]> routes)
-    {
-        Routes = routes;
     }
 
     public async Task<ResponseBase> ServeRequest(RequestBase request)
     {
         try
         {
-            if (Routes.Count == 0) throw new Exception("No routes added to the server!");
+            if (_routes.Count == 0) throw new Exception("No routes added to the server!");
 
             var route = request.Headers["Route"];
 
-            if (route is null) throw new Exception("Route key is not found. Add route header in the request!");
+            _logger.LogInformation($"Request received: {DateTime.Now} Route: {route}");
 
-            var serverRouteNotExist = !Routes.TryGetValue(route, out var handlers);
+            var serverRouteNotExist = !_routes.TryGetValue(route, out var handlers);
 
             if (serverRouteNotExist)
             {
@@ -100,7 +97,7 @@ public class RequestHandler : IRequestHandler
 
     private async Task<ResponseBase> HandleGeneralResponse(RequestBase request, Func<Context, Task>[] handlers)
     {
-        var context = new Context(request, Services);
+        var context = new Context(request, _services);
 
         foreach (var handler in handlers)
         {
@@ -131,4 +128,5 @@ public class RequestHandler : IRequestHandler
 
         return response;
     }
+
 }
