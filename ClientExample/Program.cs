@@ -3,11 +3,14 @@
 using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using Lib.Iteraction;
-using Lib.Iteraction.Bytes;
-using Lib.Iteraction.Mutation;
-using Lib.Iteraction.Serialization;
-using Lib.Iteraction.Validation;
+using BIDTP.Dotnet.Core.Iteraction.Bytes;
+using BIDTP.Dotnet.Core.Iteraction.Validation;
+using BIDTP.Dotnet.Core.Iteraction.Mutation;
+using BIDTP.Dotnet.Core.Iteraction.Logger;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Bytes;
+using BIDTP.Dotnet.Core.Iteraction.Serialization;
+using BIDTP.Dotnet.Core.Iteraction;
 using Schemas;
 
 async Task Main()

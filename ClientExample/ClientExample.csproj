@@ -8,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Lib\Lib.csproj" />
       <ProjectReference Include="..\Schemas\Schemas.csproj" />
+      <ProjectReference Include="..\src\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
     </ItemGroup>
 
 </Project>

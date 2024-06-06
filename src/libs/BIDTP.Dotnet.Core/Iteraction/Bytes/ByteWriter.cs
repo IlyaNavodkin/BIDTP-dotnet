@@ -8,6 +8,6 @@ public class ByteWriter : IByteWriter
 {
     public async Task Write(byte[] bytes, Stream clientPipeStream)
     {
-        await clientPipeStream.WriteAsync(bytes);
+        await clientPipeStream.WriteAsync(bytes, 0, bytes.Length);
     }
 }
