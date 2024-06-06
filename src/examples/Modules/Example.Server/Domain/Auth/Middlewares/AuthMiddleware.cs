@@ -1,4 +1,4 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Providers;
+﻿using BIDTP.Dotnet.Core.Iteraction.Handle;
 
 namespace Example.Server.Domain.Auth.Middlewares;
 

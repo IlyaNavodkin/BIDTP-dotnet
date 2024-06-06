@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction;
 
 namespace Example.Client.WPF.Views.Tabs;
 
@@ -23,11 +23,11 @@ public partial class SendMessageTab : UserControl
             {
                 MainWindow? mainWindow = null;
 
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    mainWindow = (MainWindow)Application.Current.MainWindow;
-                    SendMessageButton.IsEnabled = false;
-                });
+                //await Dispatcher.InvokeAsync(() =>
+                //{
+                //    mainWindow = (MainWindow)Application.Current.MainWindow;
+                //    SendMessageButton.IsEnabled = false;
+                //});
 
                 var request = new Request();
 
@@ -35,12 +35,12 @@ public partial class SendMessageTab : UserControl
                 string? messageValue = null;
                 string? token = null;
 
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    messageValue = MessageInputTextBox.Text;
-                    multipleValueString = MultipleSymbolsTextBox.Text;
-                    token = mainWindow.AuthTokenTextBox.Text;
-                });
+                //await Dispatcher.InvokeAsync(() =>
+                //{
+                //    messageValue = MessageInputTextBox.Text;
+                //    multipleValueString = MultipleSymbolsTextBox.Text;
+                //    token = mainWindow.AuthTokenTextBox.Text;
+                //});
 
                 var multilpleValue = 0;
 
@@ -61,15 +61,15 @@ public partial class SendMessageTab : UserControl
                 request.Headers.Add("Authorization", token);
                 request.SetRoute("PrintMessage");
 
-                var response = await App.Client.WriteRequestAsync(request);
+                var response = await App.Client.Send(request);
 
                 var formattedResponseText = response.GetBody<string>();
 
-                await Dispatcher.InvokeAsync(() =>
-                {
-                    SendMessageButton.IsEnabled = true;
-                    OutPutTextBlock.Text = formattedResponseText;
-                });
+                //await Dispatcher.InvokeAsync(() =>
+                //{
+                //    SendMessageButton.IsEnabled = true;
+                //    OutPutTextBlock.Text = formattedResponseText;
+                //});
 
                 MessageBox.Show(formattedResponseText);
             });

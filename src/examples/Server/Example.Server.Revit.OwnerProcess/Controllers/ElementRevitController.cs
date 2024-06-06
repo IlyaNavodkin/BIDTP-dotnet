@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI.Selection;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Example.Server.Domain.Auth.Providers;
@@ -102,6 +103,58 @@ public static class ElementRevitController
 
         var message = $"Element with id {getElementsByCategoryRequest.Element.Id} was deleted";
         
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
+    }
+
+    public static async Task CreateRandomWall(Context context)
+    {        
+        var wallCoordinates = context.Request.GetBody<WallPointsRequest>();
+        
+        var message = string.Empty;
+        await SimpleDimpleExternalApplication
+            .AsyncEventHandler.RaiseAsync(_  =>
+            {
+                var document = Nice3point.Revit.Toolkit.Context.Document;
+            
+                using (var transaction = new Transaction(document, "Create random wall"))
+                {
+                    transaction.Start();
+
+                    var wallType = new FilteredElementCollector(document)
+                         .OfClass(typeof(WallType))
+                         .Cast<WallType>()
+                         .FirstOrDefault(); 
+
+                    var level = new FilteredElementCollector(document)
+                        .OfClass(typeof(Level))
+                        .Cast<Level>()
+                        .FirstOrDefault();
+
+                    var startPoint = new XYZ(wallCoordinates.StartPoint.X, wallCoordinates.StartPoint.Y, 0);
+                    var endPoint = new XYZ(wallCoordinates.EndPoint.X, wallCoordinates.EndPoint.Y, 0);
+
+                    if (wallType != null && level != null)
+                    {
+                        var line = Line.CreateBound(startPoint, endPoint);
+
+                        var wall = Wall.Create(document, line, wallType.Id, level.Id, 10.0, 0.0, false, false);
+
+                        transaction.Commit();
+
+                        message = $"Wall with was created";
+
+                    }
+                    else
+                    {
+                        transaction.RollBack();
+
+                        message =  $"Wall was not created";
+                    }
+                }
+            });
+
+
         context.Response = new Response(StatusCode.Success);
         context.Response.SetBody(message);
     }

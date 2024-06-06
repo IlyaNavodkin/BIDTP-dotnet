@@ -6,6 +6,7 @@ using BIDTP.Dotnet.Core.Iteraction.Handle.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Serialization.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -23,7 +24,6 @@ namespace BIDTP.Dotnet.Core.Build.Contracts
         BidtpServerBuilder WithProcessPipeQueueDelayTime(int delayTime);
         BidtpServerBuilder WithRequestHandler(IRequestHandler requestHandler);
         BidtpServerBuilder WithSerializer(ISerializer serializer);
-        BidtpServerBuilder WithServiceContainer(IServiceProvider services);
         BidtpServerBuilder WithValidator(IValidator validator);
     }
 }

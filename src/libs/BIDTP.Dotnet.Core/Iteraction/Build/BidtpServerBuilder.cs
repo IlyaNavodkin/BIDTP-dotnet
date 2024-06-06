@@ -33,7 +33,7 @@ namespace BIDTP.Dotnet.Core.Build
 
         private IRequestHandler _requestHandler;
 
-        private IServiceProvider _services;
+        public IServiceCollection Services { get; } = new ServiceCollection();
 
         private Dictionary<string, Func<Context, Task>[]> _routeHandlers = new();
 
@@ -76,12 +76,6 @@ namespace BIDTP.Dotnet.Core.Build
             return this;
         }
 
-        public BidtpServerBuilder WithServiceContainer(IServiceProvider services)
-        {
-            _services = services;
-            return this;
-        }
-
         public BidtpServerBuilder AddRoute(string route, params Func<Context, Task>[] handlers)
         {
             _routeHandlers.Add(route, handlers);
@@ -102,17 +96,11 @@ namespace BIDTP.Dotnet.Core.Build
 
         public BidtpServer Build(string[] args = null)
         {
-            if (_services == null)
-            {
-                var serviceCollection = new ServiceCollection();
+            Services.AddSingleton<ILogger, ConsoleLogger>();
 
-                serviceCollection
-                    .AddSingleton<ILogger, ConsoleLogger>();
+            var serviceProvider = Services.BuildServiceProvider();
 
-                _services = serviceCollection.BuildServiceProvider();
-            }
-
-            var logger = _services.GetService<ILogger>();
+            var logger = serviceProvider.GetService<ILogger>();
 
             var server = new BidtpServer
             {
@@ -122,8 +110,8 @@ namespace BIDTP.Dotnet.Core.Build
                 ByteWriter = _byteWriter,
                 ByteReader = _byteReader,
                 RequestHandler = _requestHandler ??
-                    new RequestHandler(_validator, _preparer, logger, _services, _routeHandlers),
-                Services = _services,
+                    new RequestHandler(_validator, _preparer, logger, serviceProvider, _routeHandlers),
+                Services = serviceProvider,
                 RouteHandlers = _routeHandlers,
                 PipeName = _pipeName,
                 ProcessPipeQueueDelayTime = _processPipeQueueDelayTime

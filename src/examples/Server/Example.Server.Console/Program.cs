@@ -1,8 +1,9 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Build;
+using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Logger;
+using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Server.Core.Workers;
 using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
@@ -22,23 +23,17 @@ namespace Example.Server.Console
     {
         public static async Task Main(string[] args)
         {
-            var builder = new ServerBuilder();
+            var builder = new BidtpServerBuilder();
 
-            var options = new ServerOptions("*","testpipe", 1024,  5000);
-            builder.SetGeneralOptions(options);
-            
-            var serviceCollection = new ServiceCollection();
+            builder.Services.AddHostedService<LoggingWorker>();
 
-            serviceCollection.AddHostedService<LoggingWorker>();
+            builder.Services.AddSingleton<ILogger, ConsoleLogger>();
+            builder.Services.AddTransient<AuthProvider>();
+            builder.Services.AddTransient<ColorProvider>();
+            builder.Services.AddTransient<ElementRepository>();
 
-            serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-            serviceCollection.AddTransient<AuthProvider>();
-            serviceCollection.AddTransient<ColorProvider>();
-            serviceCollection.AddTransient<ElementRepository>();
-            
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            
-            builder.AddDiContainer(serviceProvider);
+            builder.WithPipeName("testpipe");
+            builder.WithProcessPipeQueueDelayTime(100);
              
             builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
             builder.AddRoute("GetElements", ElementController.GetElements);
@@ -50,6 +45,14 @@ namespace Example.Server.Console
             {
                 var request = context.Request;
         
+                Task.Delay(2000).GetAwaiter().GetResult();
+
+                var logger = context.ServiceProvider.GetRequiredService<ILogger>();
+
+                var thread = Thread.CurrentThread;
+
+                logger.LogWarning($"Current Thread: {thread.ManagedThreadId}");
+
                 var isShitWord = request
                     .GetBody<string>()
                     .Contains("Yes of course");
@@ -75,16 +78,13 @@ namespace Example.Server.Console
             
             var server = builder.Build();
             
-            var logger = server.Services.GetRequiredService<ILogger<BIDTP.Dotnet.Core.Iteraction.Server>>();
+            var logger = server.Services.GetRequiredService<ILogger>();
     
             logger.LogInformation("Server started");
-    
-            server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
-            server.AddBackgroundService<LoggingWorker>("BackgroundWorker2"); 
-            
+                
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await server.StartAsync(cancellationTokenSource.Token);
+            await server.Start(cancellationTokenSource.Token);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Iteraction;
+using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Interfaces;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
 
 namespace Example.Server.Domain.Auth.Guards;
 

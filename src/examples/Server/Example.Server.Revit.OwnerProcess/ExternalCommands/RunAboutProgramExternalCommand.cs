@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
-using BIDTP.Dotnet.Core.Extensions;
-using BIDTP.Dotnet.Core.Iteraction.Builders;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Build;
+using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Server.Core.Workers;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
@@ -63,47 +61,33 @@ public class RunAboutProgramExternalCommand: ExternalCommand
         openFileDialog.Filter = "Text files (*.exe)|*.exe"; 
         openFileDialog.Multiselect = false;
 
-        var result = openFileDialog.ShowDialog(); 
-        if (result != true) throw new FileNotFoundException("File not found");
+        //var result = openFileDialog.ShowDialog(); 
+        //if (result != true) throw new FileNotFoundException("File not found");
 
         var filename = openFileDialog.FileName;
-        _isRunning = true;
         
         Task.Run(async () =>
         {
             Process childProcess = null;
-            BIDTP.Dotnet.Core.Iteraction.Server server = null;
+            BidtpServer server = null;
             
             try
             {
                 var cancellationTokenSource = new CancellationTokenSource();
+                
+                var builder = new BidtpServerBuilder();
+                
+                builder.Services.AddScoped<AuthProvider>();
+                builder.Services.AddScoped<ColorProvider>();
+                builder.Services.AddScoped<ElementRepository>();
 
-                var pipeName = AppDomain.CurrentDomain.GetHashedPipeName();
-                
-                var options = new ServerOptions(
-                    "*", 
-                    pipeName, 
-                    1024,  
-                    5000);
-                
-                var builder = new ServerBuilder();
-        
-                builder.SetGeneralOptions(options);
-                
-                var serviceCollection = new ServiceCollection();
-                
-                serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-                serviceCollection.AddScoped<AuthProvider>();
-                serviceCollection.AddScoped<ColorProvider>();
-                serviceCollection.AddScoped<ElementRepository>();
+                builder.WithPipeName("testpipe");
+                builder.WithProcessPipeQueueDelayTime(100);
 
-                var serviceProvider = serviceCollection.BuildServiceProvider();
-                
-                builder.AddDiContainer(serviceProvider);
-                
                 builder.AddRoute("PrintMessage", ShitWordGuard, ColorController.GetRandomColor);
                 builder.AddRoute("GetElements", ElementRevitController.GetElements);
                 builder.AddRoute("DeleteElement", ElementRevitController.DeleteElement);
+                builder.AddRoute("CreateRandomWall", ElementRevitController.CreateRandomWall);
 
                 Task ShitWordGuard(Context context)
                 {
@@ -132,12 +116,12 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 }
                 
                 server = builder.Build();
+                               
+                //childProcess = RunClientProcess(server.PipeName, filename);
                 
-                server.AddBackgroundService<LoggingWorker>();
-               
-                childProcess = RunClientProcess(options.PipeName, filename);
-                
-                await server.StartAsync(cancellationTokenSource.Token);
+
+                MessageBox.Show("Server started");
+                await server.Start(cancellationTokenSource.Token);
             }
             catch (Exception exception)
             {
@@ -146,7 +130,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
             }
             finally
             {
-                if (server != null) await server.StopAsync();
+                if (server != null) server.Stop();
                 _isRunning = false;
             }
         });

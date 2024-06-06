@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Windows;
 using System.Windows.Controls;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
+using static Example.Client.WPF.Views.Tabs.GetElementsTab;
 
 namespace Example.Client.WPF.Views.Tabs;
 
@@ -22,7 +24,7 @@ public partial class GetElementsTab : UserControl
     {
         InitializeComponent();
     }
-    
+
     private async void GetElements(object sender, RoutedEventArgs e)
     {
         try
@@ -42,7 +44,7 @@ public partial class GetElementsTab : UserControl
         
             request.SetBody<GetElementsByCategoryRequest>(getCategoryRequest);
             
-            var response = await App.Client.WriteRequestAsync(request);
+            var response = await App.Client.Send(request);
         
             if (response.StatusCode == StatusCode.Success)
             {
@@ -85,7 +87,7 @@ public partial class GetElementsTab : UserControl
         
             request.SetBody<DeleteElementRequest>(deleteElementRequest);
             
-            var response = await App.Client.WriteRequestAsync(request);
+            var response = await App.Client.Send(request);
             if (response.StatusCode == StatusCode.Success)
             {
                 var message = response.GetBody<string>();
@@ -135,7 +137,7 @@ public partial class GetElementsTab : UserControl
             request.SetRoute("GetMappedObjectFromObjectContainer");
             request.SetBody<AdditionalData>(simpleObject);
             
-            var response = await App.Client.WriteRequestAsync(request);
+            var response = await App.Client.Send(request);
 
             if (response.StatusCode is StatusCode.Success)
             {
@@ -160,37 +162,26 @@ public partial class GetElementsTab : UserControl
         }
     }
 
-    /// <summary>
-    ///  This is not work))) System.Text.Json.JsonSerializer cant serialize and deserialize System.Data.DataTable 
-    /// </summary>
-    private async void SetGetDataTable(object sender, RoutedEventArgs e)
+    private async void CreateRandomWall(object sender, RoutedEventArgs e)
     {
         try
-        {
-            var dataTable = new DataTable();
-            
-            dataTable.Columns.Add("Name", typeof(string));
-            dataTable.Columns.Add("Age", typeof(int));
-            dataTable.Columns.Add("IsAdult", typeof(bool));
-            
-            dataTable.Rows.Add("John", 30, true);
-            dataTable.Rows.Add("Jane", 25, false);
-            dataTable.Rows.Add("Bob", 40, true);
-            
+        {            
             var request = new Request();
+
+            var wallCoordinates = RandomPointGenerateService.GeneratePointsWithMinDistance();
             
-            request.SetRoute("MutateUrTable");
-            request.SetBody<DataTable>(dataTable);
+            request.Headers.Add("Authorization", "TestToken");
+            request.SetRoute("CreateRandomWall");
+
+            request.SetBody<WallPointsRequest>(wallCoordinates);
             
-            var response = await App.Client.WriteRequestAsync(request);
+            var response = await App.Client.Send(request);
             
             if (response.StatusCode is StatusCode.Success)
-            {
-                var dto = response.GetBody<DataTable>();
-                
+            {                
                 var jsonStringDto = response.GetBody<string>();
 
-                MessageBox.Show(jsonStringDto);
+                
             }
             else
             {

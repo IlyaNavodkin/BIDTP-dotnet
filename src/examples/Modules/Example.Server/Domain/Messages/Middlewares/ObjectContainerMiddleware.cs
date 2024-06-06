@@ -1,4 +1,4 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Providers;
+﻿using BIDTP.Dotnet.Core.Iteraction.Handle;
 using Example.Schemas.Dtos;
 
 namespace Example.Server.Domain.Messages.Middlewares;

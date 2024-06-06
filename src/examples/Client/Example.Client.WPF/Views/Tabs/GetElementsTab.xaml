@@ -35,8 +35,8 @@
             </Button>
             <Button
                 Margin="0 12 0 0"
-                Content="Send data table object and get sorted with added column"
-                Click="SetGetDataTable">
+                Content="Create Random Wall => "
+                Click="CreateRandomWall">
             </Button>
         </StackPanel>
     </GroupBox>

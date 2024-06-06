@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Windows;
 using BIDTP.Dotnet;
-using BIDTP.Dotnet.Core.Iteraction.Options;
+using BIDTP.Dotnet.Core.Iteraction;
 using Example.Client.WPF.Views;
 
 
@@ -12,16 +12,14 @@ namespace Example.Client.WPF
     /// </summary>
     public partial class App
     {
-        public static BIDTP.Dotnet.Core.Iteraction.Client? Client;
-        
-        protected override async void OnStartup(StartupEventArgs e)
+        public static BidtpClient Client;
+
+        protected override void OnStartup(StartupEventArgs e)
         {
-            var options = new ClientOptions("*",
-                "testpipe", 
-                1024, 9000, 
-                1000, 5000);
-            
-            Client = new BIDTP.Dotnet.Core.Iteraction.Client(options);
+
+            Client = new BidtpClient();
+
+            Client.SetPipeName("testpipe");
 
             var view = new MainWindow();
 

@@ -1,6 +1,6 @@
 ﻿using Schemas;
 
-internal class Result
+public class Result
 {
     public List<Component> Data { get; set; }
 }

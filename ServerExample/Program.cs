@@ -1,11 +1,5 @@
 ﻿using System.Text.Json;
-using BIDTP.Dotnet.Core.Iteraction.Bytes;
-using BIDTP.Dotnet.Core.Iteraction.Validation;
-using BIDTP.Dotnet.Core.Iteraction.Mutation;
-using BIDTP.Dotnet.Core.Iteraction.Logger;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
-using BIDTP.Dotnet.Core.Iteraction.Bytes;
-using BIDTP.Dotnet.Core.Iteraction.Serialization;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Build;

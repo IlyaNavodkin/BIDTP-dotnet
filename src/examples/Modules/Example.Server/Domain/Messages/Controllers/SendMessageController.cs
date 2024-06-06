@@ -1,6 +1,6 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+using BIDTP.Dotnet.Core.Iteraction.Handle;
 using Example.Schemas.Dtos;
 using Example.Server.Domain.Auth.Guards;
 using Example.Server.Domain.Auth.Middlewares;

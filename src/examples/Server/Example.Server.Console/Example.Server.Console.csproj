@@ -4,16 +4,18 @@
         <OutputType>Exe</OutputType>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <TargetFrameworks> net6.0; net48</TargetFrameworks>
+		<TargetFramework>net48</TargetFramework>
         <RootNamespace>Example.Server.Console</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Properties\" />
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
 
     <ItemGroup>
