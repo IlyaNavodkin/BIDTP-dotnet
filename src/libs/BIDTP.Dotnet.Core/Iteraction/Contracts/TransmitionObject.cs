@@ -1,4 +1,5 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Enums;
+using System.Collections.Generic;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Contracts;
 

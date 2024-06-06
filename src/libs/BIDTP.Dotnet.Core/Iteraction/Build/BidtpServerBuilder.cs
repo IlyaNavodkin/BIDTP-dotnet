@@ -1,43 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO.Pipes;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Lib.Iteraction.Bytes;
-using Lib.Iteraction.Contracts;
-using Lib.Iteraction.Handle;
-using Lib.Iteraction.Mutation;
-using Lib.Iteraction.Serialization;
-using Lib.Iteraction.Validation;
-
-/* Unmerged change from project 'BIDTP.Dotnet.Core (net48)'
-Before:
-using BIDTP.Dotnet.Core.efe;
-After:
-using BIDTP.Dotnet.Core.efe;
-using Lib;
-using Lib.Iteraction;
-using Lib.Iteraction.Build;
-using BIDTP.Dotnet.Core.efe.Build;
-*/
-using BIDTP.Dotnet.Core.efe.Handle;
-
-/* Unmerged change from project 'BIDTP.Dotnet.Core (net48)'
-Before:
-using BIDTP.Dotnet.Core.Iteraction;
-After:
-using BIDTP.Dotnet.Core.Iteraction;
-using BIDTP;
-using BIDTP.Dotnet;
-using BIDTP.Dotnet.Core;
-using BIDTP.Dotnet.Core.efe;
-using BIDTP.Dotnet.Core.efe.Build;
-using BIDTP.Dotnet.Core.Iteraction.Build;
-*/
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Logger;
@@ -45,20 +12,14 @@ using BIDTP.Dotnet.Core.Iteraction.Bytes.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Handle.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Serialization.Contracts;
-
-/* Unmerged change from project 'BIDTP.Dotnet.Core (net48)'
-Before:
-using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
-After:
-using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
-using BIDTP;
-using BIDTP.Dotnet;
-using BIDTP.Dotnet.Core;
-using BIDTP.Dotnet.Core.Iteraction.Build;
-using BIDTP.Dotnet.Core.Build;
-*/
 using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
 using BIDTP.Dotnet.Core.Build.Contracts;
+using BIDTP.Dotnet.Core.Iteraction.Serialization;
+using BIDTP.Dotnet.Core.Iteraction.Mutation;
+using BIDTP.Dotnet.Core.Iteraction.Bytes;
+using BIDTP.Dotnet.Core.Iteraction.Validation;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace BIDTP.Dotnet.Core.Build
 {

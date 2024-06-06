@@ -1,4 +1,7 @@
-﻿namespace BIDTP.Dotnet.Core.Iteraction.Handle;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BIDTP.Dotnet.Core.Iteraction.Handle;
 
 /// <summary>
 ///  The object container of the context

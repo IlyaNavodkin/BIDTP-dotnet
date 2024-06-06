@@ -1,4 +1,6 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Bytes.Contracts;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Bytes;
 

@@ -1,4 +1,5 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Contracts;
+using System.Threading.Tasks;
 
 namespace BIDTP.Dotnet.Core.Iteraction.Serialization.Contracts;
 
