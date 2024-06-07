@@ -1,0 +1,49 @@
+﻿@page "/counter"
+@rendermode InteractiveServer
+
+<PageTitle>Counter</PageTitle>
+
+<h1>Counter</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="CreateRandomWall">Click me</button>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+
+    private BidtpClient bidtpClient;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bidtpClient = new BidtpClient();
+
+        bidtpClient.SetPipeName("testpipe");
+
+        await Task.CompletedTask;
+    }
+
+    public async Task CreateRandomWall()
+    {
+        try
+        {
+            var request = new Request();
+            var body = RandomPointGenerateService.GeneratePointsWithMinDistance(0.3, 10);
+            request.SetBody(body);
+            request.SetRoute("CreateRandomWall");
+
+            var response = await bidtpClient.Send(request);
+            var text = response.GetBody<string>();
+        }
+        catch (Exception ex)
+        {
+        }
+    }
+
+}

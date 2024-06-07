@@ -8,7 +8,7 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
-using static Example.Client.WPF.Views.Tabs.GetElementsTab;
+using Example.Services.Generate;
 
 namespace Example.Client.WPF.Views.Tabs;
 
