@@ -28,15 +28,11 @@ public class RequestHandler : IRequestHandler
     public RequestHandler(
         IValidator validator,
         IPreparer preparer,
-        ILogger logger,
-        IServiceProvider serviceProvider,
-        Dictionary<string, Func<Context, Task>[]> routes)
+        ILogger logger)
     {
         _validator = validator;
         _preparer = preparer;
         _logger = logger;
-        _services = serviceProvider;
-        _routes = routes;
     }
 
     public async Task<ResponseBase> ServeRequest(RequestBase request)
@@ -130,4 +126,9 @@ public class RequestHandler : IRequestHandler
         return response;
     }
 
+    public void Initialize(object[] objects)
+    {
+        _services = (IServiceProvider)objects[0];
+        _routes = (Dictionary<string, Func<Context, Task>[]>)objects[1];
+    }
 }

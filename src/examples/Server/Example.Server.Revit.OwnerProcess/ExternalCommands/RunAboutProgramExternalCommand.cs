@@ -88,6 +88,8 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 builder.AddRoute("GetElements", ElementRevitController.GetElements);
                 builder.AddRoute("DeleteElement", ElementRevitController.DeleteElement);
                 builder.AddRoute("CreateRandomWall", ElementRevitController.CreateRandomWall);
+                builder.AddRoute("ChangeWallLocation", ElementRevitController.ChangeWallLocation);
+                builder.AddRoute("RemoveWall", ElementRevitController.RemoveWall);
 
                 Task ShitWordGuard(Context context)
                 {

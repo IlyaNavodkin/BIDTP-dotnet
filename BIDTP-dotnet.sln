@@ -61,7 +61,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebAppli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client.Blazor", "Example.Client.Blazor\Example.Client.Blazor.csproj", "{B6DA116E-D5D3-4E03-A00C-B8D63666934E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Services", "Example.Services\Example.Services.csproj", "{2D57E5A7-1ECF-40BA-9847-B1A7F301147A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Services", "Example.Services\Example.Services.csproj", "{2D57E5A7-1ECF-40BA-9847-B1A7F301147A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorCanvasApp", "BlazorCanvasApp\BlazorCanvasApp.csproj", "{A48F896C-F862-4466-B451-050A1BD1DE99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{2D57E5A7-1ECF-40BA-9847-B1A7F301147A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D57E5A7-1ECF-40BA-9847-B1A7F301147A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D57E5A7-1ECF-40BA-9847-B1A7F301147A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A48F896C-F862-4466-B451-050A1BD1DE99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A48F896C-F862-4466-B451-050A1BD1DE99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A48F896C-F862-4466-B451-050A1BD1DE99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A48F896C-F862-4466-B451-050A1BD1DE99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +191,7 @@ Global
 		{B054AA47-B33C-405D-BDAC-4ACAFB90AEB5} = {8154C1A2-80AB-4C38-BC69-C79B4C11816D}
 		{B6DA116E-D5D3-4E03-A00C-B8D63666934E} = {CA75B8B3-CCD1-401B-B6DE-5864D3F0EA4E}
 		{2D57E5A7-1ECF-40BA-9847-B1A7F301147A} = {E4455DBF-BBF2-463C-A526-5C59F5BC3003}
+		{A48F896C-F862-4466-B451-050A1BD1DE99} = {CA75B8B3-CCD1-401B-B6DE-5864D3F0EA4E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7FC2A521-5DFD-4106-BFBB-61ECBCFD32DA}

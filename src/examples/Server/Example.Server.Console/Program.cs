@@ -16,9 +16,59 @@ using Example.Server.Domain.Messages.Controllers;
 using Example.Server.Domain.Messages.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Example.Server.Console
 {
+    public class SerilogLogger : ILogger
+    {
+        private readonly Serilog.ILogger _logger;
+
+        public SerilogLogger()
+        {
+            _logger = new LoggerConfiguration()
+                .WriteTo.Console() 
+                .CreateLogger();
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            // Serilog не поддерживает области логирования, поэтому возвращаем пустой IDisposable
+            return default;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            // Преобразование уровня логирования из Microsoft.Extensions.Logging в Serilog
+            return _logger.IsEnabled(ConvertLogLevel(logLevel));
+        }
+
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+        {
+            // Преобразование уровня логирования из Microsoft.Extensions.Logging в Serilog
+            var serilogLogLevel = ConvertLogLevel(logLevel);
+
+            // Вызываем Serilog для записи лога
+            _logger.Write(serilogLogLevel, exception, formatter(state, exception));
+        }
+
+        // Преобразование уровня логирования из Microsoft.Extensions.Logging в Serilog
+        private Serilog.Events.LogEventLevel ConvertLogLevel(LogLevel logLevel)
+        {
+            return logLevel switch
+            {
+                LogLevel.Trace => Serilog.Events.LogEventLevel.Verbose,
+                LogLevel.Debug => Serilog.Events.LogEventLevel.Debug,
+                LogLevel.Information => Serilog.Events.LogEventLevel.Information,
+                LogLevel.Warning => Serilog.Events.LogEventLevel.Warning,
+                LogLevel.Error => Serilog.Events.LogEventLevel.Error,
+                LogLevel.Critical => Serilog.Events.LogEventLevel.Fatal,
+                _ => Serilog.Events.LogEventLevel.Information, // По умолчанию используется Information
+            };
+        }
+    }
+
     internal class Program
     {
         public static async Task Main(string[] args)
@@ -27,10 +77,19 @@ namespace Example.Server.Console
 
             builder.Services.AddHostedService<LoggingWorker>();
 
-            builder.Services.AddSingleton<ILogger, ConsoleLogger>();
+            
+            //builder.Services.AddSingleton<ILogger, ConsoleLogger>();
+            //builder.Services.AddSingleton<ILogger, SerilogLogger>();
             builder.Services.AddTransient<AuthProvider>();
             builder.Services.AddTransient<ColorProvider>();
             builder.Services.AddTransient<ElementRepository>();
+            builder.Services.AddLogging(
+                builder =>
+                {
+                    builder
+                        .ClearProviders()
+                        .AddSerilog();
+                });
 
             builder.WithPipeName("testpipe");
             builder.WithProcessPipeQueueDelayTime(100);

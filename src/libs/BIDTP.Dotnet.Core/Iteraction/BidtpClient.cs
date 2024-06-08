@@ -18,66 +18,43 @@ namespace BIDTP.Dotnet.Core.Iteraction;
 
 public class BidtpClient : IBidtpClient
 {
-    private IValidator _validator;
-    private IPreparer _preparer;
-    private ISerializer _serializer;
-    private IByteWriter _byteWriter;
-    private IByteReader _byteReader;
-    private ILogger _logger;
+    public IValidator Validator;
+    public IPreparer Preparer;
+    public ISerializer Serializer;
+    public IByteWriter ByteWriter;
+    public IByteReader ByteReader;
 
-    private string _pipeName;
-    private bool _isConnected;
+    public string Pipename;
 
     public BidtpClient()
     {
-        _validator = new Validator();
-        _preparer = new Preparer();
-        _serializer = new Serializer(Encoding.UTF8);
-        _byteWriter = new ByteWriter();
-        _byteReader = new ByteReader();
+        Validator = new Validator();
+        Preparer = new Preparer();
+        Serializer = new Serializer();
+        ByteWriter = new ByteWriter();
+        ByteReader = new ByteReader();
 
-        _pipeName = "DefaultPipeName";
+        Pipename = "DefaultPipeName";
     }
 
-    public void AddValidator(IValidator validator)
+    public BidtpClient(IValidator validator, 
+        IPreparer preparer, ISerializer serializer, 
+        IByteWriter byteWriter, IByteReader byteReader,
+        string pipeName)
     {
-        _validator = validator;
-    }
+        Validator = validator;
+        Preparer = preparer;
+        Serializer = serializer;
+        ByteWriter = byteWriter;
+        ByteReader = byteReader;
 
-    public void AddPreparer(IPreparer preparer)
-    {
-        _preparer = preparer;
-    }
-
-    public void AddSerializer(ISerializer serializer)
-    {
-        _serializer = serializer;
-    }
-
-    public void AddByteWriter(IByteWriter byteWriter)
-    {
-        _byteWriter = byteWriter;
-    }
-
-    public void AddByteReader(IByteReader byteReader)
-    {
-        _byteReader = byteReader;
-    }
-
-    public void AddLogger(ILogger logger)
-    {
-        _logger = logger;
-    }
-
-    public void SetPipeName(string pipeName)
-    {
-        _pipeName = pipeName;
+        Pipename = pipeName;
     }
 
     private async Task<NamedPipeClientStream> TryToConnect(CancellationToken cancellationToken = default)
     {
         var clientPipeStream = new NamedPipeClientStream
-        (".", _pipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+        (".", Pipename, PipeDirection.InOut, PipeOptions.Asynchronous);
 
         await clientPipeStream.ConnectAsync(cancellationToken);
 
@@ -88,17 +65,17 @@ public class BidtpClient : IBidtpClient
     {
         var pipeStream = await TryToConnect(cancellationToken);
 
-        var validRequest = _validator.ValidateRequest(request);
+        var validRequest = Validator.ValidateRequest(request);
 
-        var preparedRequest = _preparer.PrepareRequest(validRequest);
+        var preparedRequest = Preparer.PrepareRequest(validRequest);
 
-        var serializeRequest = await _serializer.SerializeRequest(preparedRequest);
+        var serializeRequest = await Serializer.SerializeRequest(preparedRequest);
 
-        await _byteWriter.Write(serializeRequest, pipeStream);
+        await ByteWriter.Write(serializeRequest, pipeStream);
 
-        var deserializeResponse = await _byteReader.Read(pipeStream);
+        var deserializeResponse = await ByteReader.Read(pipeStream);
 
-        var response = await _serializer.DeserializeResponse(deserializeResponse);
+        var response = await Serializer.DeserializeResponse(deserializeResponse);
 
         return response;
     }

@@ -17,13 +17,7 @@ namespace BIDTP.Dotnet.Core.Build.Contracts
     {
         BidtpServerBuilder AddRoute(string route, params Func<Context, Task>[] handlers);
         BidtpServer Build(string[] args = null);
-        BidtpServerBuilder WithByteReader(IByteReader byteReader);
-        BidtpServerBuilder WithByteWriter(IByteWriter byteWriter);
         BidtpServerBuilder WithPipeName(string pipeName);
-        BidtpServerBuilder WithPreparer(IPreparer preparer);
         BidtpServerBuilder WithProcessPipeQueueDelayTime(int delayTime);
-        BidtpServerBuilder WithRequestHandler(IRequestHandler requestHandler);
-        BidtpServerBuilder WithSerializer(ISerializer serializer);
-        BidtpServerBuilder WithValidator(IValidator validator);
     }
 }

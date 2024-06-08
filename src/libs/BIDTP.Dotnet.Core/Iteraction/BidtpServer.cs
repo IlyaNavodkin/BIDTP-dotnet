@@ -22,21 +22,43 @@ namespace BIDTP.Dotnet.Core.Iteraction
 {
     public class BidtpServer : IBidtpServer
     {
-        public IValidator Validator;
-        public IPreparer Preparer;
-        public ISerializer Serializer;
-        public IByteWriter ByteWriter;
-        public IByteReader ByteReader;
-        public IRequestHandler RequestHandler;
-        public ILogger Logger;
+        public IValidator Validator { get; }
+        public IPreparer Preparer { get; }
+        public ISerializer Serializer { get; }
+        public IByteWriter ByteWriter { get; }
+        public IByteReader ByteReader { get; }
+        public IRequestHandler RequestHandler { get; }
+        public ILogger Logger { get; }
 
-        public IServiceProvider Services;
-        public Dictionary<string, Func<Context, Task>[]> RouteHandlers;
+        public IServiceProvider Services { get; }
+        public Dictionary<string, Func<Context, Task>[]> RouteHandlers { get; }
 
         private CancellationTokenSource _cancellationTokenSource;
 
         public string PipeName;
         public int ProcessPipeQueueDelayTime;
+
+        public BidtpServer(IValidator validator, IPreparer preparer, 
+            ISerializer serializer, IByteWriter byteWriter,
+            IByteReader byteReader, IRequestHandler requestHandler, 
+            ServiceProvider serviceProvider, Dictionary<string, 
+            Func<Context, Task>[]> routeHandlers, string pipeName, 
+            int processPipeQueueDelayTime)
+        {
+            Validator = validator;
+            Preparer = preparer;
+            Serializer = serializer;
+            ByteWriter = byteWriter;
+            ByteReader = byteReader;
+            RequestHandler = requestHandler;
+
+            PipeName = pipeName;
+            ProcessPipeQueueDelayTime = processPipeQueueDelayTime;
+
+            RouteHandlers = routeHandlers;
+
+            Services = serviceProvider;
+        }
 
         public bool IsRunning => _cancellationTokenSource != null && !_cancellationTokenSource.IsCancellationRequested;
 

@@ -173,7 +173,7 @@ public partial class GetElementsTab : UserControl
             request.Headers.Add("Authorization", "TestToken");
             request.SetRoute("CreateRandomWall");
 
-            request.SetBody<WallPointsRequest>(wallCoordinates);
+            request.SetBody<WallLineRequest>(wallCoordinates);
             
             var response = await App.Client.Send(request);
             

@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazor.Extensions.Canvas" Version="1.0.0" />
+    <PackageReference Include="BlazorPanzoom" Version="0.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\examples\Modules\Example.Schemas\Example.Schemas.csproj" />
+    <ProjectReference Include="..\src\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+  </ItemGroup>
+
+</Project>

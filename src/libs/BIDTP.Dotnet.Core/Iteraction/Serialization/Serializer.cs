@@ -12,12 +12,7 @@ namespace BIDTP.Dotnet.Core.Iteraction.Serialization;
 
 public class Serializer : ISerializer
 {
-    private readonly Encoding _encoding;
-
-    public Serializer(Encoding encoding)
-    {
-        _encoding = encoding;
-    }
+    private readonly Encoding _encoding = Encoding.UTF8;
 
     public Task<byte[]> SerializeRequest(RequestBase request)
     {

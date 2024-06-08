@@ -8,9 +8,8 @@ using Example.Schemas.Dtos;
 namespace Example.Schemas.Requests
 {
 
-    public class WallPointsRequest
+    public class WallLineRequest
     {
-        public PointDto StartPoint { get; set; }
-        public PointDto EndPoint { get; set; }
+        public LineDto Line { get; set; }
     }
 }

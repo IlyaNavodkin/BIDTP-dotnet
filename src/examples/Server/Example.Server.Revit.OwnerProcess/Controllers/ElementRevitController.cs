@@ -108,15 +108,15 @@ public static class ElementRevitController
     }
 
     public static async Task CreateRandomWall(Context context)
-    {        
-        var wallCoordinates = context.Request.GetBody<WallPointsRequest>();
-        
+    {
+        var wallCoordinates = context.Request.GetBody<WallLineRequest>();
+
         var message = string.Empty;
         await SimpleDimpleExternalApplication
-            .AsyncEventHandler.RaiseAsync(_  =>
+            .AsyncEventHandler.RaiseAsync(_ =>
             {
                 var document = Nice3point.Revit.Toolkit.Context.Document;
-            
+
                 using (var transaction = new Transaction(document, "Create random wall"))
                 {
                     transaction.Start();
@@ -124,15 +124,15 @@ public static class ElementRevitController
                     var wallType = new FilteredElementCollector(document)
                          .OfClass(typeof(WallType))
                          .Cast<WallType>()
-                         .FirstOrDefault(); 
+                         .FirstOrDefault();
 
                     var level = new FilteredElementCollector(document)
                         .OfClass(typeof(Level))
                         .Cast<Level>()
                         .FirstOrDefault();
 
-                    var startPoint = new XYZ(wallCoordinates.StartPoint.X, wallCoordinates.StartPoint.Y, 0);
-                    var endPoint = new XYZ(wallCoordinates.EndPoint.X, wallCoordinates.EndPoint.Y, 0);
+                    var startPoint = new XYZ(wallCoordinates.Line.StartPoint.X, -wallCoordinates.Line.StartPoint.Y, 0);
+                    var endPoint = new XYZ(wallCoordinates.Line.EndPoint.X, -wallCoordinates.Line.EndPoint.Y, 0);
 
                     if (wallType != null && level != null)
                     {
@@ -140,23 +140,105 @@ public static class ElementRevitController
 
                         var wall = Wall.Create(document, line, wallType.Id, level.Id, 10.0, 0.0, false, false);
 
+                        wall.get_Parameter(BuiltInParameter.ALL_MODEL_INSTANCE_COMMENTS).Set(wallCoordinates.Line.Guid);
+
                         transaction.Commit();
 
-                        message = $"Wall with was created";
-
+                        message = wall.Id.ToString();
                     }
                     else
                     {
                         transaction.RollBack();
 
-                        message =  $"Wall was not created";
+                        message = $"Wall was not created";
                     }
                 }
             });
 
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
+    }
+
+    public static async Task ChangeWallLocation(Context context)
+    {
+        var wallCoordinates = context.Request.GetBody<WallLineRequest>();
+        var message = string.Empty;
+
+        await SimpleDimpleExternalApplication
+            .AsyncEventHandler.RaiseAsync(_ =>
+            {
+                var document = Nice3point.Revit.Toolkit.Context.Document;
+
+                using (var transaction = new Transaction(document, "Change wall location"))
+                {
+                    transaction.Start();
+
+                    var existWalls = new FilteredElementCollector(document)
+                        .OfClass(typeof(Wall))
+                        .Cast<Wall>()
+                        .ToList();
+
+                    var existWall = existWalls.FirstOrDefault(e => e.Id.ToString() == wallCoordinates.Line.ElementId);
+
+                    if (existWall != null)
+                    {
+                        var locationCurve = existWall.Location as LocationCurve;
+
+                        if (locationCurve != null)
+                        {
+                            // Отражение координат
+                            var newStartPoint = new XYZ(wallCoordinates.Line.StartPoint.X, -wallCoordinates.Line.StartPoint.Y, 0);
+                            var newEndPoint = new XYZ(wallCoordinates.Line.EndPoint.X, -wallCoordinates.Line.EndPoint.Y, 0);
+
+                            var newLine = Line.CreateBound(newStartPoint, newEndPoint);
+                            locationCurve.Curve = newLine;
+
+                            message = $"Wall location was changed successfully.";
+                        }
+                        else
+                        {
+                            message = "Failed to cast wall location to LocationCurve.";
+                        }
+
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        transaction.RollBack();
+                        message = $"Wall was not found.";
+                    }
+                }
+            });
+
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
+    }
+
+    public static async Task RemoveWall(Context context)
+    {
+        var wallCoordinates = context.Request.GetBody<WallRemoveRequest>();
+        var message = string.Empty;
+
+        await SimpleDimpleExternalApplication
+            .AsyncEventHandler.RaiseAsync(_ =>
+            {
+                var document = Nice3point.Revit.Toolkit.Context.Document;
+
+                using (var transaction = new Transaction(document, "Change wall location"))
+                {
+                    transaction.Start();
+
+                    var elementId = new ElementId(Convert.ToInt32(wallCoordinates.ElementId));
+
+                    document.Delete(elementId);
+
+                    message = $"Element with id {wallCoordinates.ElementId} was deleted";
+
+                    transaction.Commit();
+                }
+            });
 
         context.Response = new Response(StatusCode.Success);
         context.Response.SetBody(message);
     }
 }
-            

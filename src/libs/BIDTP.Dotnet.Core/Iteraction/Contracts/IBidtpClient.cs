@@ -10,13 +10,6 @@ namespace BIDTP.Dotnet.Core.Iteraction.Contracts
 {
     public interface IBidtpClient
     {
-        void AddByteReader(IByteReader byteReader);
-        void AddByteWriter(IByteWriter byteWriter);
-        void AddLogger(ILogger logger);
-        void AddPreparer(IPreparer preparer);
-        void AddSerializer(ISerializer serializer);
-        void AddValidator(IValidator validator);
         Task<ResponseBase> Send(RequestBase request, CancellationToken cancellationToken = default);
-        void SetPipeName(string pipeName);
     }
 }

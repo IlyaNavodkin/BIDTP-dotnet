@@ -13,10 +13,9 @@ namespace Example.Client.WPF
 
         protected override void OnStartup(StartupEventArgs e)
         {
-
             Client = new BidtpClient();
 
-            Client.SetPipeName("testpipe");
+            Client.Pipename = "testpipe";
 
             var view = new MainWindow();
 
