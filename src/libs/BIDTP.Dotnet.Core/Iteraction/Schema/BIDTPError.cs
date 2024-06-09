@@ -1,6 +1,6 @@
 ﻿namespace BIDTP.Dotnet.Core.Iteraction.Schema;
 
-public class Error
+public class BIDTPError
 {
     public string Message { get; set; }
     public string Description { get; set; }

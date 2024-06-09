@@ -74,7 +74,7 @@ public class RequestHandler : IRequestHandler
     {
         Console.WriteLine(exception);
 
-        var error = new Error
+        var error = new BIDTPError
         {
             Message = "Internal server error!",
             Description = exception.Message,

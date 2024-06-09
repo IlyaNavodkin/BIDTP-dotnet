@@ -35,7 +35,7 @@ public class AuthProvider
     
         if(!authorizationIsValid)
         {
-            var error = new Error
+            var error = new BIDTPError
             {
                 ErrorCode = 140,
                 Message = "Вы не авторизованы!",
@@ -44,7 +44,7 @@ public class AuthProvider
             
             var response = new Response(StatusCode.Unauthorized);
             
-            response.SetBody<Error>(error);
+            response.SetBody<BIDTPError>(error);
 
             context.Response = response;
         }

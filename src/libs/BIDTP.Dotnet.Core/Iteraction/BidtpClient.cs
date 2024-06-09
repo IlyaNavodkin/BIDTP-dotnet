@@ -1,6 +1,7 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Bytes;
 using BIDTP.Dotnet.Core.Iteraction.Bytes.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
+using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Mutation;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Serialization;
@@ -8,6 +9,7 @@ using BIDTP.Dotnet.Core.Iteraction.Serialization.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Validation;
 using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
@@ -25,6 +27,10 @@ public class BidtpClient : IBidtpClient
     public IByteReader ByteReader;
 
     public string Pipename;
+
+    public event EventHandler<EventArgs> RequestSended;
+    public event EventHandler<EventArgs> ResponseReceived;
+    public event EventHandler<EventArgs> IsConnected;
 
     public BidtpClient()
     {
@@ -65,6 +71,8 @@ public class BidtpClient : IBidtpClient
     {
         var pipeStream = await TryToConnect(cancellationToken);
 
+        IsConnected?.Invoke(this, new ClientConnectedEventArgs(Pipename));
+
         var validRequest = Validator.ValidateRequest(request);
 
         var preparedRequest = Preparer.PrepareRequest(validRequest);
@@ -73,9 +81,13 @@ public class BidtpClient : IBidtpClient
 
         await ByteWriter.Write(serializeRequest, pipeStream);
 
+        RequestSended?.Invoke(this, new RequestSendedProgressEventArgs(preparedRequest));
+
         var deserializeResponse = await ByteReader.Read(pipeStream);
 
         var response = await Serializer.DeserializeResponse(deserializeResponse);
+
+        ResponseReceived?.Invoke(this, new ResponseReceivedProgressEventArgs(response));
 
         return response;
     }

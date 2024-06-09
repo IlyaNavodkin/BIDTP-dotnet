@@ -118,7 +118,7 @@ namespace Example.Server.Console
         
                 if(isShitWord)
                 {
-                    var dto = new Error
+                    var dto = new BIDTPError
                     {
                         Message = "I am Alexandr Nevsky",
                         Description = "Exception: Chicken-Bodybuilder detected",

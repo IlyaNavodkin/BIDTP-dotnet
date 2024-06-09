@@ -54,7 +54,7 @@ public partial class GetElementsTab : UserControl
             }
             else
             {
-                var error = response.GetBody<Error>();
+                var error = response.GetBody<BIDTPError>();
             
                 MessageBox.Show($"Message: {error.Message} " +
                                 $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
@@ -109,7 +109,7 @@ public partial class GetElementsTab : UserControl
             }
             else
             {
-                var error = response.GetBody<Error>();
+                var error = response.GetBody<BIDTPError>();
             
                 MessageBox.Show($"Message: {error.Message} " +
                                 $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
@@ -149,7 +149,7 @@ public partial class GetElementsTab : UserControl
             }
             else
             {
-                var error = response.GetBody<Error>();
+                var error = response.GetBody<BIDTPError>();
             
                 MessageBox.Show($"Message: {error.Message} " +
                                 $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
@@ -185,7 +185,7 @@ public partial class GetElementsTab : UserControl
             }
             else
             {
-                var error = response.GetBody<Error>();
+                var error = response.GetBody<BIDTPError>();
             
                 MessageBox.Show($"Message: {error.Message} " +
                                 $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");

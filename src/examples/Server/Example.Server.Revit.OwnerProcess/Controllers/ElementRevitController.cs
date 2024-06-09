@@ -241,4 +241,32 @@ public static class ElementRevitController
         context.Response = new Response(StatusCode.Success);
         context.Response.SetBody(message);
     }
+
+    public static async Task DriveCar(Context context)
+    {
+        var wallCoordinates = context.Request.GetBody<WallRemoveRequest>();
+        var message = string.Empty;
+
+        await SimpleDimpleExternalApplication
+            .AsyncEventHandler.RaiseAsync(_ =>
+            {
+                var document = Nice3point.Revit.Toolkit.Context.Document;
+
+                using (var transaction = new Transaction(document, "Change wall location"))
+                {
+                    transaction.Start();
+
+                    var elementId = new ElementId(Convert.ToInt32(wallCoordinates.ElementId));
+
+                    document.Delete(elementId);
+
+                    message = $"Element with id {wallCoordinates.ElementId} was deleted";
+
+                    transaction.Commit();
+                }
+            });
+
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
+    }
 }

@@ -17,6 +17,8 @@ using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
 using System.Collections.Generic;
 using System;
 using System.Threading;
+using BIDTP.Dotnet.Core.Iteraction.Bytes;
+using BIDTP.Dotnet.Core.Iteraction.Events;
 
 namespace BIDTP.Dotnet.Core.Iteraction
 {
@@ -37,6 +39,9 @@ namespace BIDTP.Dotnet.Core.Iteraction
 
         public string PipeName;
         public int ProcessPipeQueueDelayTime;
+
+        public event EventHandler<EventArgs> RequestReceived;
+        public event EventHandler<EventArgs> ResponseSended;
 
         public BidtpServer(IValidator validator, IPreparer preparer, 
             ISerializer serializer, IByteWriter byteWriter,
@@ -119,13 +124,18 @@ namespace BIDTP.Dotnet.Core.Iteraction
             {
                 var deserializeRequest = await ByteReader.Read(pipeServer);
 
+
                 var request = await Serializer.DeserializeRequest(deserializeRequest);
+
+                RequestReceived?.Invoke(this, new RequestReceivedProgressEventArgs(request));
 
                 var response = await RequestHandler.ServeRequest(request);
 
                 var serializeRequest = await Serializer.SerializeResponse(response);
 
                 await ByteWriter.Write(serializeRequest, pipeServer);
+
+                ResponseSended?.Invoke(this, new ResponseSendedProgressEventArgs(response));
 
                 Logger?.LogInformation("Response sent");
                 Logger?.LogInformation(response.GetBody<string>());

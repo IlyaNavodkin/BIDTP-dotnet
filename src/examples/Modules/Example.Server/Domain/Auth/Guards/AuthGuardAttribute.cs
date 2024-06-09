@@ -18,7 +18,7 @@ public class AuthGuardAttribute : Attribute, IMethodScopedPreInvokable
 
         if (string.IsNullOrEmpty(userIdString))
         {
-            var dto = new Error
+            var dto = new BIDTPError
             {
                 Message = "Not authorized",
                 Description = "Not authorized ",

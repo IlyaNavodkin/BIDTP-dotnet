@@ -90,6 +90,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 builder.AddRoute("CreateRandomWall", ElementRevitController.CreateRandomWall);
                 builder.AddRoute("ChangeWallLocation", ElementRevitController.ChangeWallLocation);
                 builder.AddRoute("RemoveWall", ElementRevitController.RemoveWall);
+                builder.AddRoute("DriveCar", ElementRevitController.DriveCar);
 
                 Task ShitWordGuard(Context context)
                 {
@@ -101,7 +102,7 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                     
                     if(isShitWord)
                     {
-                        var dto = new Error
+                        var dto = new BIDTPError
                         {
                             Message = "Я не плохой",
                             Description = "Сам такой?",
