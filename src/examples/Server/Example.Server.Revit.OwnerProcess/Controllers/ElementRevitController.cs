@@ -164,14 +164,20 @@ public static class ElementRevitController
         var wallCoordinates = context.Request.GetBody<WallLineRequest>();
         var message = string.Empty;
 
+
+        await Task.Delay(3000);
+
         await SimpleDimpleExternalApplication
-            .AsyncEventHandler.RaiseAsync(_ =>
+            .AsyncEventHandler.RaiseAsync(async _ =>
             {
+               
+
                 var document = Nice3point.Revit.Toolkit.Context.Document;
 
                 using (var transaction = new Transaction(document, "Change wall location"))
                 {
                     transaction.Start();
+
 
                     var existWalls = new FilteredElementCollector(document)
                         .OfClass(typeof(Wall))

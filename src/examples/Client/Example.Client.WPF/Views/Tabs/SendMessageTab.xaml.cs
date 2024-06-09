@@ -23,24 +23,11 @@ public partial class SendMessageTab : UserControl
             {
                 MainWindow? mainWindow = null;
 
-                //await Dispatcher.InvokeAsync(() =>
-                //{
-                //    mainWindow = (MainWindow)Application.Current.MainWindow;
-                //    SendMessageButton.IsEnabled = false;
-                //});
-
                 var request = new Request();
 
                 string? multipleValueString = null;
                 string? messageValue = null;
                 string? token = null;
-
-                //await Dispatcher.InvokeAsync(() =>
-                //{
-                //    messageValue = MessageInputTextBox.Text;
-                //    multipleValueString = MultipleSymbolsTextBox.Text;
-                //    token = mainWindow.AuthTokenTextBox.Text;
-                //});
 
                 var multilpleValue = 0;
 

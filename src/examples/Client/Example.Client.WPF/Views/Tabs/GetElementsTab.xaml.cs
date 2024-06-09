@@ -161,40 +161,4 @@ public partial class GetElementsTab : UserControl
             MessageBox.Show(exception.Message);
         }
     }
-
-    private async void CreateRandomWall(object sender, RoutedEventArgs e)
-    {
-        try
-        {            
-            var request = new Request();
-
-            var wallCoordinates = RandomPointGenerateService.GeneratePointsWithMinDistance();
-            
-            request.Headers.Add("Authorization", "TestToken");
-            request.SetRoute("CreateRandomWall");
-
-            request.SetBody<WallLineRequest>(wallCoordinates);
-            
-            var response = await App.Client.Send(request);
-            
-            if (response.StatusCode is StatusCode.Success)
-            {                
-                var jsonStringDto = response.GetBody<string>();
-
-                
-            }
-            else
-            {
-                var error = response.GetBody<BIDTPError>();
-            
-                MessageBox.Show($"Message: {error.Message} " +
-                                $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
-            }
-
-        }
-        catch (Exception exception)
-        {
-            MessageBox.Show(exception.Message);
-        }
-    }
 }

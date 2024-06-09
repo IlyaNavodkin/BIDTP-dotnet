@@ -35,8 +35,7 @@
             </Button>
             <Button
                 Margin="0 12 0 0"
-                Content="Create Random Wall => "
-                Click="CreateRandomWall">
+                Content="Create Random Wall => ">
             </Button>
         </StackPanel>
     </GroupBox>

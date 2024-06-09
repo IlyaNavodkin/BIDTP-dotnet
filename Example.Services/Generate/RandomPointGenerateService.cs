@@ -8,22 +8,6 @@ namespace Example.Services.Generate
     {
         private static Random _random = new Random();
 
-        public static WallLineRequest GeneratePointsWithMinDistance(double minDistance = 0.3, double maxDistance = 6)
-        {
-            PointDto startPoint;
-            PointDto endPoint;
-
-            double distance;
-            do
-            {
-                startPoint = GenerateRandomPoint(maxDistance);
-                endPoint = GenerateRandomPoint(maxDistance);
-
-                distance = CalculateDistance(startPoint, endPoint);
-            } while (distance < minDistance);
-
-            return new WallLineRequest { StartPoint = startPoint, EndPoint = endPoint };
-        }
 
         private static PointDto GenerateRandomPoint(double maxDistance)
         {

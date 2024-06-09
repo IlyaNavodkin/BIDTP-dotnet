@@ -76,7 +76,6 @@ namespace Example.Server.Console
 
             builder.Services.AddHostedService<LoggingWorker>();
 
-            
             //builder.Services.AddSingleton<ILogger, ConsoleLogger>();
             //builder.Services.AddSingleton<ILogger, SerilogLogger>();
             builder.Services.AddTransient<AuthProvider>();
@@ -103,8 +102,6 @@ namespace Example.Server.Console
             {
                 var request = context.Request;
         
-                Task.Delay(2000).GetAwaiter().GetResult();
-
                 var logger = context.ServiceProvider.GetRequiredService<ILogger>();
 
                 var thread = Thread.CurrentThread;
