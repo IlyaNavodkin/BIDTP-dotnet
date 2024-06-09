@@ -29,7 +29,7 @@
             <StackPanel HorizontalAlignment="Left"
                         Orientation="Vertical"
                         Margin="10 0  0 0 ">
-                <TextBlock Text="Auth token" 
+                <TextBlock Text="Auth token (its a number 123)"
                            Margin="0 10 0 0"/>
                 <TextBox x:Name="AuthTokenTextBox" 
                          Width="100"

@@ -51,15 +51,15 @@ static async Task CreateAndSend()
 
     client.Pipename = "testpipe";
 
-    //var request = new Request();
+    var request = new Request();
 
-    //request.SetRoute("apple/sayHello");
-    //request.SetBody("test");
+    request.SetRoute("apple/sayHello");
+    request.SetBody("test");
 
-    //var response = await client.Send(request);
-    //var responseBody = response.GetBody<string>();
+    var response = await client.Send(request);
+    var responseBody = response.GetBody<string>();
 
-    //Console.WriteLine(responseBody);
+    Console.WriteLine(responseBody);
 
 
     //var request2 = new Request();
@@ -74,15 +74,15 @@ static async Task CreateAndSend()
     //Console.WriteLine(responseBody2);
 
 
-    var request3 = new Request();
+    //var request3 = new Request();
 
-    request3.SetRoute("apple/throwException");
-    request3.SetBody("test");
+    //request3.SetRoute("apple/throwException");
+    //request3.SetBody("test");
 
-    var response3 = await client.Send(request3);
-    var responseBody3 = response3.GetBody<string>();
+    //var response3 = await client.Send(request3);
+    //var responseBody3 = response3.GetBody<string>();
 
-    Console.WriteLine(responseBody3);
+    //Console.WriteLine(responseBody3);
 
     //var request4 = new Request();
 

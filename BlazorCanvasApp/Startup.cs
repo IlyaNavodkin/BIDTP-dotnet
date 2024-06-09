@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorCanvasApp.Data;
 using BlazorPanzoom;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 
-namespace BlazorCanvasApp
+namespace Example.Client.Blazor
 {
     public class Startup
     {
@@ -29,7 +28,6 @@ namespace BlazorCanvasApp
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddBlazorPanzoomServices();
-            services.AddSingleton<WeatherForecastService>();
 
             services.AddSingleton<IBidtpClient, BidtpClient>(services =>
             {

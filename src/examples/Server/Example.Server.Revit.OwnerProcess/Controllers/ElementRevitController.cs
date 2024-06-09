@@ -19,7 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Example.Server.Revit.OwnerProcess.Controllers;
 
-[ControllerRoute("Element")]
+[ControllerRoute("ElementRevit")]
 public class ElementRevitController : ControllerBase
 {
     /// <summary>
@@ -27,6 +27,7 @@ public class ElementRevitController : ControllerBase
     /// </summary>
     /// <param name="context"> The context. </param>
     /// <returns> The response. </returns>
+    [MethodRoute("GetElements")]
     public static async Task GetElements(Context context)
     {
         var authService = context.ServiceProvider.GetService<AuthProvider>();
@@ -72,12 +73,13 @@ public class ElementRevitController : ControllerBase
             context.Response = response;
         });
     }
-    
+
     /// <summary>
     ///  Delete element route handler
     /// </summary>
     /// <param name="context"> The context. </param>
     /// <returns> The response. </returns>
+    [MethodRoute("DeleteElement")]
     public static async Task DeleteElement(Context context)
     {
         var authService = context.ServiceProvider.GetService<AuthProvider>();

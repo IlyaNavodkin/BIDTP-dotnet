@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Example.Client.WPF.ChildProcess.Args;
+namespace Example.Client.WPF.Args;
 
 /// <summary>
 ///  Class for parsing command line arguments
@@ -27,14 +27,14 @@ public class ArgumentParseUtil
                 result.PipeName = serverNameIsMatch.Groups[1].Value;
                 continue;
             }
-            
+
             var processIdIsMatch = processIdRegex.Match(arg);
             if (processIdIsMatch.Success)
             {
                 result.OwnerProcessId = processIdIsMatch.Groups[1].Value;
             }
         }
-    
+
         return result;
     }
 }

@@ -11,7 +11,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Exceptions.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Handle.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
@@ -33,8 +32,6 @@ public class RequestHandler : IRequestHandler
     private Dictionary<string, (Type ControllerType, string ActionName)> _routes 
         = new Dictionary<string, (Type, string)>();
 
-    public List<IExceptionHandler> ExceptionHandlers { get; set; } = new List<IExceptionHandler>();
-
     public RequestHandler(
         IValidator validator,
         IPreparer preparer,
@@ -51,7 +48,8 @@ public class RequestHandler : IRequestHandler
 
         try
         {
-            if (_routes.Count == 0) throw new Exception("No routes added to the server!");
+            if (_routes.Count == 0) 
+                throw new Exception($"No routes added to the server! Use WithController<T>() method to add routes!");
 
             var route = request.Headers["Route"];
             _logger.LogInformation($"Request received: {DateTime.Now} Route: {route}");
@@ -72,35 +70,17 @@ public class RequestHandler : IRequestHandler
 
             return preparedResponse;
         }
-        catch (Exception ex)
+        catch (Exception exception)
         {
-            return await HandleException(ex, context);
+            var response = await HandleServerInternalErrorResponse(exception);
+
+            return response;
         }
-    }
-
-    private async Task<ResponseBase> HandleException(Exception exception, Context context)
-    {
-        _logger?.LogCritical("Internal server error!");
-
-        ResponseBase response = null;
-
-        foreach (var handler in ExceptionHandlers)
-        {
-            await handler.HandleException(exception, context);
-
-            if (context.Response != null) break;
-        }
-
-        if (response != null) return response;
-
-        response = await HandleServerInternalErrorResponse(exception);
-
-        return response;
     }
 
     private async Task<ResponseBase> HandleServerInternalErrorResponse(Exception exception)
     {
-        _logger?.LogCritical(exception, "Default server error handler!");
+        _logger?.LogCritical(exception, "Internal server error handler!");
 
         var error = new BIDTPError
         {
@@ -145,17 +125,7 @@ public class RequestHandler : IRequestHandler
             throw new ArgumentNullException( $"{nameof(controllerTypes)} cannot be null or empty!");
         }
 
-        RegisterExceptionHandlers();
         RegisterAllControllers(controllerTypes);
-    }
-
-    private void RegisterExceptionHandlers()
-    {
-        var exceptionHandlers = _services
-            .GetServices<IExceptionHandler>()
-            .ToList();
-
-        ExceptionHandlers.AddRange(exceptionHandlers);
     }
 
     private void RegisterAllControllers(Type[] controllerTypes)

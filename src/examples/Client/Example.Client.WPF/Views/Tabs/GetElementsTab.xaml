@@ -11,12 +11,6 @@
             <DataGrid x:Name = "DataGridElements"
                 Margin="0 10 0 10"
                 Height="200">
-                <DataGrid.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Delete" 
-                                  Click="DeleteElement"/>
-                    </ContextMenu>
-                </DataGrid.ContextMenu>
             </DataGrid>
             <TextBlock
                 Text="Filter by category name" />
@@ -27,15 +21,6 @@
                 Margin="0 12 0 0"
                 Content="Get elements"
                 Click="GetElements">
-            </Button>
-            <Button
-                Margin="0 12 0 0"
-                Content="Set and get additional data"
-                Click="SetGetAdditionalData">
-            </Button>
-            <Button
-                Margin="0 12 0 0"
-                Content="Create Random Wall => ">
             </Button>
         </StackPanel>
     </GroupBox>

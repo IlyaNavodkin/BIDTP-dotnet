@@ -2,6 +2,7 @@
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using Example.Schemas.Requests;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Elements.Repositories;
@@ -9,8 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Example.Server.Domain.Elements.Controllers;
 
-[ControllerRoute("TestAccessAuth")]
-public class TestAccessAuthController
+[ControllerRoute("ElementRevit")]
+public class ElementsController : ControllerBase
 {
     [MethodRoute("GetElements")]
     /// <summary>

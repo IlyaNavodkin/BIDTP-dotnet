@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using BIDTP.Dotnet.Core.Iteraction;
+using UIFramework;
 
 namespace Example.Client.WPF.Views.Tabs;
 
@@ -17,6 +18,9 @@ public partial class SendMessageTab : UserControl
 
     private void SendMessageButton_OnClick(object sender, RoutedEventArgs e)
     {
+        var mainWindow = (MainWindow)Application.Current.MainWindow;
+        var token = mainWindow.AuthTokenTextBox.Text;
+
         try
         {
             var taskRun = Task.Run(async () =>
@@ -25,28 +29,12 @@ public partial class SendMessageTab : UserControl
 
                 var request = new Request();
 
-                string? multipleValueString = null;
-                string? messageValue = null;
-                string? token = null;
-
-                var multilpleValue = 0;
-
-                if (multipleValueString is null || !int.TryParse(multipleValueString, out multilpleValue))
-                {
-                    multilpleValue = 1;
-                }
-
                 var stringBuilder = new StringBuilder();
-
-                for (var i = 0; i < multilpleValue; i++)
-                {
-                    stringBuilder.Append(messageValue);
-                }
 
                 request.SetBody(stringBuilder.ToString());
 
                 request.Headers.Add("Authorization", token);
-                request.SetRoute("PrintMessage");
+                request.SetRoute("Color/GetRandomColor");
 
                 var response = await App.Client.Send(request);
 

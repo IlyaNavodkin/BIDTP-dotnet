@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Helpers;
 
 namespace BIDTP.Dotnet.Core.Iteraction;
 
@@ -17,7 +18,7 @@ public class Response : ResponseBase
             return (T)(object)Body;
         }
 
-        return JsonSerializer.Deserialize<T>(Body);
+        return JsonSerializer.Deserialize<T>(Body, JsonHelper.GetDefaultJsonSerializerOptions());
     }
 
     public override void SetBody<T>(T body)
@@ -28,7 +29,7 @@ public class Response : ResponseBase
         }
         else
         {
-            Body = JsonSerializer.Serialize(body);
+            Body = JsonSerializer.Serialize(body, JsonHelper.GetDefaultJsonSerializerOptions());
         }
     }
 }

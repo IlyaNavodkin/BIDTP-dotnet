@@ -1,4 +1,4 @@
-﻿namespace Example.Client.WPF.ChildProcess.Args;
+﻿namespace Example.Client.WPF.Args;
 
 /// <summary>
 ///  Class for parsing command line arguments
