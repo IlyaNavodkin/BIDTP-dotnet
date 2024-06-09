@@ -78,58 +78,55 @@ namespace Example.Server.Console
 
             //builder.Services.AddSingleton<ILogger, ConsoleLogger>();
             //builder.Services.AddSingleton<ILogger, SerilogLogger>();
+
             builder.Services.AddTransient<AuthProvider>();
             builder.Services.AddTransient<ColorProvider>();
             builder.Services.AddTransient<ElementRepository>();
-            builder.Services.AddLogging(
-                builder =>
-                {
-                    builder
-                        .ClearProviders()
-                        .AddSerilog();
-                });
+
 
             builder.WithPipeName("testpipe");
             builder.WithProcessPipeQueueDelayTime(100);
              
-            builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
-            builder.AddRoute("GetElements", ElementController.GetElements);
-            builder.AddRoute("MutateUrTable", DataTableController.MutateUrTable);
-            builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle,
-                SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
+
+
+            //builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
+            //builder.AddRoute("GetElements", ElementController.GetElements);
+            //builder.AddRoute("MutateUrTable", DataTableController.MutateUrTable);
+            //builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle,
+            //    SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
             
-            Task JustChickenGuard(Context context)
-            {
-                var request = context.Request;
+            //Task JustChickenGuard(Context context)
+            //{
+            //    var request = context.Request;
         
-                var logger = context.ServiceProvider.GetRequiredService<ILogger>();
+            //    var logger = context.ServiceProvider.GetRequiredService<ILogger>();
 
-                var thread = Thread.CurrentThread;
+            //    var thread = Thread.CurrentThread;
 
-                logger.LogWarning($"Current Thread: {thread.ManagedThreadId}");
+            //    logger.LogWarning($"Current Thread: {thread.ManagedThreadId}");
 
-                var isShitWord = request
-                    .GetBody<string>()
-                    .Contains("Yes of course");
+            //    var isShitWord = request
+            //        .GetBody<string>()
+            //        .Contains("Yes of course");
         
-                if(isShitWord)
-                {
-                    var dto = new BIDTPError
-                    {
-                        Message = "I am Alexandr Nevsky",
-                        Description = "Exception: Chicken-Bodybuilder detected",
-                        ErrorCode = 228
-                    };
+            //    if(isShitWord)
+            //    {
+            //        var dto = new BIDTPError
+            //        {
+            //            Message = "I am Alexandr Nevsky",
+            //            Description = "Exception: Chicken-Bodybuilder detected",
+            //            ErrorCode = 228
+            //        };
 
-                    var response = new Response(StatusCode.ClientError);
+            //        var response = new Response(StatusCode.ClientError);
 
-                    response.SetBody(dto);
+            //        response.SetBody(dto);
             
-                    context.Response = response;
-                }
+            //        context.Response = response;
+            //    }
 
-                return Task.CompletedTask;
-            }
+            //    return Task.CompletedTask;
+            //}
             
             var server = builder.Build();
 

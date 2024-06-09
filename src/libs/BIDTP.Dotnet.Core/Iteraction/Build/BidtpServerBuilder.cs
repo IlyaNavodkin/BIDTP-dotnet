@@ -17,6 +17,7 @@ using BIDTP.Dotnet.Core.Iteraction.Mutation;
 using BIDTP.Dotnet.Core.Iteraction.Bytes;
 using BIDTP.Dotnet.Core.Iteraction.Validation;
 using System.Linq;
+using System.Reflection;
 
 namespace BIDTP.Dotnet.Core.Build
 {
@@ -24,16 +25,8 @@ namespace BIDTP.Dotnet.Core.Build
     {
         public IServiceCollection Services { get; } = new ServiceCollection();
 
-        private Dictionary<string, Func<Context, Task>[]> _routeHandlers = new();
-
         private string _pipeName = "DefaultPipeName";
         private int _processPipeQueueDelayTime = 100;
-
-        public BidtpServerBuilder AddRoute(string route, params Func<Context, Task>[] handlers)
-        {
-            _routeHandlers.Add(route, handlers);
-            return this;
-        }
 
         public BidtpServerBuilder WithPipeName(string pipeName)
         {
@@ -47,7 +40,7 @@ namespace BIDTP.Dotnet.Core.Build
             return this;
         }
 
-        public BidtpServerBuilder WithDefaultServices()
+        private BidtpServerBuilder WithDefaultServices()
         {
             if (!Services.Any(s => s.ServiceType == typeof(ILogger)))
             {
@@ -91,6 +84,8 @@ namespace BIDTP.Dotnet.Core.Build
         {
             WithDefaultServices();
 
+            AddControllers();
+
             var serviceProvider = Services.BuildServiceProvider();
 
             var logger = serviceProvider.GetService<ILogger>();
@@ -99,7 +94,7 @@ namespace BIDTP.Dotnet.Core.Build
 
             var requestHandler = serviceProvider.GetService<IRequestHandler>();
 
-            requestHandler.Initialize(serviceProvider, _routeHandlers);
+            requestHandler.Initialize(serviceProvider);
 
             logger.LogInformation("IRequestHandler initialized...");
 
@@ -118,12 +113,23 @@ namespace BIDTP.Dotnet.Core.Build
                 byteReader,
                 requestHandler,
                 serviceProvider,
-                _routeHandlers,
                 _pipeName,
                 _processPipeQueueDelayTime
             );
 
             return server;
+        }
+
+        private void AddControllers()
+        {
+            var controllerTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly => assembly.GetTypes())
+                .Where(type => type.GetCustomAttributes<ControllerRouteAttribute>().Any());
+
+            foreach (var controllerType in controllerTypes)
+            {
+                Services.AddScoped(controllerType);
+            }
         }
     }
 }

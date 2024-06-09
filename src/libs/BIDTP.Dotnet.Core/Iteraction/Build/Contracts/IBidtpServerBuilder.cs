@@ -15,7 +15,6 @@ namespace BIDTP.Dotnet.Core.Build.Contracts
 {
     public interface IBidtpServerBuilder
     {
-        BidtpServerBuilder AddRoute(string route, params Func<Context, Task>[] handlers);
         BidtpServer Build(string[] args = null);
         BidtpServerBuilder WithPipeName(string pipeName);
         BidtpServerBuilder WithProcessPipeQueueDelayTime(int delayTime);

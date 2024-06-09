@@ -33,7 +33,6 @@ namespace BIDTP.Dotnet.Core.Iteraction
         public ILogger Logger { get; }
 
         public IServiceProvider Services { get; }
-        public Dictionary<string, Func<Context, Task>[]> RouteHandlers { get; }
 
         private CancellationTokenSource _cancellationTokenSource;
 
@@ -46,8 +45,7 @@ namespace BIDTP.Dotnet.Core.Iteraction
         public BidtpServer(IValidator validator, IPreparer preparer, 
             ISerializer serializer, IByteWriter byteWriter,
             IByteReader byteReader, IRequestHandler requestHandler, 
-            ServiceProvider serviceProvider, Dictionary<string, 
-            Func<Context, Task>[]> routeHandlers, string pipeName, 
+            ServiceProvider serviceProvider, string pipeName, 
             int processPipeQueueDelayTime)
         {
             Validator = validator;
@@ -59,8 +57,6 @@ namespace BIDTP.Dotnet.Core.Iteraction
 
             PipeName = pipeName;
             ProcessPipeQueueDelayTime = processPipeQueueDelayTime;
-
-            RouteHandlers = routeHandlers;
 
             Services = serviceProvider;
         }

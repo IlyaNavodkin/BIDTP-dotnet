@@ -20,7 +20,7 @@ async Task Main()
 
     var tasks = new List<Task>();
 
-    for (int i = 0; i <1; i++)
+    for (int i = 0; i <1000; i++)
     {
         tasks.Add(CreateAndSend());
     }
@@ -69,13 +69,59 @@ static async Task CreateAndSend()
 
     var request = new Request();
 
-    request.SetRoute("PrintMessage");
+    request.SetRoute("apple/sayHello");
     request.SetBody("test");
 
     var response = await client.Send(request);
     var responseBody = response.GetBody<string>();
 
     Console.WriteLine(responseBody);
+
+
+    //var request2 = new Request();
+
+    //request2.SetRoute("apple/sayFuckU");
+    //request2.SetBody("test");
+
+    //var response2 = await client.Send(request2);
+    //var responseBody2 = response2.GetBody<string>();
+
+
+    //Console.WriteLine(responseBody2);
+
+
+    //var request3 = new Request();
+
+    //request3.SetRoute("apple/throwException");
+    //request3.SetBody("test");
+
+    //var response3 = await client.Send(request3);
+    //var responseBody3 = response3.GetBody<string>();
+
+    //Console.WriteLine(responseBody3);
+
+    //var request4 = new Request();
+
+    //request4.SetRoute("book/sayHello");
+    //request4.SetBody("test");
+
+    //var response4 = await client.Send(request4);
+    //var responseBody4 = response4.GetBody<string>();
+
+
+    //Console.WriteLine(responseBody4);
+
+
+    //var request5 = new Request();
+
+    //request5.SetRoute("book/sayFuckU");
+    //request5.SetBody("test");
+
+
+    //var response5 = await client.Send(request5);
+    //var responseBody5 = response5.GetBody<string>();
+
+    //Console.WriteLine(responseBody5);
 }
 
 
