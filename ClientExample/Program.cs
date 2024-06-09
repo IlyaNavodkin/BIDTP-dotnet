@@ -11,7 +11,7 @@ using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Bytes;
 using BIDTP.Dotnet.Core.Iteraction.Serialization;
 using BIDTP.Dotnet.Core.Iteraction;
-using Schemas;
+using BIDTP.Dotnet.Core.Iteraction.Events;
 
 async Task Main()
 {
@@ -22,7 +22,7 @@ async Task Main()
 
     for (int i = 0; i <1; i++)
     {
-        tasks.Add(CreateAndSendFromConsole());
+        tasks.Add(CreateAndSend());
     }
 
     await Task.WhenAll(tasks);
@@ -41,38 +41,30 @@ async Task Main()
 
 static async Task CreateAndSend()
 {
-    var btw = new ByteWriter();
-    var btr = new ByteReader();
-    var ser = new Serializer(Encoding.Unicode);
-    var val = new Validator();
-    var prep = new Preparer();
-
     var client = new BidtpClient();
 
-    client.SetPipeName("testPipe");
-
-    var body = new Computer
-    {
-        Id = 1,
-        Name = Guid.NewGuid().ToString(),
-        Components = new List<Component>
-        {
-            new Component
-            {
-                Id = 1,
-                Name = "Rtx 3060"
-            }
-        }
+    client.RequestSended += (s, e) => 
+    {    
+        var eventArgs = (RequestReceivedProgressEventArgs)e;
     };
 
-    var request = new Request
+    client.ResponseReceived += (s, e) =>
     {
-        Headers = new Dictionary<string, string>
-        {
-            ["Route"] = "check"
-        },
-        Body = JsonSerializer.Serialize(body)
+        var eventArgs = (ResponseReceivedProgressEventArgs)e;
     };
+
+    client.IsConnected += (s, e) =>
+    {
+        var eventArgs = (ClientConnectedEventArgs)e;
+    };
+
+
+    client.Pipename = "testpipe";
+
+    var request = new Request();
+
+    request.SetRoute("PrintMessage");
+    request.SetBody("test");
 
     var response = await client.Send(request);
     var responseBody = response.GetBody<string>();
@@ -80,51 +72,5 @@ static async Task CreateAndSend()
     Console.WriteLine(responseBody);
 }
 
-static async Task CreateAndSendFromConsole()
-{
-    var btw = new ByteWriter();
-    var btr = new ByteReader();
-    var ser = new Serializer(Encoding.Unicode);
-    var val = new Validator();
-    var prep = new Preparer();
-
-    var client = new BidtpClient();
-
-    client.SetPipeName("testPipe");
-
-    while (true) // Бесконечный цикл
-    {
-        Console.WriteLine("Enter the route (or 'exit' to quit):");
-        var route = Console.ReadLine(); // Считываем ввод с консоли
-
-        var body = new Computer
-        {
-            Id = 1,
-            Name = Guid.NewGuid().ToString(),
-            Components = new List<Component>
-            {
-                new Component
-                {
-                    Id = 1,
-                    Name = "Rtx 3060"
-                }
-            }
-        };
-
-        var request = new Request
-        {
-            Headers = new Dictionary<string, string>
-            {
-                ["Route"] = route // Устанавливаем значение маршрута из ввода с консоли
-            },
-            Body = JsonSerializer.Serialize(body)
-        };
-
-        var response = await client.Send(request);
-        var responseBody = response.GetBody<string>();
-
-        Console.WriteLine(responseBody);
-    }
-}
 
 await Main();

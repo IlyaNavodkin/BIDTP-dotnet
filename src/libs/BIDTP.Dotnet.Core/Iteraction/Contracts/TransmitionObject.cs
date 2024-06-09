@@ -9,5 +9,4 @@ public abstract class TransmitionObject
     public string Body;
     public abstract T GetBody<T>();
     public abstract void SetBody<T>(T body);
-    public MessageType MessageType;
 }
