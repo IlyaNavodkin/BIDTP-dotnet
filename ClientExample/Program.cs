@@ -45,17 +45,23 @@ static async Task CreateAndSend()
 
     client.RequestSended += (s, e) => 
     {    
-        var eventArgs = (RequestReceivedProgressEventArgs)e;
+        var eventArgs = (RequestSendedProgressEventArgs)e;
+
+        Console.WriteLine("Request sended");
     };
 
     client.ResponseReceived += (s, e) =>
     {
         var eventArgs = (ResponseReceivedProgressEventArgs)e;
+
+        Console.WriteLine("Response received");
     };
 
     client.IsConnected += (s, e) =>
     {
         var eventArgs = (ClientConnectedEventArgs)e;
+
+        Console.WriteLine("Client connected");
     };
 
 

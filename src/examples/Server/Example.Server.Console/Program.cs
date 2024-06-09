@@ -1,11 +1,10 @@
 ﻿using BIDTP.Dotnet.Core.Build;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Events;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
-using BIDTP.Dotnet.Core.Iteraction.Logger;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Server.Core.Workers;
-using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
@@ -136,7 +135,25 @@ namespace Example.Server.Console
             }
             
             var server = builder.Build();
-            
+
+            server.RequestReceived += (s, e) =>
+            {
+                var eventArgs = (RequestReceivedProgressEventArgs)e;
+
+                var logger = server.Services.GetRequiredService<ILogger>();
+
+                logger.LogInformation ($"Request received");
+            };
+
+            server.ResponseSended += (s, e) =>
+            {
+                var eventArgs = (ResponseSendedProgressEventArgs)e;
+
+                var logger = server.Services.GetRequiredService<ILogger>();
+
+                logger.LogInformation($"Request sended");
+            };
+
             var logger = server.Services.GetRequiredService<ILogger>();
     
             logger.LogInformation("Server started");
