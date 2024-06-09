@@ -120,7 +120,6 @@ namespace BIDTP.Dotnet.Core.Iteraction
             {
                 var deserializeRequest = await ByteReader.Read(pipeServer);
 
-
                 var request = await Serializer.DeserializeRequest(deserializeRequest);
 
                 RequestReceived?.Invoke(this, new RequestReceivedProgressEventArgs(request));

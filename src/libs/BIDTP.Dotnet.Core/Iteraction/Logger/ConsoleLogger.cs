@@ -54,6 +54,11 @@ namespace BIDTP.Dotnet.Core.Iteraction.Logger
 
             Console.WriteLine($"{DateTime.Now:o} [{logLevel}] - {formatter(state, exception)}");
 
+            if (exception != null)
+            {
+                Console.WriteLine(exception);
+            }
+
             Console.ForegroundColor = previousColor;
         }
     }

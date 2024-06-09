@@ -2,7 +2,8 @@
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Events;
-using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Exceptions;
+using BIDTP.Dotnet.Core.Iteraction.Exceptions.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Server.Core.Workers;
 using Example.Server.Domain.Auth.Providers;
@@ -82,6 +83,8 @@ namespace Example.Server.Console
             builder.Services.AddTransient<AuthProvider>();
             builder.Services.AddTransient<ColorProvider>();
             builder.Services.AddTransient<ElementRepository>();
+
+            builder.Services.AddScoped<IExceptionHandler, TestCustomExceptionHandler>();
 
 
             builder.WithPipeName("testpipe");

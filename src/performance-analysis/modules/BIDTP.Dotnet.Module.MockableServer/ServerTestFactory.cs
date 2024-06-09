@@ -25,9 +25,9 @@ public static class ServerTestFactory
 
         builder.AddDiContainer(serviceProvider);
 
-        builder.AddRoute("GetMessageForAdmin", AuthMiddleware.Handle, SendMessageController.GetMessageForAdmin);
-        builder.AddRoute("GetMessageForUser", AuthMiddleware.Handle, SendMessageController.GetMessageForUser);
-        builder.AddRoute("GetAuthAccessResponse", AuthMiddleware.Handle,SendMessageController.GetAuthAccessResponse);
+        builder.AddRoute("GetMessageForAdmin", FirstCustomMiddleware.Handle, SendMessageController.GetMessageForAdmin);
+        builder.AddRoute("GetMessageForUser", FirstCustomMiddleware.Handle, SendMessageController.GetMessageForUser);
+        builder.AddRoute("GetAuthAccessResponse", FirstCustomMiddleware.Handle,SendMessageController.GetAuthAccessResponse);
         builder.AddRoute("GetFreeAccessResponse", SendMessageController.GetFreeAccessResponse);
         builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle, 
             SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);

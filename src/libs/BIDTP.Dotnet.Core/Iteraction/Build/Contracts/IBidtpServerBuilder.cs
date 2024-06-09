@@ -18,5 +18,6 @@ namespace BIDTP.Dotnet.Core.Build.Contracts
         BidtpServer Build(string[] args = null);
         BidtpServerBuilder WithPipeName(string pipeName);
         BidtpServerBuilder WithProcessPipeQueueDelayTime(int delayTime);
+        BidtpServerBuilder WithController<TController>() where TController : class;
     }
 }

@@ -5,12 +5,17 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Exceptions.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Handle.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
 using BIDTP.Dotnet.Core.Iteraction.Validation.Contracts;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +33,8 @@ public class RequestHandler : IRequestHandler
     private Dictionary<string, (Type ControllerType, string ActionName)> _routes 
         = new Dictionary<string, (Type, string)>();
 
+    public List<IExceptionHandler> ExceptionHandlers { get; set; } = new List<IExceptionHandler>();
+
     public RequestHandler(
         IValidator validator,
         IPreparer preparer,
@@ -40,6 +47,8 @@ public class RequestHandler : IRequestHandler
 
     public async Task<ResponseBase> ServeRequest(RequestBase request)
     {
+        Context context = null;
+
         try
         {
             if (_routes.Count == 0) throw new Exception("No routes added to the server!");
@@ -55,8 +64,8 @@ public class RequestHandler : IRequestHandler
             var actionName = routeInfo.ActionName;
             var controllerType = routeInfo.ControllerType;
 
-            var response = await HandleRequestWithController
-                (request, actionName, controllerType);
+            context = new Context(request, _services);
+            var response = await HandleRequestWithController(request, actionName, controllerType, context);
 
             var validatedResponse = _validator.ValidateResponse(response);
             var preparedResponse = _preparer.PrepareResponse(validatedResponse);
@@ -65,17 +74,33 @@ public class RequestHandler : IRequestHandler
         }
         catch (Exception ex)
         {
-            _logger?.LogCritical(ex, "Internal server error!");
-
-            var errorResponse = await HandleServerInternalErrorResponse(ex);
-
-            return errorResponse;
+            return await HandleException(ex, context);
         }
+    }
+
+    private async Task<ResponseBase> HandleException(Exception exception, Context context)
+    {
+        _logger?.LogCritical("Internal server error!");
+
+        ResponseBase response = null;
+
+        foreach (var handler in ExceptionHandlers)
+        {
+            await handler.HandleException(exception, context);
+
+            if (context.Response != null) break;
+        }
+
+        if (response != null) return response;
+
+        response = await HandleServerInternalErrorResponse(exception);
+
+        return response;
     }
 
     private async Task<ResponseBase> HandleServerInternalErrorResponse(Exception exception)
     {
-        Console.WriteLine(exception);
+        _logger?.LogCritical(exception, "Default server error handler!");
 
         var error = new BIDTPError
         {
@@ -96,12 +121,11 @@ public class RequestHandler : IRequestHandler
     }
 
     private async Task<ResponseBase> HandleRequestWithController
-        (RequestBase request, string actionName, Type controllerType)
+        (RequestBase request, string actionName,
+        Type controllerType, Context context)
     {
         using var scope = _services.CreateScope();
         var controller = (IController)scope.ServiceProvider.GetRequiredService(controllerType);
-
-        var context = new Context(request, _services);
 
         await controller.HandleRequest(actionName, context);
 
@@ -113,27 +137,46 @@ public class RequestHandler : IRequestHandler
     public void Initialize(object[] objects)
     {
         _services = (IServiceProvider)objects[0];
+        
+        var controllerTypes = (Type[])objects[1];
 
-        RegisterAllControllers();
+        if (controllerTypes is null)
+        {
+            throw new ArgumentNullException( $"{nameof(controllerTypes)} cannot be null or empty!");
+        }
+
+        RegisterExceptionHandlers();
+        RegisterAllControllers(controllerTypes);
     }
 
-    private void RegisterAllControllers()
+    private void RegisterExceptionHandlers()
     {
-        var controllerTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly => assembly.GetTypes())
-            .Where(type => type.GetCustomAttributes<ControllerRouteAttribute>().Any());
+        var exceptionHandlers = _services
+            .GetServices<IExceptionHandler>()
+            .ToList();
 
+        ExceptionHandlers.AddRange(exceptionHandlers);
+    }
+
+    private void RegisterAllControllers(Type[] controllerTypes)
+    {
         foreach (var controllerType in controllerTypes)
         {
             var controllerRouteAttribute = controllerType.GetCustomAttribute<ControllerRouteAttribute>();
+
+            if (controllerRouteAttribute is null) continue;
+
             var controllerRoute = controllerRouteAttribute.Route;
 
             var methods = controllerType.GetMethods()
-                .Where(m => m.GetCustomAttributes<RouteAttribute>().Any());
+                .Where(m => m.GetCustomAttributes<MethodRouteAttribute>().Any());
 
             foreach (var method in methods)
             {
-                var methodRouteAttribute = method.GetCustomAttribute<RouteAttribute>();
+                var methodRouteAttribute = method.GetCustomAttribute<MethodRouteAttribute>();
+
+                if (controllerRouteAttribute.Route == null) continue;
+
                 var fullRoute = $"{controllerRoute}/{methodRouteAttribute.Route}";
                 _routes[fullRoute] = (controllerType, method.Name);
             }

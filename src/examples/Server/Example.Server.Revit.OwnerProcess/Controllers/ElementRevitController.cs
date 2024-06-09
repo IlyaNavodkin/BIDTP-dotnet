@@ -9,14 +9,18 @@ using Autodesk.Revit.UI.Selection;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
+using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Example.Server.Revit.OwnerProcess.Controllers;
 
-public static class ElementRevitController
+[ControllerRoute("Element")]
+public class ElementRevitController : ControllerBase
 {
     /// <summary>
     ///  Get elements by category route handler
@@ -107,6 +111,9 @@ public static class ElementRevitController
         context.Response.SetBody(message);
     }
 
+    [SecondCustomMiddleware]
+    [FirstCustomMiddleware]
+    [MethodRoute("CreateRandomWall")]
     public static async Task CreateRandomWall(Context context)
     {
         var wallCoordinates = context.Request.GetBody<WallLineRequest>();
@@ -159,13 +166,11 @@ public static class ElementRevitController
         context.Response.SetBody(message);
     }
 
+    [MethodRoute("ChangeWallLocation")]
     public static async Task ChangeWallLocation(Context context)
     {
         var wallCoordinates = context.Request.GetBody<WallLineRequest>();
         var message = string.Empty;
-
-
-        await Task.Delay(3000);
 
         await SimpleDimpleExternalApplication
             .AsyncEventHandler.RaiseAsync(async _ =>
@@ -192,7 +197,6 @@ public static class ElementRevitController
 
                         if (locationCurve != null)
                         {
-                            // Отражение координат
                             var newStartPoint = new XYZ(wallCoordinates.Line.StartPoint.X, -wallCoordinates.Line.StartPoint.Y, 0);
                             var newEndPoint = new XYZ(wallCoordinates.Line.EndPoint.X, -wallCoordinates.Line.EndPoint.Y, 0);
 
@@ -220,35 +224,10 @@ public static class ElementRevitController
         context.Response.SetBody(message);
     }
 
+    [FirstCustomMiddleware]
+    [SecondCustomMiddleware]
+    [MethodRoute("RemoveWall")]
     public static async Task RemoveWall(Context context)
-    {
-        var wallCoordinates = context.Request.GetBody<WallRemoveRequest>();
-        var message = string.Empty;
-
-        await SimpleDimpleExternalApplication
-            .AsyncEventHandler.RaiseAsync(_ =>
-            {
-                var document = Nice3point.Revit.Toolkit.Context.Document;
-
-                using (var transaction = new Transaction(document, "Change wall location"))
-                {
-                    transaction.Start();
-
-                    var elementId = new ElementId(Convert.ToInt32(wallCoordinates.ElementId));
-
-                    document.Delete(elementId);
-
-                    message = $"Element with id {wallCoordinates.ElementId} was deleted";
-
-                    transaction.Commit();
-                }
-            });
-
-        context.Response = new Response(StatusCode.Success);
-        context.Response.SetBody(message);
-    }
-
-    public static async Task DriveCar(Context context)
     {
         var wallCoordinates = context.Request.GetBody<WallRemoveRequest>();
         var message = string.Empty;

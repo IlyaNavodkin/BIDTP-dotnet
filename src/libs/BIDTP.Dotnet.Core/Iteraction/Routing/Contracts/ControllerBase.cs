@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BIDTP.Dotnet.Core.Iteraction
+namespace BIDTP.Dotnet.Core.Iteraction.Routing.Contracts
 {
     public abstract class ControllerBase : IController
     {
@@ -38,32 +38,5 @@ namespace BIDTP.Dotnet.Core.Iteraction
                 throw new Exception($"No action found for route: {actionName}");
             }
         }
-    }
-
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class ControllerRouteAttribute : Attribute
-    {
-        public string Route { get; }
-
-        public ControllerRouteAttribute(string route)
-        {
-            Route = route;
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
-    public class RouteAttribute : Attribute
-    {
-        public string Route { get; }
-
-        public RouteAttribute(string route)
-        {
-            Route = route;
-        }
-    }
-
-    public interface IController
-    {
-        Task HandleRequest(string actionName, Context context);
     }
 }

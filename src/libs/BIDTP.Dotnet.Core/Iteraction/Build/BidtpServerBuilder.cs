@@ -18,12 +18,15 @@ using BIDTP.Dotnet.Core.Iteraction.Bytes;
 using BIDTP.Dotnet.Core.Iteraction.Validation;
 using System.Linq;
 using System.Reflection;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 
 namespace BIDTP.Dotnet.Core.Build
 {
     public class BidtpServerBuilder : IBidtpServerBuilder
     {
         public IServiceCollection Services { get; } = new ServiceCollection();
+
+        private readonly HashSet<Type> _controllerTypes = new HashSet<Type>();
 
         private string _pipeName = "DefaultPipeName";
         private int _processPipeQueueDelayTime = 100;
@@ -40,7 +43,20 @@ namespace BIDTP.Dotnet.Core.Build
             return this;
         }
 
-        private BidtpServerBuilder WithDefaultServices()
+        public BidtpServerBuilder WithController<TController>() where TController : class
+        {
+            if (_controllerTypes.Contains(typeof(TController)))
+            {
+                throw new InvalidOperationException
+                    ($"Controller type {typeof(TController).Name} is already registered.");
+            }
+
+            _controllerTypes.Add(typeof(TController));
+
+            return this;
+        }
+
+        private BidtpServerBuilder RegisterDefaultServices()
         {
             if (!Services.Any(s => s.ServiceType == typeof(ILogger)))
             {
@@ -82,9 +98,8 @@ namespace BIDTP.Dotnet.Core.Build
 
         public BidtpServer Build(string[] args = null)
         {
-            WithDefaultServices();
-
-            AddControllers();
+            RegisterDefaultServices();
+            RegisterControllers();
 
             var serviceProvider = Services.BuildServiceProvider();
 
@@ -94,7 +109,7 @@ namespace BIDTP.Dotnet.Core.Build
 
             var requestHandler = serviceProvider.GetService<IRequestHandler>();
 
-            requestHandler.Initialize(serviceProvider);
+            requestHandler.Initialize(serviceProvider, _controllerTypes.ToArray());
 
             logger.LogInformation("IRequestHandler initialized...");
 
@@ -120,13 +135,9 @@ namespace BIDTP.Dotnet.Core.Build
             return server;
         }
 
-        private void AddControllers()
+        private void RegisterControllers()
         {
-            var controllerTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assembly => assembly.GetTypes())
-                .Where(type => type.GetCustomAttributes<ControllerRouteAttribute>().Any());
-
-            foreach (var controllerType in controllerTypes)
+            foreach (var controllerType in _controllerTypes)
             {
                 Services.AddScoped(controllerType);
             }

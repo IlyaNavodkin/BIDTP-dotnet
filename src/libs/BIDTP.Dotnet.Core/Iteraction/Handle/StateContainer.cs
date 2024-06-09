@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace BIDTP.Dotnet.Core.Iteraction.Handle;
 
 /// <summary>
-///  The object container of the context
+///  The state container of the context
 /// </summary>
-public class ObjectContainer
+public class StateContainer
 {
     /// <summary>
     /// Additional data of the request for mutation 

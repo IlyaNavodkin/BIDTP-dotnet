@@ -15,6 +15,7 @@ using Example.Server.Core.Workers;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
+using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
 using Example.Server.Domain.Messages.Controllers;
 using Example.Server.Revit.OwnerProcess.Controllers;
@@ -84,39 +85,8 @@ public class RunAboutProgramExternalCommand: ExternalCommand
                 builder.WithPipeName("testpipe");
                 builder.WithProcessPipeQueueDelayTime(100);
 
-                builder.AddRoute("PrintMessage", ShitWordGuard, ColorController.GetRandomColor);
-                builder.AddRoute("GetElements", ElementRevitController.GetElements);
-                builder.AddRoute("DeleteElement", ElementRevitController.DeleteElement);
-                builder.AddRoute("CreateRandomWall", ElementRevitController.CreateRandomWall);
-                builder.AddRoute("ChangeWallLocation", ElementRevitController.ChangeWallLocation);
-                builder.AddRoute("RemoveWall", ElementRevitController.RemoveWall);
-                builder.AddRoute("DriveCar", ElementRevitController.DriveCar);
-
-                Task ShitWordGuard(Context context)
-                {
-                    var request = context.Request;
-                    
-                    var isShitWord = request
-                        .GetBody<string>()
-                        .Contains("Плохой");
-                    
-                    if(isShitWord)
-                    {
-                        var dto = new BIDTPError
-                        {
-                            Message = "Я не плохой",
-                            Description = "Сам такой?",
-                            ErrorCode = 228
-                        };
-
-                        var response = new Response(StatusCode.ClientError);
-                        response.SetBody(dto);
-                        
-                        context.Response = response;
-                    }
-
-                    return Task.CompletedTask;
-                }
+                builder.WithController<ColorController>();
+                builder.WithController<ElementRevitController>();
                 
                 server = builder.Build();
                                

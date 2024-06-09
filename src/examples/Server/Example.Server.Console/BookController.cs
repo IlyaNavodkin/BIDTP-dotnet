@@ -1,6 +1,7 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ namespace Example.Server.Console
             this.logger = logger;
         }
 
-        [Route("sayHello")]
+        [MethodRoute("sayHello")]
         public async Task BOOKSAYHELLO(Context context)
         {
             var request = context.Request;
@@ -34,7 +35,7 @@ namespace Example.Server.Console
             context.Response = response;
         }
 
-        [Route("sayFuckU")]
+        [MethodRoute("sayFuckU")]
         public async Task FUCKU(Context context)
         {
             var request = context.Request;

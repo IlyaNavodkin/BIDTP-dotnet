@@ -142,7 +142,7 @@
 
                 request.SetBody(dto);
 
-                request.SetRoute("CreateRandomWall");
+                request.SetRoute("Element/CreateRandomWall");
 
                 var response = await bidtpClient.Send(request);
 
@@ -201,7 +201,7 @@
 
             request.SetBody(dto);
 
-            request.SetRoute("RemoveWall");
+            request.SetRoute("Element/RemoveWall");
 
             var response = await bidtpClient.Send(request);
 
@@ -372,7 +372,7 @@
 
             request.SetBody(dto);
 
-            request.SetRoute("ChangeWallLocation");
+            request.SetRoute("Element/ChangeWallLocation");
 
             var response = await bidtpClient.Send(request);
 
