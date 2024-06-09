@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Example.Server.Domain.Colors.Controllers;
 
-[ControllerRoute("color")]
+[ControllerRoute("Color")]
 public class ColorController : ControllerBase
 {
     [MethodRoute("GetRandomColor")]

@@ -4,18 +4,6 @@ using System.Diagnostics;
 
 namespace Example.Server.Domain.Auth.Middlewares;
 
-
-[AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-public class FirstCustomMiddlewareAttribute : Attribute, IMethodScopedPreInvokable
-{
-    public Task Invoke(Context context)
-    {   
-        Debug.WriteLine("Custom First Middleware");
-
-        return Task.CompletedTask;
-    }
-}
-
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class SecondCustomMiddlewareAttribute : Attribute, IMethodScopedPreInvokable
 {

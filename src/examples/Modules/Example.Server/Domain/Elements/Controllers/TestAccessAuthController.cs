@@ -1,6 +1,7 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using Example.Schemas.Requests;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Elements.Repositories;
@@ -8,8 +9,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Example.Server.Domain.Elements.Controllers;
 
-public class ElementController
+[ControllerRoute("TestAccessAuth")]
+public class TestAccessAuthController
 {
+    [MethodRoute("GetElements")]
     /// <summary>
     ///  Get elements by category route handler
     /// </summary>

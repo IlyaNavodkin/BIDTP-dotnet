@@ -10,11 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Properties\" />
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
     
     <ItemGroup>

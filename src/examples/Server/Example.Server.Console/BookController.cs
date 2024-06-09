@@ -1,6 +1,7 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using Microsoft.Extensions.Logging;
 using System;

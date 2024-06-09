@@ -1,16 +1,19 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
+using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using Example.Schemas.Dtos;
 using Example.Server.Domain.Auth.Guards;
 using Example.Server.Domain.Auth.Middlewares;
 
 namespace Example.Server.Domain.Messages.Controllers;
 
+[ControllerRoute("SendMessage")]
 public class SendMessageController
 {
     [AuthGuard]
     [RoleGuard("admin")]
+    [MethodRoute("GetMessageForAdmin")]
     public static Task GetMessageForAdmin(Context context)
     {
         var request = context.Request;
@@ -26,6 +29,7 @@ public class SendMessageController
     
     [AuthGuard]
     [RoleGuard("user")]
+    [MethodRoute("GetMessageForUser")]
     public static Task GetMessageForUser(Context context)
     {
         context.Response = new Response(StatusCode.Success);
@@ -36,6 +40,7 @@ public class SendMessageController
     }
     
     [AuthGuard]
+    [MethodRoute("GetAuthAccessResponse")]
     public static Task GetAuthAccessResponse(Context context)
     {
         var response = new Response(StatusCode.Success);
@@ -47,7 +52,7 @@ public class SendMessageController
         return Task.CompletedTask;
     }
     
-    
+    [MethodRoute("GetFreeAccessResponse")]
     public static Task GetFreeAccessResponse(Context context)
     {
         var response = new Response(StatusCode.Success);
@@ -59,6 +64,7 @@ public class SendMessageController
         return Task.CompletedTask;
     }
     
+    [MethodRoute("GetMappedObjectWithMetadataFromObjectContainer")]
     public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
     {
         var objectContainer = context.ObjectContainer;

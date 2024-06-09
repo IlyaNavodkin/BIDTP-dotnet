@@ -1,5 +1,5 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
-using BIDTP.Dotnet.Core.Iteraction.Options;
+﻿using BIDTP.Dotnet.Core.Build;
+using BIDTP.Dotnet.Core.Iteraction;
 using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Messages.Controllers;
 using Example.Server.Domain.Messages.Middlewares;
@@ -10,33 +10,17 @@ namespace BIDTP.Dotnet.Module.MockableServer;
 
 public static class ServerTestFactory
 {
-    public static Core.Iteraction.Server CreateServer()
+    public static BidtpServer CreateServer()
     {
-        var builder = new ServerBuilder();
+        var builder = new BidtpServerBuilder();
 
-        var options = new ServerOptions("*","testpipe", 1024,  5000);
-        builder.SetGeneralOptions(options);
-
-        var serviceCollection = new ServiceCollection();
-
-        serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-
-        var serviceProvider = serviceCollection.BuildServiceProvider();
-
-        builder.AddDiContainer(serviceProvider);
-
-        builder.AddRoute("GetMessageForAdmin", FirstCustomMiddleware.Handle, SendMessageController.GetMessageForAdmin);
-        builder.AddRoute("GetMessageForUser", FirstCustomMiddleware.Handle, SendMessageController.GetMessageForUser);
-        builder.AddRoute("GetAuthAccessResponse", FirstCustomMiddleware.Handle,SendMessageController.GetAuthAccessResponse);
-        builder.AddRoute("GetFreeAccessResponse", SendMessageController.GetFreeAccessResponse);
-        builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle, 
-            SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
-        
+        builder.WithController<SendMessageController>();
+       
         var server = builder.Build();
 
-        var logger = server.Services.GetRequiredService<ILogger<Core.Iteraction.Server>>();
+        var logger = server.Services.GetRequiredService<ILogger>();
 
-        logger.LogInformation("Server started");
+        logger.LogInformation("Server test factory created server");
         
         return server;
     }

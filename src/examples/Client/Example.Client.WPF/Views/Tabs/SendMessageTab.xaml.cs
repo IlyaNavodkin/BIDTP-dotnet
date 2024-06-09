@@ -52,12 +52,6 @@ public partial class SendMessageTab : UserControl
 
                 var formattedResponseText = response.GetBody<string>();
 
-                //await Dispatcher.InvokeAsync(() =>
-                //{
-                //    SendMessageButton.IsEnabled = true;
-                //    OutPutTextBlock.Text = formattedResponseText;
-                //});
-
                 MessageBox.Show(formattedResponseText);
             });
 
