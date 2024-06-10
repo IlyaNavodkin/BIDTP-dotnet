@@ -26,12 +26,9 @@ namespace Example.Server.Console
 
             builder.Services.AddHostedService<LoggingWorker>();
 
-            //builder.Services.AddSingleton<ILogger, ConsoleLogger>();
-            //builder.Services.AddSingleton<ILogger, SerilogLogger>();
-
             builder.Services.AddTransient<AuthProvider>();
             builder.Services.AddTransient<ColorProvider>();
-            builder.Services.AddTransient<ElementRepository>();
+            builder.Services.AddScoped<ElementRepository>();
 
             builder.WithPipeName("testpipe");
             builder.WithProcessPipeQueueDelayTime(100);

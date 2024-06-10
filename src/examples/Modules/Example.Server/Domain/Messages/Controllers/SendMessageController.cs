@@ -14,7 +14,7 @@ public class SendMessageController
     [AuthGuard]
     [RoleGuard("admin")]
     [MethodRoute("GetMessageForAdmin")]
-    public static Task GetMessageForAdmin(Context context)
+    public Task GetMessageForAdmin(Context context)
     {
         var request = context.Request;
         

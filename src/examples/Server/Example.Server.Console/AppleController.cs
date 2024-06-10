@@ -3,6 +3,7 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
+using Example.Server.Domain.Auth.Middlewares;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,8 @@ namespace Example.Server.Console
         }
 
         [MethodRoute("sayHello")]
+        [FirstCustomMiddleware]
+        [SecondCustomMiddleware]
         public async Task SAYHELLO(Context context)
         {
             var request = context.Request;

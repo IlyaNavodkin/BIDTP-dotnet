@@ -27,26 +27,26 @@ static async Task CreateAndSend()
 {
     var client = new BidtpClient();
 
-    client.RequestSended += (s, e) =>
-    {
-        var eventArgs = (RequestSendedProgressEventArgs)e;
+    //client.RequestSended += (s, e) =>
+    //{
+    //    var eventArgs = (RequestSendedProgressEventArgs)e;
 
-        Console.WriteLine("Request sended");
-    };
+    //    Console.WriteLine("Request sended");
+    //};
 
-    client.ResponseReceived += (s, e) =>
-    {
-        var eventArgs = (ResponseReceivedProgressEventArgs)e;
+    //client.ResponseReceived += (s, e) =>
+    //{
+    //    var eventArgs = (ResponseReceivedProgressEventArgs)e;
 
-        Console.WriteLine("Response received");
-    };
+    //    Console.WriteLine("Response received");
+    //};
 
-    client.IsConnected += (s, e) =>
-    {
-        var eventArgs = (ClientConnectedEventArgs)e;
+    //client.IsConnected += (s, e) =>
+    //{
+    //    var eventArgs = (ClientConnectedEventArgs)e;
 
-        Console.WriteLine("Client connected");
-    };
+    //    Console.WriteLine("Client connected");
+    //};
 
 
     client.Pipename = "testpipe";
