@@ -17,7 +17,6 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Example.Server.Console
 {
-
     internal class Program
     {
         public static async Task Main(string[] args)

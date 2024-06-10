@@ -36,3 +36,4 @@ public class AuthGuardAttribute : Attribute, IMethodScopedPreInvokable
         return Task.CompletedTask;
     }
 }
+

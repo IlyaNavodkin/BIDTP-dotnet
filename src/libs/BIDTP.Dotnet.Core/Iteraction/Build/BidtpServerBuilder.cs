@@ -30,6 +30,13 @@ namespace BIDTP.Dotnet.Core.Build
 
         private string _pipeName = "DefaultPipeName";
         private int _processPipeQueueDelayTime = 100;
+        private IServiceProvider _externalServiceProvider;
+
+        public BidtpServerBuilder UseServiceProvider(IServiceProvider serviceProvider)
+        {
+            _externalServiceProvider = serviceProvider;
+            return this;
+        }
 
         public BidtpServerBuilder WithPipeName(string pipeName)
         {
@@ -98,10 +105,19 @@ namespace BIDTP.Dotnet.Core.Build
 
         public BidtpServer Build(string[] args = null)
         {
-            RegisterDefaultServices();
-            RegisterControllers();
+            IServiceProvider serviceProvider = null;
 
-            var serviceProvider = Services.BuildServiceProvider();
+            if (_externalServiceProvider is null)
+            {
+                RegisterDefaultServices();
+                RegisterControllers();
+
+                serviceProvider = Services.BuildServiceProvider();
+            }
+            else
+            {
+                serviceProvider = _externalServiceProvider;
+            }
 
             var logger = serviceProvider.GetService<ILogger>();
 

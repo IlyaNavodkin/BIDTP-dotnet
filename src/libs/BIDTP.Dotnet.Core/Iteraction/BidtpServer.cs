@@ -22,7 +22,7 @@ using BIDTP.Dotnet.Core.Iteraction.Events;
 
 namespace BIDTP.Dotnet.Core.Iteraction
 {
-    public class BidtpServer : IBidtpServer
+    public class BidtpServer : IBidtpServer, IDisposable
     {
         public IValidator Validator { get; }
         public IPreparer Preparer { get; }
@@ -41,11 +41,14 @@ namespace BIDTP.Dotnet.Core.Iteraction
 
         public event EventHandler<EventArgs> RequestReceived;
         public event EventHandler<EventArgs> ResponseSended;
+        public event EventHandler<EventArgs> ServerStarted;
 
-        public BidtpServer(IValidator validator, IPreparer preparer, 
+        private bool _disposed = false; // флаг для отслеживания вызова Dispose
+
+        public BidtpServer(IValidator validator, IPreparer preparer,
             ISerializer serializer, IByteWriter byteWriter,
-            IByteReader byteReader, IRequestHandler requestHandler, 
-            ServiceProvider serviceProvider, string pipeName, 
+            IByteReader byteReader, IRequestHandler requestHandler,
+            IServiceProvider serviceProvider, string pipeName,
             int processPipeQueueDelayTime)
         {
             Validator = validator;
@@ -80,6 +83,8 @@ namespace BIDTP.Dotnet.Core.Iteraction
                 ProcessPipeQueue(_cancellationTokenSource.Token),
                 ListenForNewConnections(_cancellationTokenSource.Token)
                 );
+
+            ServerStarted?.Invoke(this, EventArgs.Empty);
         }
 
         public void Stop()
@@ -159,6 +164,30 @@ namespace BIDTP.Dotnet.Core.Iteraction
                     break;
                 }
             }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    _cancellationTokenSource?.Dispose();
+                }
+
+                _disposed = true;
+            }
+        }
+
+        ~BidtpServer()
+        {
+            Dispose(false);
         }
     }
 }

@@ -11,6 +11,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
+using BIDTP.Dotnet.Core.Iteraction.Exceptions;
 using BIDTP.Dotnet.Core.Iteraction.Handle.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Mutation.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
@@ -49,14 +50,17 @@ public class RequestHandler : IRequestHandler
         try
         {
             if (_routes.Count == 0) 
-                throw new Exception($"No routes added to the server! Use WithController<T>() method to add routes!");
+                throw new BIDTPException($"No routes added to the server! Use WithController<T>() method to add routes!", 
+                    InternalServerErrorType.RouteNotFoundError);
 
             var route = request.Headers["Route"];
             _logger.LogInformation($"Request received: {DateTime.Now} Route: {route}");
 
             if (!_routes.TryGetValue(route, out var routeInfo))
             {
-                throw new Exception($"Route '{route}' not found!");
+                var notFoundResponse = await HandleRouteNotFoundErrorResponse(request);
+
+                return notFoundResponse;
             }
 
             var actionName = routeInfo.ActionName;
@@ -86,12 +90,40 @@ public class RequestHandler : IRequestHandler
         {
             Message = "Internal server error!",
             Description = exception.Message,
-            ErrorCode = (int)InternalServerErrorType.DispatcherExceptionError,
+            ErrorCode = (int)InternalServerErrorType.RequestHandlerError,
             StackTrace = exception.StackTrace,
 
         };
 
         var errorResponse = new Response(StatusCode.ServerError);
+        errorResponse.SetBody(error);
+
+        var validateResponser = _validator.ValidateResponse(errorResponse);
+        var prepareResponser = _preparer.PrepareResponse(validateResponser);
+
+        return prepareResponser;
+    }
+
+    private async Task<ResponseBase> HandleRouteNotFoundErrorResponse(RequestBase request)
+    {
+        var route = request.Headers[Constants.RouteHeaderName];
+        var id = request.Headers[Constants.ResponseProcessIdHeaderName];
+        var pid = request.Headers[Constants.ResponseProcessIdHeaderName];
+
+        var message = $"Route '{route}' not found! Request id: {id}, pid: {pid}";
+
+        _logger?.LogWarning(message);
+
+        var error = new BIDTPError
+        {
+            Message = "Client error!",
+            Description = message,
+            ErrorCode = (int)InternalServerErrorType.RouteNotFoundError,
+            StackTrace = null,
+
+        };
+
+        var errorResponse = new Response(StatusCode.NotFound);
         errorResponse.SetBody(error);
 
         var validateResponser = _validator.ValidateResponse(errorResponse);

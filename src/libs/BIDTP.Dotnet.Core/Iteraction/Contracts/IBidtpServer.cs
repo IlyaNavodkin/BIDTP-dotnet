@@ -13,5 +13,6 @@ namespace BIDTP.Dotnet.Core.Iteraction.Contracts
 
         public event EventHandler<EventArgs> RequestReceived;
         public event EventHandler<EventArgs> ResponseSended;
+        public event EventHandler<EventArgs> ServerStarted;
     }
 }
