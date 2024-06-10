@@ -13,7 +13,7 @@ public class ObjectContainerMiddleware : Attribute, IMethodScopedPreInvokable
 
         var additionalData = request.GetBody<AdditionalData>();
 
-        context.ObjectContainer.AddObject<AdditionalData>(additionalData);
+        context.StateContainer.AddObject<AdditionalData>(additionalData);
 
         return Task.CompletedTask;
     }

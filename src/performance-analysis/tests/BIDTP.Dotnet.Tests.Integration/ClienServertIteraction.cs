@@ -243,7 +243,7 @@ namespace BIDTP.Dotnet.Tests
         }
 
         [Test]
-        public async Task WriteRequestAsync_GetMappedObjectWithMetadataFromObjectContainer_MappingMiddlewareMiddleware_SuccessfullyWritesRequest()
+        public async Task WriteRequestAsync_GetDataFromStateContainer_SuccessfullyWritesRequest()
         {
             _client = new BidtpClient();
 
@@ -258,7 +258,7 @@ namespace BIDTP.Dotnet.Tests
 
             var request = new Request();
 
-            request.SetRoute("SendMessage/GetMappedObjectWithMetadataFromObjectContainer");
+            request.SetRoute("SendMessage/GetDataFromStateContainer");
             request.SetBody<AdditionalData>(simpleObject);
 
             var response = await _client.Send(request);

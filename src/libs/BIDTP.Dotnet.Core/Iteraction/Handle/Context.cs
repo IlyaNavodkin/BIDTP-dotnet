@@ -23,7 +23,7 @@ public class Context
     /// <summary>
     ///  Additional data of the request for mutation 
     /// </summary>
-    public StateContainer ObjectContainer { get; } = new StateContainer();
+    public StateContainer StateContainer { get; } = new StateContainer();
 
     /// <summary>
     ///  Constructor

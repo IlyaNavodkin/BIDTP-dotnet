@@ -71,10 +71,10 @@ public class SendMessageController : ControllerBase
     }
 
     [ObjectContainerMiddleware]
-    [MethodRoute("GetMappedObjectWithMetadataFromObjectContainer")]
-    public static Task GetMappedObjectWithMetadataFromObjectContainer(Context context)
+    [MethodRoute("GetDataFromStateContainer")]
+    public static Task GetDataFromStateContainer(Context context)
     {
-        var objectContainer = context.ObjectContainer;
+        var objectContainer = context.StateContainer;
 
         var additionalData = objectContainer.GetObject<AdditionalData>();
         
