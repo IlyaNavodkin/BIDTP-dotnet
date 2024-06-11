@@ -53,8 +53,11 @@ public class RequestHandler : IRequestHandler
                 throw new BIDTPException($"No routes added to the server! Use WithController<T>() method to add routes!", 
                     InternalServerErrorType.RouteNotFoundError);
 
-            var route = request.Headers["Route"];
-            _logger.LogInformation($"Request received: {DateTime.Now} Route: {route}");
+            var route = request.Headers[Constants.RouteHeaderName];
+            var id = request.Headers[Constants.RequestResponseGuidHeaderName];
+            var pid = request.Headers[Constants.ResponseProcessIdHeaderName];
+
+            _logger.LogInformation($"Request received: {DateTime.Now} Route: {route} Id: {id} Pid: {pid}");
 
             if (!_routes.TryGetValue(route, out var routeInfo))
             {
