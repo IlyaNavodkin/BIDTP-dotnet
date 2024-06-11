@@ -26,7 +26,8 @@ public class BidtpClient : IBidtpClient
     public IByteWriter ByteWriter;
     public IByteReader ByteReader;
 
-    public string Pipename;
+    public string Pipename = "DefaultPipeName";
+    public int Timeout = 5000;
 
     public event EventHandler<EventArgs> RequestSended;
     public event EventHandler<EventArgs> ResponseReceived;
@@ -39,8 +40,6 @@ public class BidtpClient : IBidtpClient
         Serializer = new Serializer();
         ByteWriter = new ByteWriter();
         ByteReader = new ByteReader();
-
-        Pipename = "DefaultPipeName";
     }
 
     public BidtpClient(IValidator validator, 
@@ -62,7 +61,7 @@ public class BidtpClient : IBidtpClient
         var clientPipeStream = new NamedPipeClientStream
         (".", Pipename, PipeDirection.InOut, PipeOptions.Asynchronous);
 
-        await clientPipeStream.ConnectAsync(cancellationToken);
+        await clientPipeStream.ConnectAsync(Timeout, cancellationToken);
 
         return clientPipeStream;
     }

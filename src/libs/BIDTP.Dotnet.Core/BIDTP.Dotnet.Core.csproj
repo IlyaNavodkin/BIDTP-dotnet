@@ -3,7 +3,8 @@
     <PropertyGroup>
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
-		<TargetFramework>net48</TargetFramework>
+		<TargetFrameworks>net48;net6.0;netstandard2.0;netstandard2.1</TargetFrameworks>
+		<!--<TargetFramework>net48</TargetFramework>-->
         <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <RootNamespace>BIDTP.Dotnet.Core</RootNamespace>

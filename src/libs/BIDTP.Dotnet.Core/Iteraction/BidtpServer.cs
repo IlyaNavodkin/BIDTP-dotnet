@@ -43,7 +43,7 @@ namespace BIDTP.Dotnet.Core.Iteraction
         public event EventHandler<EventArgs> ResponseSended;
         public event EventHandler<EventArgs> ServerStarted;
 
-        private bool _disposed = false; // флаг для отслеживания вызова Dispose
+        private bool _disposed = false;
 
         public BidtpServer(IValidator validator, IPreparer preparer,
             ISerializer serializer, IByteWriter byteWriter,
