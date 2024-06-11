@@ -8,7 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+    <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
   </ItemGroup>
+
+
 
 </Project>
