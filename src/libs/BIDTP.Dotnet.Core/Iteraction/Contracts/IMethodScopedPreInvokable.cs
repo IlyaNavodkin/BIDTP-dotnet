@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
+﻿using BIDTP.Dotnet.Core.Iteraction.Handle;
+using System.Threading.Tasks;
 
-namespace BIDTP.Dotnet.Core.Iteraction.Interfaces;
+namespace BIDTP.Dotnet.Core.Iteraction.Contracts;
 
 /// <summary>
 ///  Pre-invokable method of the server 

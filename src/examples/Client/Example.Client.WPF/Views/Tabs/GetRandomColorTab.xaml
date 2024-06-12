@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Example.Client.WPF.Views.Tabs.GetRandomColorTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="500">
+    <GroupBox Margin="10"
+              Header="Getr color">
+        <StackPanel Orientation="Vertical">
+
+            <Button x:Name="SendMessageButton"
+                    Content="Get random color"
+                    HorizontalAlignment="Stretch"  
+                    Click="GetRandomColor"
+                    Margin="0 10 0 0"/>
+        </StackPanel>
+    </GroupBox>
+</UserControl>

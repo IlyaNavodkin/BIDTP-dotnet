@@ -12,8 +12,9 @@ public static class JsonHelper
     ///  Get the json serializer options
     /// </summary>
     /// <returns> The json serializer options </returns>
-    public static JsonSerializerOptions GetDefaultJsonSerializerOptions() 
-        => new() { 
+    public static JsonSerializerOptions GetDefaultJsonSerializerOptions()
+        => new()
+        {
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
         };
 }

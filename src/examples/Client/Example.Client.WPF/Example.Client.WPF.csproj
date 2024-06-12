@@ -2,20 +2,17 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <RootNamespace>Example.Client.WPF</RootNamespace>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
-    
-    <ItemGroup>
-      <Reference Include="System.Net.Http" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Schemas\Example.Modules.Schemas.csproj" />
     </ItemGroup>
+    
 
 </Project>

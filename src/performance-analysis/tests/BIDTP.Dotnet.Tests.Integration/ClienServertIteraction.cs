@@ -1,9 +1,8 @@
-using BIDTP.Dotnet.Core.Iteraction;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
+﻿using BIDTP.Dotnet.Core.Iteraction;
+using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Options;
 using BIDTP.Dotnet.Module.MockableServer;
-using Example.Schemas.Dtos;
+using Example.Modules.Schemas.Dtos;
 using NUnit.Framework;
 
 namespace BIDTP.Dotnet.Tests
@@ -11,143 +10,115 @@ namespace BIDTP.Dotnet.Tests
     [TestFixture]
     public class ClienServertIteraction
     {
-        private const string PipeName = "testPipe";
-        private const int ChunkSize = 1024;
-        private const int LifeCheckTimeRate = 5000;
-        private const int ReconnectTimeRate = 10000;
-        private const int ConnectTimeout = 5000;
+        private string PipeName;
 
-        private Server _server;
-        private Client _client;
+        private BidtpServer _server;
+        private BidtpClient _client;
+
         private CancellationTokenSource _clientCancellationTokenSource;
         private CancellationTokenSource _serverCancellationTokenSource;
-        
-        [SetUp]
-        public void SetUp()
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
             _server = ServerTestFactory.CreateServer();
+
+            PipeName = _server.PipeName;
+
             _clientCancellationTokenSource = new CancellationTokenSource();
             _serverCancellationTokenSource = new CancellationTokenSource();
-            
-            _server.StartAsync(_serverCancellationTokenSource.Token);
+
+            _server.Start(_serverCancellationTokenSource.Token);
+
+            Thread.Sleep(2000);
         }
-        
-        
-        [TearDown]
-        public void TearDown()
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
         {
-            _clientCancellationTokenSource?.Cancel();
-            _serverCancellationTokenSource?.Cancel();
-            _server?.Dispose();
+            _serverCancellationTokenSource.Cancel();
+            _serverCancellationTokenSource.Dispose();
+            _server.Dispose();
+
+            _clientCancellationTokenSource.Cancel();
+            _clientCancellationTokenSource.Dispose();
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var request = new Request();
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            request.SetRoute("GetMessageForAdmin");
+            request.SetRoute("SendMessage/GetMessageForAdmin");
             request.Headers.Add("Authorization", "adminToken");
 
-            var response = await _client.WriteRequestAsync(request);
-            
+            var response = await _client.Send(request);
+
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_UnauthorizedWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
-            
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
+
             var request = new Request();
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            
-            request.SetRoute("GetMessageForAdmin");
 
-            var response = await _client.WriteRequestAsync(request);
-            
+            request.SetRoute("SendMessage/GetMessageForAdmin");
+
+            var response = await _client.Send(request);
+
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Unauthorized));
         }
 
         [Test]
         public async Task WriteRequestAsync_RouteNotExist()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
-            
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
+
             var request = new Request();
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            
+
             request.SetRoute("LaLaLa");
             request.Headers.Add("Authorization", "userToken");
-            
-            var response = await _client.WriteRequestAsync(request);
+
+            var response = await _client.Send(request);
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.NotFound));
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_Spam_RouteNotExist()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
-            
-            var tasks = new List<Task<Response>>();
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
+
+            var tasks = new List<Task<ResponseBase>>();
 
             for (int i = 0; i < 5; i++)
             {
                 var request = new Request();
-                
+
                 request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
                 request.SetRoute("LaLaLa");
                 request.Headers.Add("Authorization", "userToken");
-                
-                var task = _client.WriteRequestAsync(request);
+
+                var task = _client.Send(request);
                 tasks.Add(task);
             }
-            
+
             await Task.WhenAll(tasks);
-            
+
             foreach (var task in tasks)
             {
                 var response = await task;
@@ -157,195 +128,147 @@ namespace BIDTP.Dotnet.Tests
         [Test]
         public async Task WriteRequestAsync_Spam_AllMessagesRoute()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
-            
-            var tasks = new List<Task<Response>>();
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
+
+            var tasks = new List<Task<ResponseBase>>();
 
             var messageForAdminRequest = new Request();
-            
+
             messageForAdminRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            messageForAdminRequest.SetRoute("GetMessageForAdmin");
+            messageForAdminRequest.SetRoute("SendMessage/GetMessageForAdmin");
             messageForAdminRequest.Headers.Add("Authorization", "adminToken");
 
             var messageForUserRequest = new Request();
-            
+
             messageForUserRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            messageForUserRequest.SetRoute("GetMessageForUser");
+            messageForUserRequest.SetRoute("SendMessage/GetMessageForUser");
             messageForUserRequest.Headers.Add("Authorization", "userToken");
-            
+
             var messageForFreeAccessRequest = new Request();
-            
+
             messageForFreeAccessRequest.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            messageForFreeAccessRequest.SetRoute("GetFreeAccessResponse");
-            
-            tasks.Add(_client.WriteRequestAsync(messageForAdminRequest));
-            tasks.Add(_client.WriteRequestAsync(messageForUserRequest));
-            tasks.Add(_client.WriteRequestAsync(messageForFreeAccessRequest));
-            
+            messageForFreeAccessRequest.SetRoute("SendMessage/GetFreeAccessResponse");
+
+            tasks.Add(_client.Send(messageForAdminRequest));
+            tasks.Add(_client.Send(messageForUserRequest));
+            tasks.Add(_client.Send(messageForFreeAccessRequest));
+
             foreach (var task in tasks)
             {
                 var response = await task;
                 Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             }
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetMessageForAdmin_InternalErrorWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var request = new Request();
-            
+
             request.SetBody<string>("internal error");
-            request.SetRoute("GetMessageForAdmin");
+            request.SetRoute("SendMessage/GetMessageForAdmin");
             request.Headers.Add("Authorization", "adminToken");
 
-            var response = await _client.WriteRequestAsync(request);
+            var response = await _client.Send(request);
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.ServerError));
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetMessageForUser_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var request = new Request();
-            
+
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            request.SetRoute("GetMessageForUser");
+            request.SetRoute("SendMessage/GetMessageForUser");
             request.Headers.Add("Authorization", "userToken");
 
-            var response = await _client.WriteRequestAsync(request);
+            var response = await _client.Send(request);
 
             var successMessageString = "{ \"Response\": \"" + "Hello user" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             Assert.That(successMessageString == response.GetBody<string>());
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetAuthAccessResponse_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var request = new Request();
-            
+
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            request.SetRoute("GetAuthAccessResponse");
+            request.SetRoute("SendMessage/GetAuthAccessResponse");
             request.Headers.Add("Authorization", "randomToken");
 
-            var response = await _client.WriteRequestAsync(request);
+            var response = await _client.Send(request);
 
             var successMessageString = "{ \"Response\": \"" + "Auth access" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             Assert.That(successMessageString == response.GetBody<string>());
         }
-        
+
         [Test]
         public async Task WriteRequestAsync_GetFreeAccessResponse_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-            );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var request = new Request();
-            
+
             request.SetBody<string>("{ \"Message\": \"" + "Hello World" + "\" }");
-            request.SetRoute("GetFreeAccessResponse");
-            
-            var response = await _client.WriteRequestAsync(request);
+            request.SetRoute("SendMessage/GetFreeAccessResponse");
+
+            var response = await _client.Send(request);
 
             var successMessageString = "{ \"Response\": \"" + "Free access" + "\" }";
 
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
             Assert.That(successMessageString == response.GetBody<string>());
         }
-        
+
         [Test]
-        public async Task WriteRequestAsync_GetMappedObjectWithMetadataFromObjectContainer_MappingMiddlewareMiddleware_SuccessfullyWritesRequest()
+        public async Task WriteRequestAsync_GetDataFromStateContainer_SuccessfullyWritesRequest()
         {
-            var clientOptions = new ClientOptions(
-                "*", 
-                PipeName, 
-                ChunkSize, 
-                LifeCheckTimeRate, 
-                ReconnectTimeRate, 
-                ConnectTimeout
-                );
-            
-            _client = new Client(clientOptions);
-            await _client.ConnectToServer(_clientCancellationTokenSource);
+            _client = new BidtpClient();
+
+            _client.Pipename = PipeName;
 
             var simpleObject = new AdditionalData
             {
                 Guid = Guid.NewGuid().ToString(),
-                Items = new List<string>  { "Item1", "Item2" },
+                Items = new List<string> { "Item1", "Item2" },
                 Name = "Test"
             };
 
             var request = new Request();
-            
-            request.SetRoute("GetMappedObjectFromObjectContainer");
+
+            request.SetRoute("SendMessage/GetDataFromStateContainer");
             request.SetBody<AdditionalData>(simpleObject);
-            
-            var response = await _client.WriteRequestAsync(request);
+
+            var response = await _client.Send(request);
 
             var dto = response.GetBody<AdditionalData>();
-            
+
             Assert.That(dto.Name, Is.EqualTo(simpleObject.Name));
             Assert.That(dto.Items, Is.EqualTo(simpleObject.Items));
             Assert.That(dto.Guid, Is.EqualTo(simpleObject.Guid));
-            
+
             Assert.That(response.StatusCode, Is.EqualTo(StatusCode.Success));
         }
     }

@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2024-12-06
+
+### Added
+
+-   add new client sample based on blazor Example.Client.Blazor
+-   add async connection many-to-one - from clients to server
+-   add controllers
+
+
+### Changed
+
+-   change global arch of iteraction
+-   add interfaces and module-components for Client and Server
+-   change routing system, use Controllers
+-   change ALL examples
+
+
+### Fixed
+
 ## [1.3.2] - 2024-31-03
 
 ### Added

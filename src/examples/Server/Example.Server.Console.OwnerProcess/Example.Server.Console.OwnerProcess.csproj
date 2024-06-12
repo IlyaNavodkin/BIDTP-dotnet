@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -10,19 +10,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Properties\" />
-    </ItemGroup>
-    
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Server\Example.Modules.Server.csproj" />
     </ItemGroup>
 
-
+    <ItemGroup>
+        <Reference Include="System.Net.Http" />
+    </ItemGroup>
+    
 
 </Project>

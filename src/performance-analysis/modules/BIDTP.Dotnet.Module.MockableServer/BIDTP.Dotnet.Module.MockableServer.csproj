@@ -10,11 +10,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Properties\" />
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
     
     <ItemGroup>
@@ -24,7 +26,8 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\..\examples\Modules\Example.Server\Example.Server.csproj" />
+      <ProjectReference Include="..\..\..\examples\Modules\Example.Modules.Schemas\Example.Modules.Schemas.csproj" />
+      <ProjectReference Include="..\..\..\examples\Modules\Example.Modules.Server\Example.Modules.Server.csproj" />
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
     </ItemGroup>
     

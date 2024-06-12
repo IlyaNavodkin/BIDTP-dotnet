@@ -4,20 +4,24 @@
         <OutputType>Exe</OutputType>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
-        <TargetFrameworks> net6.0; net48</TargetFrameworks>
+		<TargetFramework>net48</TargetFramework>
         <RootNamespace>Example.Server.Console</RootNamespace>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Remove="Properties\**" />
+      <EmbeddedResource Remove="Properties\**" />
+      <None Remove="Properties\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Server\Example.Modules.Server.csproj" />
+    </ItemGroup>
 
     <ItemGroup>
         <Reference Include="System.Net.Http" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Properties\" />
-    </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
-    </ItemGroup>
 </Project>

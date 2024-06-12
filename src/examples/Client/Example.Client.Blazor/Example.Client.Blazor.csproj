@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MudBlazor" Version="6.20.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+    <ProjectReference Include="..\..\Modules\Example.Modules.Client\Example.Modules.Client.csproj" />
+    <ProjectReference Include="..\..\Modules\Example.Modules.Schemas\Example.Modules.Schemas.csproj" />
+  </ItemGroup>
+
+</Project>

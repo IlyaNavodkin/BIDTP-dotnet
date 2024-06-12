@@ -1,20 +1,16 @@
-﻿using BIDTP.Dotnet.Core.Iteraction.Builders;
-using BIDTP.Dotnet.Core.Iteraction.Dtos;
-using BIDTP.Dotnet.Core.Iteraction.Enums;
-using BIDTP.Dotnet.Core.Iteraction.Options;
-using BIDTP.Dotnet.Core.Iteraction.Providers;
-using Example.Server.Core.Workers;
-using Example.Server.Domain.Auth.Middlewares;
-using Example.Server.Domain.Auth.Providers;
-using Example.Server.Domain.Colors.Controllers;
-using Example.Server.Domain.Colors.Providers;
-using Example.Server.Domain.DataTable;
-using Example.Server.Domain.Elements.Controllers;
-using Example.Server.Domain.Elements.Repositories;
-using Example.Server.Domain.Messages.Controllers;
-using Example.Server.Domain.Messages.Middlewares;
+﻿using BIDTP.Dotnet.Core.Build;
+using BIDTP.Dotnet.Core.Iteraction.Events;
+using Example.Modules.Server.Core.Workers;
+using Example.Modules.Server.Domain.Apple.Controllers;
+using Example.Modules.Server.Domain.Auth.Providers;
+using Example.Modules.Server.Domain.Books.Controllers;
+using Example.Modules.Server.Domain.Colors.Controllers;
+using Example.Modules.Server.Domain.Colors.Providers;
+using Example.Modules.Server.Domain.Elements.Controllers;
+using Example.Modules.Server.Domain.Elements.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Example.Server.Console
 {
@@ -22,67 +18,49 @@ namespace Example.Server.Console
     {
         public static async Task Main(string[] args)
         {
-            var builder = new ServerBuilder();
+            var builder = new BidtpServerBuilder();
 
-            var options = new ServerOptions("*","testpipe", 1024,  5000);
-            builder.SetGeneralOptions(options);
-            
-            var serviceCollection = new ServiceCollection();
+            builder.Services.AddHostedService<LoggingWorker>();
 
-            serviceCollection.AddLogging(l => l.AddConsole().SetMinimumLevel(LogLevel.Information));
-            serviceCollection.AddTransient<AuthProvider>();
-            serviceCollection.AddTransient<ColorProvider>();
-            serviceCollection.AddTransient<ElementRepository>();
-            
-            var serviceProvider = serviceCollection.BuildServiceProvider();
-            
-            builder.AddDiContainer(serviceProvider);
+            builder.Services.AddTransient<AuthProvider>();
+            builder.Services.AddTransient<ColorProvider>();
+            builder.Services.AddScoped<ElementRepository>();
+
+            builder.WithPipeName("testpipe");
+            builder.WithProcessPipeQueueDelayTime(100);
+
+            builder.WithController<ColorController>();
+            builder.WithController<AppleController>();
+            builder.WithController<ElementsController>();
+            builder.WithController<BookController>();
              
-            builder.AddRoute("PrintMessage", JustChickenGuard, ColorController.GetRandomColor);
-            builder.AddRoute("GetElements", ElementController.GetElements);
-            builder.AddRoute("MutateUrTable", DataTableController.MutateUrTable);
-            builder.AddRoute("GetMappedObjectFromObjectContainer", ObjectContainerMiddleware.Handle,
-                SendMessageController.GetMappedObjectWithMetadataFromObjectContainer);
-            
-            Task JustChickenGuard(Context context)
-            {
-                var request = context.Request;
-        
-                var isShitWord = request
-                    .GetBody<string>()
-                    .Contains("Yes of course");
-        
-                if(isShitWord)
-                {
-                    var dto = new Error
-                    {
-                        Message = "I am Alexandr Nevsky",
-                        Description = "Exception: Chicken-Bodybuilder detected",
-                        ErrorCode = 228
-                    };
-
-                    var response = new Response(StatusCode.ClientError);
-
-                    response.SetBody(dto);
-            
-                    context.Response = response;
-                }
-
-                return Task.CompletedTask;
-            }
-            
             var server = builder.Build();
-            
-            var logger = server.Services.GetRequiredService<ILogger<BIDTP.Dotnet.Core.Iteraction.Server>>();
+
+            server.RequestReceived += (s, e) =>
+            {
+                var eventArgs = (RequestReceivedProgressEventArgs)e;
+
+                var logger = server.Services.GetRequiredService<ILogger>();
+
+                logger.LogInformation ($"Request received");
+            };
+
+            server.ResponseSended += (s, e) =>
+            {
+                var eventArgs = (ResponseSendedProgressEventArgs)e;
+
+                var logger = server.Services.GetRequiredService<ILogger>();
+
+                logger.LogInformation($"Request sended");
+            };
+
+            var logger = server.Services.GetRequiredService<ILogger>();
     
             logger.LogInformation("Server started");
-    
-            server.AddBackgroundService<LoggingWorker>("BackgroundWorker1");
-            server.AddBackgroundService<LoggingWorker>("BackgroundWorker2"); 
-            
+                
             var cancellationTokenSource = new CancellationTokenSource();
 
-            await server.StartAsync(cancellationTokenSource.Token);
+            await server.Start(cancellationTokenSource.Token);
         }
     }
 }
