@@ -16,7 +16,7 @@ public partial class GetRandomColorTab : UserControl
         InitializeComponent();
     }
 
-    private void SendMessageButton_OnClick(object sender, RoutedEventArgs e)
+    private void GetRandomColor(object sender, RoutedEventArgs e)
     {
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         var token = mainWindow.AuthTokenTextBox.Text;

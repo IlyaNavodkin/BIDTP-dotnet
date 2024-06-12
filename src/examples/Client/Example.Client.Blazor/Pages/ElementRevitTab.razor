@@ -1,8 +1,66 @@
 ﻿@page "/ElementRevitTab"
+@using Example.Schemas.Dtos
 
-<h1>Elements iteraction</h1>
+<MudText>Elements iteraction</MudText>
 
+<MudCard Class="m-4">
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Elements Repository</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid>
+            <MudItem xs="12">
 
+                @if (_elements != null)
+                {
+                    @if (_elements.Count != 0)
+                    {
+                        <MudTable Items="_elements" Hover="true" SelectedItemChanged="@((ElementDto context) => SelectedElementChanged(context))">
+                            <HeaderContent>
+                                <MudTh>Element ID</MudTh>
+                                <MudTh>Element Name</MudTh>
+                            </HeaderContent>
+                            <RowTemplate>
+                                <MudTd DataLabel="Element ID">@context.Id</MudTd>
+                                <MudTd DataLabel="Element Name">@context.Name</MudTd>
+                            </RowTemplate>
+                        </MudTable>
+                    }
+                    else
+                    {
+                        <MudText Typo="Typo.subtitle1">No elements found</MudText>
+                    }
+                }
+                else
+                {
+                    <MudText Typo="Typo.subtitle1">_elements is null...</MudText>
+                }
 
+            </MudItem>
+            <MudItem xs="12">
+                <MudText Typo="Typo.subtitle2">Filter by category name</MudText>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_categoryName" Label="Category" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudButton OnClick="GetElements" Variant="Variant.Outlined" Color="Color.Primary" Class="mt-2">Get elements</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton OnClick="DeleteElement" Variant="Variant.Outlined" Color="Color.Secondary" Class="mt-2">Delete selected element</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton OnClick="CreateRandomWall" Variant="Variant.Outlined" Color="Color.Success" Class="mt-2">Create random wall</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton OnClick="CreateFloorsColumns" Variant="Variant.Outlined" Color="Color.Success" Class="mt-2">Create floor columns</MudButton>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField @bind-Value="_token" Label="Auth token (its a number 123)" Variant="Variant.Outlined"></MudTextField>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
 
 

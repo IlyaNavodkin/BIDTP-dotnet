@@ -12,7 +12,7 @@
             <Button x:Name="SendMessageButton"
                     Content="Get random color"
                     HorizontalAlignment="Stretch"  
-                    Click="SendMessageButton_OnClick"
+                    Click="GetRandomColor"
                     Margin="0 10 0 0"/>
         </StackPanel>
     </GroupBox>

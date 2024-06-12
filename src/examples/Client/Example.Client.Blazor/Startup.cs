@@ -10,6 +10,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
+using MudBlazor.Services;
+using MudBlazor;
+using Newtonsoft.Json.Linq;
 
 namespace Example.Client.Blazor
 {
@@ -26,6 +29,19 @@ namespace Example.Client.Blazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.TopCenter;
+
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.NewestOnTop = false;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 3000;
+                config.SnackbarConfiguration.HideTransitionDuration = 200;
+                config.SnackbarConfiguration.ShowTransitionDuration = 200;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            });
 
             services.AddSingleton<IBidtpClient, BidtpClient>(services =>
             {

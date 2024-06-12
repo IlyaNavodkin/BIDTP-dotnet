@@ -1,32 +1,15 @@
-﻿<div class="top-row pl-4 navbar navbar-dark">
-    <a class="navbar-brand" href="">Example.Client.Blazor</a>
-    <button class="navbar-toggler" @onclick="ToggleNavMenu">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-</div>
+﻿<MudPaper Width="250px" Elevation="0" Class="py-1">
+    <MudNavMenu Margin="Margin.Dense" 
+    Color="Color.Warning">
+        <MudNavLink Href="/GetRandomColorTab" 
+            Icon="@Icons.Material.Filled.Colorize">GetRandomColorTab
+        </MudNavLink>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="CanvasDrawing">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Draw
-            </NavLink>
-        </li>
-    </ul>
-</div>
+        <MudNavLink Match="NavLinkMatch.Prefix" 
+            Href="ElementRevitTab" 
+            Icon="@Icons.Material.Filled.EmojiObjects">
+            ElementRevitTab
+        </MudNavLink>
 
-@code {
-    private bool collapseNavMenu = true;
-
-    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+    </MudNavMenu>
+</MudPaper>
