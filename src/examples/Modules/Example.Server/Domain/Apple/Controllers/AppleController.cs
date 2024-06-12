@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Example.Server.Console
+namespace Example.Server.Domain.Apple.Controllers
 {
     [ControllerRoute("apple")]
     public class AppleController : ControllerBase
@@ -19,7 +19,7 @@ namespace Example.Server.Console
         private readonly ILogger logger;
         private readonly string Id = Guid.NewGuid().ToString();
 
-        public AppleController(ILogger logger) 
+        public AppleController(ILogger logger)
         {
             this.logger = logger;
         }

@@ -10,14 +10,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Example.Server.Console
+namespace Example.Server.Domain.Books.Controllers
 {
     [ControllerRoute("book")]
     public class BookController : ControllerBase
     {
         private readonly ILogger logger;
 
-        public BookController(ILogger logger) 
+        public BookController(ILogger logger)
         {
             this.logger = logger;
         }
