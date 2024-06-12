@@ -41,9 +41,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client.Blazor", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Revit.ExternalCommand", "src\examples\Server\Example.Server.Revit.ExternalCommand\Example.Server.Revit.ExternalCommand.csproj", "{13BB7BF0-BE82-4006-8C57-0FFDF482105C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Revit.Idling", "src\examples\Server\Example.Server.Revit.Idling\Example.Server.Revit.Idling.csproj", "{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Revit", "src\examples\Server\Example.Server.Revit.Idling\Example.Server.Revit.csproj", "{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Revit", "Example.Revit\Example.Revit.csproj", "{02F3F7B6-4297-4C7B-A012-22793E181220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Revit", "Example.Revit\Example.Revit.csproj", "{02F3F7B6-4297-4C7B-A012-22793E181220}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

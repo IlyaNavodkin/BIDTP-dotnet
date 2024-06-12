@@ -6,6 +6,7 @@ using System.Windows;
 using Autodesk.Revit.UI;
 using BIDTP.Dotnet.Core.Build;
 using BIDTP.Dotnet.Core.Iteraction;
+using Example.Revit.Controllers;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
@@ -17,7 +18,7 @@ using Nice3point.Revit.Toolkit.External;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using Exception = System.Exception;
 
-namespace Example.Server.Revit.Idling;
+namespace Example.Server.Revit;
 
 /// <summary>
 ///  The simple dimple external application
@@ -58,13 +59,12 @@ public class SimpleDimpleExternalApplication: ExternalApplication
 
             builder.Services.AddScoped<AuthProvider>();
             builder.Services.AddScoped<ColorProvider>();
-            builder.Services.AddScoped<ElementRepository>();
 
             builder.WithPipeName("testpipe");
             builder.WithProcessPipeQueueDelayTime(100);
 
-            builder.WithController<ColorController>();
-            builder.WithController<ElementsController>();
+            builder.WithController<RevitColorController>();
+            builder.WithController<ElementRevitController>();
 
             BidtpServer = builder.Build();
 
