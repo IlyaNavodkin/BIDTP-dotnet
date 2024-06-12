@@ -55,10 +55,9 @@ public partial class ElementRevitTab : UserControl
                 }
                 else
                 {
-                    var error = response.GetBody<BIDTPError>();
+                    var error = response.GetBody<string>();
 
-                    MessageBox.Show($"Message: {error.Message} " +
-                                    $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                    MessageBox.Show(error);
                 }
             }
             catch (Exception exception)
@@ -113,10 +112,9 @@ public partial class ElementRevitTab : UserControl
                 }
                 else
                 {
-                    var error = response.GetBody<BIDTPError>();
+                    var error = response.GetBody<string>();
 
-                    MessageBox.Show($"Message: {error.Message} " +
-                                    $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                    MessageBox.Show(error);
                 }
             }
             catch (Exception exception)
@@ -135,7 +133,7 @@ public partial class ElementRevitTab : UserControl
         {
             try
             {
-                var randomLine = RandomService.GenerateRandomLine(2);
+                var randomLine = RandomService.GenerateRandomLine(4);
 
                 var request = new Request();
 
@@ -161,8 +159,47 @@ public partial class ElementRevitTab : UserControl
                 {
                     var error = response.GetBody<BIDTPError>();
 
-                    MessageBox.Show($"Message: {error.Message} " +
-                                    $"\nError code: {error.ErrorCode}\nDescription: {error.Description}");
+                    MessageBox.Show($"error");
+                }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        });
+    }
+
+    private void CreateFloorsColumns(object sender, RoutedEventArgs e)
+    {
+        var mainWindow = (MainWindow)Application.Current.MainWindow;
+        var token = mainWindow.AuthTokenTextBox.Text;
+
+        var taskRun = Task.Run(async () =>
+        {
+            try
+            {
+                var randomLine = RandomService.GenerateRandomLine(4);
+
+                var request = new Request();
+
+                request.Headers.Add("Authorization", token);
+                request.SetRoute("ElementRevit/CreateFloorsColumns");
+
+                request.SetBody<string>("Can u please create some columns?");
+
+                var response = await App.Client.Send(request);
+
+                if (response.StatusCode == StatusCode.Success)
+                {
+                    var result = response.GetBody<string>();
+
+                    MessageBox.Show(result);
+                }
+                else
+                {
+                    var error = response.GetBody<string>();
+
+                    MessageBox.Show(error);
                 }
             }
             catch (Exception exception)

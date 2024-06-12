@@ -1,11 +1,14 @@
 ﻿using System.Diagnostics;
+using System.Text;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Structure;
 using Autodesk.Revit.UI.Selection;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
+using BIDTP.Dotnet.Core.Iteraction.Schema;
 using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
 using Example.Server.Domain.Auth.Middlewares;
@@ -19,10 +22,13 @@ namespace Example.Revit.Controllers;
 public class ElementRevitController : ControllerBase
 {
     private readonly AsyncEventHandler _asyncEventHandler;
+    private readonly Random _random;
 
     public ElementRevitController(AsyncEventHandler asyncEventHandler)
     {
         _asyncEventHandler = asyncEventHandler;
+
+        _random = new Random();
     }
 
     [MethodRoute("GetElements")]
@@ -109,6 +115,12 @@ public class ElementRevitController : ControllerBase
     [MethodRoute("CreateRandomWall")]
     public async Task CreateRandomWall(Context context)
     {
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+
+        if (!authorizationIsValid) return;
+
         var wallCoordinates = context.Request.GetBody<CreateRandomWallLineRequest>();
 
         var message = string.Empty;
@@ -161,6 +173,12 @@ public class ElementRevitController : ControllerBase
     [MethodRoute("ChangeWallLocation")]
     public async Task ChangeWallLocation(Context context)
     {
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+
+        if (!authorizationIsValid) return;
+
         var wallCoordinates = context.Request.GetBody<CreateRandomWallLineRequest>();
         var message = string.Empty;
 
@@ -205,6 +223,125 @@ public class ElementRevitController : ControllerBase
                 {
                     transaction.RollBack();
                     message = $"Wall was not found.";
+                }
+            }
+        });
+
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
+    }
+
+    [MethodRoute("CreateFloorsColumns")]
+    public async Task CreateFloorsColumns(Context context)
+    {
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+
+        if (!authorizationIsValid) return;
+
+        var message = string.Empty;
+        Response response = null;
+
+        await _asyncEventHandler.RaiseAsync(_ =>
+        {
+            var document = Nice3point.Revit.Toolkit.Context.Document;
+
+            using (var transaction = new Transaction(document, "Create columns and floors"))
+            {
+                transaction.Start();
+
+                var columnType = new FilteredElementCollector(document)
+                    .OfClass(typeof(FamilySymbol))
+                    .OfCategory(BuiltInCategory.OST_Columns)
+                    .Cast<FamilySymbol>()
+                    .FirstOrDefault();
+
+                var pickedFloorReference = Nice3point.Revit.Toolkit.Context.UiDocument
+                .Selection.PickObject(ObjectType.Element, "Pick Floor for columns");
+
+                var pickedElement = document.GetElement(pickedFloorReference);
+
+                if (pickedElement is null)
+                {
+                    context.Response = new Response(StatusCode.ClientError);
+
+                    context.Response.SetBody("Failed to get picked element.");
+
+                    return;
+                }
+
+                if (pickedElement is not Floor)
+                {
+                    context.Response = new Response(StatusCode.ClientError);
+
+                    context.Response.SetBody("Picked element is not floor.");
+
+                    return;
+                }
+
+                var floorElement = (Floor) pickedElement;
+
+                var floorLevel = (Level) document.GetElement(floorElement.LevelId);
+
+                var geometryOptions = new Options {  ComputeReferences = true, View = document.ActiveView };
+                var geometryElement = floorElement.get_Geometry(geometryOptions);
+
+                PlanarFace targetPlanarFace = null;
+
+                foreach (var item in geometryElement)
+                {
+                    if (item is Solid solid)
+                    {
+                        foreach (var face in solid.Faces)
+                        {
+                            if (face is not PlanarFace planarFace) continue;
+                            if (!planarFace.FaceNormal.IsAlmostEqualTo(XYZ.BasisZ)) continue;
+
+                            targetPlanarFace = planarFace;
+                        }
+                    }
+                }
+
+                if (targetPlanarFace == null)
+                {                    
+                    context.Response = new Response(StatusCode.ClientError);
+
+                    context.Response.SetBody("Failed to get planar face.");
+
+                    return;
+                }
+
+                var vertexes = targetPlanarFace.Triangulate().Vertices;
+
+                var createdColumns = new List<FamilyInstance>();
+
+                foreach (var vertex in vertexes)
+                {
+                    var createdColumn = document.Create.NewFamilyInstance(vertex, columnType,
+                        floorLevel, StructuralType.Column);
+
+                    var offsetValue = _random.Next(-2, 8);
+
+                    createdColumn.get_Parameter(BuiltInParameter.FAMILY_TOP_LEVEL_OFFSET_PARAM)
+                    .Set(offsetValue);
+
+                    createdColumns.Add(createdColumn);
+                }
+
+                if (createdColumns.Count > 0)
+                {
+                    message = $"Columns and floors were created successfully.";
+
+                    transaction.Commit();
+                }
+                else
+                {
+                    transaction.RollBack();
+
+                    context.Response = new Response(StatusCode.ClientError);
+
+                    context.Response.SetBody("Columns were not created.");
                 }
             }
         });

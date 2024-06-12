@@ -15,7 +15,7 @@
         <GroupBox Grid.Row="0" 
                   Header="Sample cases">
             <TabControl>
-                <TabItem Header="Send message">
+                <TabItem Header="Get random color string">
                     <tabs:GetRandomColorTab/>
                 </TabItem>
                 <TabItem Header="ElementRevit">
