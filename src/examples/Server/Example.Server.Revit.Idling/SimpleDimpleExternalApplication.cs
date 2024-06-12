@@ -12,6 +12,7 @@ using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
 using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
+using Example.Server.Revit.Configurator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nice3point.Revit.Toolkit.External;
@@ -38,7 +39,10 @@ public class SimpleDimpleExternalApplication: ExternalApplication
         try
         {            
             AsyncEventHandler = new AsyncEventHandler();
-            
+
+            var configurator = RevitUiConfigurator.GetInstance();
+            configurator.ConfigureRevitUiComponents(Application);
+
             Task.Run(StartBidtpServer);
         }
         catch (Exception exception)

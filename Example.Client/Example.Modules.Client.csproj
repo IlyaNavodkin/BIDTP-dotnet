@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\examples\Modules\Example.Schemas\Example.Schemas.csproj" />
+    <ProjectReference Include="..\src\examples\Modules\Example.Schemas\Example.Modules.Schemas.csproj" />
   </ItemGroup>
 
 </Project>

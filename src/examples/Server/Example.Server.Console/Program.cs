@@ -11,8 +11,6 @@ using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
 using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
-using Example.Server.Domain.Messages.Controllers;
-using Example.Server.Domain.Messages.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ILogger = Microsoft.Extensions.Logging.ILogger;

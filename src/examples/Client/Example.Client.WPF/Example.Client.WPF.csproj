@@ -12,7 +12,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Schemas.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Schemas\Example.Modules.Schemas.csproj" />
     </ItemGroup>
 
 </Project>

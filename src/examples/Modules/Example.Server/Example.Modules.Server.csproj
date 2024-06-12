@@ -30,6 +30,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\Example.Schemas\Example.Schemas.csproj" />
+      <ProjectReference Include="..\Example.Schemas\Example.Modules.Schemas.csproj" />
     </ItemGroup>
 </Project>

@@ -21,9 +21,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Console", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Console.OwnerProcess", "src\examples\Server\Example.Server.Console.OwnerProcess\Example.Server.Console.OwnerProcess.csproj", "{9C42E4E5-D7EF-43B5-8774-B2E71549E5C9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Schemas", "src\examples\Modules\Example.Schemas\Example.Schemas.csproj", "{0FAC995E-EFF8-4C85-A585-9ED18164ADE7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Modules.Schemas", "src\examples\Modules\Example.Schemas\Example.Modules.Schemas.csproj", "{0FAC995E-EFF8-4C85-A585-9ED18164ADE7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server", "src\examples\Modules\Example.Server\Example.Server.csproj", "{0F5DE65F-1C75-46C0-90B5-2B7F357B0CAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Modules.Server", "src\examples\Modules\Example.Server\Example.Modules.Server.csproj", "{0F5DE65F-1C75-46C0-90B5-2B7F357B0CAA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client.WPF", "src\examples\Client\Example.Client.WPF\Example.Client.WPF.csproj", "{49D726AE-FD85-4E37-906F-46E36F5084AD}"
 EndProject
@@ -39,13 +39,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client.Console", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Client.Blazor", "src\examples\Client\Example.Client.Blazor\Example.Client.Blazor.csproj", "{B285BE53-9096-44A4-8D3E-CA5D511399F6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Revit.ExternalCommand", "src\examples\Server\Example.Server.Revit.ExternalCommand\Example.Server.Revit.ExternalCommand.csproj", "{13BB7BF0-BE82-4006-8C57-0FFDF482105C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Server.Revit", "src\examples\Server\Example.Server.Revit.Idling\Example.Server.Revit.csproj", "{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Revit", "Example.Revit\Example.Revit.csproj", "{02F3F7B6-4297-4C7B-A012-22793E181220}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example.Modules.Revit", "Example.Revit\Example.Modules.Revit.csproj", "{02F3F7B6-4297-4C7B-A012-22793E181220}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Client", "Example.Client\Example.Client.csproj", "{6B0B0352-A7E4-40C3-AC0A-D92F64A18FF3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Modules.Client", "Example.Client\Example.Modules.Client.csproj", "{6B0B0352-A7E4-40C3-AC0A-D92F64A18FF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -345,34 +343,6 @@ Global
 		{B285BE53-9096-44A4-8D3E-CA5D511399F6}.Release R24|Any CPU.Build.0 = Release|Any CPU
 		{B285BE53-9096-44A4-8D3E-CA5D511399F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B285BE53-9096-44A4-8D3E-CA5D511399F6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R19|Any CPU.ActiveCfg = Debug R19|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R19|Any CPU.Build.0 = Debug R19|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R20|Any CPU.ActiveCfg = Debug R20|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R20|Any CPU.Build.0 = Debug R20|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R21|Any CPU.ActiveCfg = Debug R21|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R21|Any CPU.Build.0 = Debug R21|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R22|Any CPU.ActiveCfg = Debug R22|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R22|Any CPU.Build.0 = Debug R22|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R23|Any CPU.ActiveCfg = Debug R23|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R23|Any CPU.Build.0 = Debug R23|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R24|Any CPU.ActiveCfg = Debug R24|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug R24|Any CPU.Build.0 = Debug R24|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R19|Any CPU.ActiveCfg = Release R19|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R19|Any CPU.Build.0 = Release R19|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R20|Any CPU.ActiveCfg = Release R20|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R20|Any CPU.Build.0 = Release R20|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R21|Any CPU.ActiveCfg = Release R21|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R21|Any CPU.Build.0 = Release R21|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R22|Any CPU.ActiveCfg = Release R22|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R22|Any CPU.Build.0 = Release R22|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R23|Any CPU.ActiveCfg = Release R23|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R23|Any CPU.Build.0 = Release R23|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R24|Any CPU.ActiveCfg = Release R24|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release R24|Any CPU.Build.0 = Release R24|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release|Any CPU.ActiveCfg = Release R20|Any CPU
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C}.Release|Any CPU.Build.0 = Release R20|Any CPU
 		{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}.Debug R19|Any CPU.ActiveCfg = Debug R19|Any CPU
 		{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}.Debug R19|Any CPU.Build.0 = Debug R19|Any CPU
 		{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD}.Debug R20|Any CPU.ActiveCfg = Debug R20|Any CPU
@@ -477,7 +447,6 @@ Global
 		{35ACB5A3-1B63-483C-B8F1-7EE7693C19BE} = {8154C1A2-80AB-4C38-BC69-C79B4C11816D}
 		{A2416A29-5C62-4114-B138-1E9688002485} = {CA75B8B3-CCD1-401B-B6DE-5864D3F0EA4E}
 		{B285BE53-9096-44A4-8D3E-CA5D511399F6} = {CA75B8B3-CCD1-401B-B6DE-5864D3F0EA4E}
-		{13BB7BF0-BE82-4006-8C57-0FFDF482105C} = {CE83691C-9A03-478C-B3CC-DC9D79606533}
 		{572D3C5C-FEDC-4989-B1BC-55F0D13F31DD} = {CE83691C-9A03-478C-B3CC-DC9D79606533}
 		{02F3F7B6-4297-4C7B-A012-22793E181220} = {E4455DBF-BBF2-463C-A526-5C59F5BC3003}
 		{6B0B0352-A7E4-40C3-AC0A-D92F64A18FF3} = {E4455DBF-BBF2-463C-A526-5C59F5BC3003}

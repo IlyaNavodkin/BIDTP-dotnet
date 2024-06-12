@@ -1,8 +1,6 @@
 ﻿using BIDTP.Dotnet.Core.Build;
 using BIDTP.Dotnet.Core.Iteraction;
-using Example.Server.Domain.Auth.Middlewares;
-using Example.Server.Domain.Messages.Controllers;
-using Example.Server.Domain.Messages.Middlewares;
+using BIDTP.Dotnet.Module.MockableServer.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

@@ -1,15 +1,13 @@
 ﻿using System.Diagnostics;
 using BIDTP.Dotnet.Core.Build;
-using BIDTP.Dotnet.Core.Iteraction;
-using BIDTP.Dotnet.Core.Iteraction.Enums;
-using Example.Server.Core.Utils;
 using Example.Server.Core.Workers;
+using Example.Server.Domain.Apple.Controllers;
 using Example.Server.Domain.Auth.Providers;
+using Example.Server.Domain.Books.Controllers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
 using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
-using Example.Server.Domain.Messages.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -26,13 +24,15 @@ try
 
     builder.Services.AddTransient<AuthProvider>();
     builder.Services.AddTransient<ColorProvider>();
-    builder.Services.AddTransient<ElementRepository>();
+    builder.Services.AddScoped<ElementRepository>();
 
-    builder.WithPipeName(serverName);
+    builder.WithPipeName("testpipe");
     builder.WithProcessPipeQueueDelayTime(100);
 
     builder.WithController<ColorController>();
-    builder.WithController<SendMessageController>();
+    builder.WithController<AppleController>();
+    builder.WithController<ElementsController>();
+    builder.WithController<BookController>();
 
     var server = builder.Build();
 

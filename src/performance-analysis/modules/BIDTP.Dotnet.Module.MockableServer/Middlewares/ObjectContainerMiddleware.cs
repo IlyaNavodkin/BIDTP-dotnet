@@ -2,7 +2,7 @@
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using Example.Schemas.Dtos;
 
-namespace Example.Server.Domain.Messages.Middlewares;
+namespace BIDTP.Dotnet.Module.MockableServer.Middlewares;
 
 [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class ObjectContainerMiddleware : Attribute, IMethodScopedPreInvokable
@@ -13,7 +13,7 @@ public class ObjectContainerMiddleware : Attribute, IMethodScopedPreInvokable
 
         var additionalData = request.GetBody<AdditionalData>();
 
-        context.StateContainer.AddObject<AdditionalData>(additionalData);
+        context.StateContainer.AddObject(additionalData);
 
         return Task.CompletedTask;
     }
