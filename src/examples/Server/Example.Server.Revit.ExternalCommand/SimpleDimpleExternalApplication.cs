@@ -10,17 +10,17 @@ using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Colors.Controllers;
 using Example.Server.Domain.Colors.Providers;
 using Example.Server.Domain.Elements.Repositories;
-using Example.Server.Revit.OwnerProcess.Configurator;
-using Example.Server.Revit.OwnerProcess.Controllers;
-using Example.Server.Revit.OwnerProcess.Extensions;
-using Example.Server.Revit.OwnerProcess.Utils;
+using Example.Server.Revit.ExternalCommand.Configurator;
+using Example.Server.Revit.ExternalCommand.Controllers;
+using Example.Server.Revit.ExternalCommand.Extensions;
+using Example.Server.Revit.ExternalCommand.Utils;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nice3point.Revit.Toolkit.External;
 using Nice3point.Revit.Toolkit.External.Handlers;
 using Exception = System.Exception;
 
-namespace Example.Server.Revit.OwnerProcess;
+namespace Example.Server.Revit.ExternalCommand;
 
 /// <summary>
 ///  The simple dimple external application

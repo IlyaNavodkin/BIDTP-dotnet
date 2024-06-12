@@ -3,10 +3,13 @@ using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
+using Example.Schemas.Dtos;
 using Example.Schemas.Requests;
+using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
 using Example.Server.Domain.Elements.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using Nice3point.Revit.Toolkit.External.Handlers;
 
 namespace Example.Server.Domain.Elements.Controllers;
 
@@ -14,11 +17,6 @@ namespace Example.Server.Domain.Elements.Controllers;
 public class ElementsController : ControllerBase
 {
     [MethodRoute("GetElements")]
-    /// <summary>
-    ///  Get elements by category route handler
-    /// </summary>
-    /// <param name="context"> The context. </param>
-    /// <returns> The response. </returns>
     public static async Task GetElements(Context context)
     {
         var authService = context.ServiceProvider.GetService<AuthProvider>();
@@ -35,5 +33,43 @@ public class ElementsController : ControllerBase
         context.Response = new Response(StatusCode.Success);
         
         context.Response.SetBody( result );
+    }
+
+    [MethodRoute("DeleteElement")]
+    public async Task DeleteElement(Context context)
+    {
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+
+        var elementDto = context.Request.GetBody<ElementDto>();
+
+        if (!authorizationIsValid) return;
+
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody($"Element {elementDto.Id} was deleted");
+    }
+
+    [SecondCustomMiddleware]
+    [FirstCustomMiddleware]
+    [MethodRoute("CreateRandomWall")]
+    public async Task CreateRandomWall(Context context)
+    {
+        var wallCoordinates = context.Request.GetBody<CreateRandomWallLineRequest>();
+
+        var authService = context.ServiceProvider.GetService<AuthProvider>();
+
+        var authorizationIsValid = await authService.IsAuth(context);
+
+        if (!authorizationIsValid) return;
+
+        var startPoint = wallCoordinates.Line.StartPoint;
+        var endPoint = wallCoordinates.Line.EndPoint;
+
+        var message = $"Wall with start point {startPoint.X} | " +
+            $"{startPoint.Y} and end point  {endPoint.X} | {endPoint.Y}  was created";
+
+        context.Response = new Response(StatusCode.Success);
+        context.Response.SetBody(message);
     }
 }

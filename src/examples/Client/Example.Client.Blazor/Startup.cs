@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using BlazorPanzoom;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 
@@ -27,7 +26,6 @@ namespace Example.Client.Blazor
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddBlazorPanzoomServices();
 
             services.AddSingleton<IBidtpClient, BidtpClient>(services =>
             {

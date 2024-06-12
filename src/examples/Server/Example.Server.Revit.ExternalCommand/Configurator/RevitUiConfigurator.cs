@@ -1,10 +1,10 @@
 ﻿using System;
 using Autodesk.Revit.UI;
 using Autodesk.Windows;
-using Example.Server.Revit.OwnerProcess.ExternalCommands;
-using Example.Server.Revit.OwnerProcess.Utils;
+using Example.Server.Revit.ExternalCommand.ExternalCommands;
+using Example.Server.Revit.ExternalCommand.Utils;
 
-namespace Example.Server.Revit.OwnerProcess.Configurator;
+namespace Example.Server.Revit.ExternalCommand.Configurator;
 
 /// <summary>
 ///  The revit ui configurator 

@@ -17,7 +17,7 @@ using Example.Server.Domain.Auth.Middlewares;
 using Example.Server.Domain.Auth.Providers;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Example.Server.Revit.OwnerProcess.Controllers;
+namespace Example.Server.Revit.ExternalCommand.Controllers;
 
 [ControllerRoute("ElementRevit")]
 public class ElementRevitController : ControllerBase
@@ -118,7 +118,7 @@ public class ElementRevitController : ControllerBase
     [MethodRoute("CreateRandomWall")]
     public static async Task CreateRandomWall(Context context)
     {
-        var wallCoordinates = context.Request.GetBody<WallLineRequest>();
+        var wallCoordinates = context.Request.GetBody<CreateRandomWallLineRequest>();
 
         var message = string.Empty;
         await SimpleDimpleExternalApplication
@@ -171,7 +171,7 @@ public class ElementRevitController : ControllerBase
     [MethodRoute("ChangeWallLocation")]
     public static async Task ChangeWallLocation(Context context)
     {
-        var wallCoordinates = context.Request.GetBody<WallLineRequest>();
+        var wallCoordinates = context.Request.GetBody<CreateRandomWallLineRequest>();
         var message = string.Empty;
 
         await SimpleDimpleExternalApplication

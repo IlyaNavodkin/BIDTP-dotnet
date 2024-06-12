@@ -9,9 +9,9 @@ using UIFramework;
 
 namespace Example.Client.WPF.Views.Tabs;
 
-public partial class SendMessageTab : UserControl
+public partial class GetRandomColorTab : UserControl
 {
-    public SendMessageTab()
+    public GetRandomColorTab()
     {
         InitializeComponent();
     }
@@ -21,10 +21,11 @@ public partial class SendMessageTab : UserControl
         var mainWindow = (MainWindow)Application.Current.MainWindow;
         var token = mainWindow.AuthTokenTextBox.Text;
 
-        try
+        var taskRun = Task.Run(async () =>
         {
-            var taskRun = Task.Run(async () =>
+            try
             {
+
                 MainWindow? mainWindow = null;
 
                 var request = new Request();
@@ -41,13 +42,12 @@ public partial class SendMessageTab : UserControl
                 var formattedResponseText = response.GetBody<string>();
 
                 MessageBox.Show(formattedResponseText);
-            });
-
-        }
-        catch (Exception exception)
-        {
-            MessageBox.Show(exception.Message);
-            SendMessageButton.IsEnabled = true;
-        }
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+                SendMessageButton.IsEnabled = true;
+            }
+        });
     }
 }

@@ -16,10 +16,10 @@
                   Header="Sample cases">
             <TabControl>
                 <TabItem Header="Send message">
-                    <tabs:SendMessageTab/>
+                    <tabs:GetRandomColorTab/>
                 </TabItem>
-                <TabItem Header="Elements repository">
-                    <tabs:GetElementsTab/>
+                <TabItem Header="ElementRevit">
+                    <tabs:ElementRevitTab/>
                 </TabItem>
             </TabControl>
         </GroupBox>

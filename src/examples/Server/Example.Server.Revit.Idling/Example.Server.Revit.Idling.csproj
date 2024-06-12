@@ -1,0 +1,92 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <Configurations>Debug R20;Debug R21;Debug R22;Debug R23;Release R20;Release R21;Release R22;Release R23;Debug R19;Release R19;Release R24;Debug R24;Debug</Configurations>
+        <OutputType>Library</OutputType>
+        <ForceBuild>true</ForceBuild>
+        <AppDesignerFolder>Properties</AppDesignerFolder>
+        <TargetFramework>net48</TargetFramework>
+        <FileAlignment>512</FileAlignment>
+        <Deterministic>true</Deterministic>
+        <LangVersion>latest</LangVersion>
+        <PlatformTarget>x64</PlatformTarget>
+        <RevitVersion>Unknowable</RevitVersion>
+        <UseWpf>true</UseWpf>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <NoWarn>CS0169, CS1998, NU1902, CS1572, CS1573, CS0419, CS0162</NoWarn>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Addin Include="$(ProjectDir)\Resources\Addin\$(RevitVersion)\**" />
+        <Families Include="$(ProjectDir)\Resources\Families\**" />
+    </ItemGroup>
+
+    <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+        <RevitVersion>2023</RevitVersion>
+        <DefineConstants>$(DefineConstants);R23</DefineConstants>
+        <PackageId>001961ef-2d16-4848-bfbe-c7c753055912</PackageId>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release'))">
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+        <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(Configuration.Contains('Release'))">
+        <AddinPath>bin\$(Configuration)</AddinPath>
+        <OutputPath>$(AddinPath)\$(RootNamespace)</OutputPath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+        <AddinPath>$(ProgramData)\Autodesk\Revit\Addins\$(RevitVersion)\</AddinPath>
+        <OutputPath>$(AddinPath)$(RootNamespace)</OutputPath>
+    </PropertyGroup>
+
+    <Target Name="Init Revit properties" BeforeTargets="Build">
+        <Message Text=" " Importance="High" />
+        <Message Text="TARGET: Init Revit properties" Importance="High" />
+        <Message Text="INFO: Configuration - [$(Configuration)]" Importance="High" />
+        <Message Text="INFO: RevitVersion - [$(RevitVersion)]" Importance="High" />
+        <Message Text=" " Importance="High" />
+    </Target>
+
+    <Target Name="Copy artifacts to debug" AfterTargets="Build">
+        <Copy SourceFiles="@(Addin)" DestinationFolder="$(AddinPath)" />
+        <Copy SourceFiles="@(Families)" DestinationFolder="$(OutputPath)\Families" />
+    </Target>
+
+    <PropertyGroup Condition="$(Configuration.Contains('Debug'))">
+        <StartAction>Program</StartAction>
+        <StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+        <RevitProgrammFolder>C:\Program Files\Autodesk\Revit $(RevitVersion)</RevitProgrammFolder>
+        <StartArguments>/language ENG</StartArguments>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*-*" />
+        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*-*" />
+        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*-*" />
+        <PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*-*" />
+        <PackageReference Include="Nice3point.Revit.Api.UIFrameworkServices" Version="$(RevitVersion).*-*" />
+        <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
+        
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Properties\" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
+    </ItemGroup>
+</Project>

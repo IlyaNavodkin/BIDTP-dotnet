@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Example.Client.WPF.Views.Tabs.GetElementsTab"
+﻿<UserControl x:Class="Example.Client.WPF.Views.Tabs.ElementRevitTab"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -22,6 +22,17 @@
                 Content="Get elements"
                 Click="GetElements">
             </Button>
+            <Button
+                Margin="0 12 0 0"
+                Content="Delete selected elementt"
+                Click="DeleteElement">
+            </Button>
+            <Button
+                Margin="0 12 0 0"
+                Content="Create random wall"
+                Click="CreateRandomWall">
+            </Button>
+
         </StackPanel>
     </GroupBox>
 

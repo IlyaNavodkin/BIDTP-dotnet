@@ -18,7 +18,7 @@ using Example.Server.Domain.Colors.Providers;
 using Example.Server.Domain.Elements.Controllers;
 using Example.Server.Domain.Elements.Repositories;
 using Example.Server.Domain.Messages.Controllers;
-using Example.Server.Revit.OwnerProcess.Controllers;
+using Example.Server.Revit.ExternalCommand.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
@@ -26,14 +26,14 @@ using Nice3point.Revit.Toolkit.External;
 using Serilog;
 using UIFrameworkServices;
 
-namespace Example.Server.Revit.OwnerProcess.ExternalCommands;
+namespace Example.Server.Revit.ExternalCommand.ExternalCommands;
 
 /// <summary>
 ///  The run about program external command
 /// </summary>
 [Transaction(TransactionMode.Manual)]
 [Regeneration(RegenerationOption.Manual)]
-public class RunAboutProgramExternalCommand: ExternalCommand
+public class RunAboutProgramExternalCommand: Nice3point.Revit.Toolkit.External.ExternalCommand
 {
     /// <summary>
     ///  Is running flag
