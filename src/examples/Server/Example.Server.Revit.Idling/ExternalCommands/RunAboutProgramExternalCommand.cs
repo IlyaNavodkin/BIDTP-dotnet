@@ -4,10 +4,10 @@ using System.IO;
 using System.Windows;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
+using Example.Server.Revit;
 using Microsoft.Win32;
-using Serilog;
 
-namespace Example.Server.Revit.ExternalCommands;
+namespace Example.Modules.Server.Revit.ExternalCommands;
 
 /// <summary>
 ///  The run about program external command
@@ -27,8 +27,6 @@ public class RunAboutProgramExternalCommand : Nice3point.Revit.Toolkit.External.
     {
         SuppressExceptions(exception =>
         {
-            Log.Fatal(exception, $"Unhandled exception in {nameof(RunAboutProgramExternalCommand)}");
-
             _isRunning = false;
         });
 

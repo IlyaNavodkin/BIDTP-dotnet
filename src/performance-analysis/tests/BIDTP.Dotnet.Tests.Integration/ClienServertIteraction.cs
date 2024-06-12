@@ -2,7 +2,7 @@
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Module.MockableServer;
-using Example.Schemas.Dtos;
+using Example.Modules.Schemas.Dtos;
 using NUnit.Framework;
 
 namespace BIDTP.Dotnet.Tests

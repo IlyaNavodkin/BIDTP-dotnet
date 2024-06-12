@@ -1,7 +1,7 @@
 ﻿using System;
 using Autodesk.Revit.UI;
 using Autodesk.Windows;
-using Example.Server.Revit.ExternalCommands;
+using Example.Modules.Server.Revit.ExternalCommands;
 using Example.Server.Revit.Utils;
 
 namespace Example.Server.Revit.Configurator;

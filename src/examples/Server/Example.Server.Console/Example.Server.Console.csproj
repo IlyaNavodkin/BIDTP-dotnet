@@ -15,11 +15,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Reference Include="System.Net.Http" />
+      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Server\Example.Modules.Server.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Modules.Server.csproj" />
+        <Reference Include="System.Net.Http" />
     </ItemGroup>
+
+
 </Project>

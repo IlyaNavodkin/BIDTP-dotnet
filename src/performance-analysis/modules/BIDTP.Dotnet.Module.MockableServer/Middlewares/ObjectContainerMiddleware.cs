@@ -1,6 +1,6 @@
 ﻿using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Handle;
-using Example.Schemas.Dtos;
+using Example.Modules.Schemas.Dtos;
 
 namespace BIDTP.Dotnet.Module.MockableServer.Middlewares;
 

@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics;
 using BIDTP.Dotnet.Core.Build;
-using Example.Server.Core.Workers;
-using Example.Server.Domain.Apple.Controllers;
-using Example.Server.Domain.Auth.Providers;
-using Example.Server.Domain.Books.Controllers;
-using Example.Server.Domain.Colors.Controllers;
-using Example.Server.Domain.Colors.Providers;
-using Example.Server.Domain.Elements.Controllers;
-using Example.Server.Domain.Elements.Repositories;
+using Example.Modules.Server.Domain.Elements.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Example.Modules.Server.Domain.Colors.Controllers;
+using Example.Modules.Server.Domain.Auth.Providers;
+using Example.Modules.Server.Core.Workers;
+using Example.Modules.Server.Domain.Colors.Providers;
+using Example.Modules.Server.Domain.Apple.Controllers;
+using Example.Modules.Server.Domain.Elements.Controllers;
+using Example.Modules.Server.Domain.Books.Controllers;
 
 var cancellationTokenSource = new CancellationTokenSource();
 Process childProcess = null;

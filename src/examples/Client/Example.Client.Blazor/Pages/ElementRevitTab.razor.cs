@@ -2,17 +2,14 @@ using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Contracts;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
-using Example.Client.Services;
-using Example.Schemas.Dtos;
-using Example.Schemas.Requests;
+using Example.Modules.Client.Services;
+using Example.Modules.Schemas.Dtos;
+using Example.Modules.Schemas.Requests;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static MudBlazor.CategoryTypes;
-using static MudBlazor.Defaults.Classes;
 
 namespace Example.Client.Blazor.Pages
 {

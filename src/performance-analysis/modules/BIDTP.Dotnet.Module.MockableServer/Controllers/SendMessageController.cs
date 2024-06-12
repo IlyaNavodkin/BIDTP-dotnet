@@ -4,9 +4,9 @@ using BIDTP.Dotnet.Core.Iteraction.Handle;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Attributes;
 using BIDTP.Dotnet.Core.Iteraction.Routing.Contracts;
 using BIDTP.Dotnet.Module.MockableServer.Middlewares;
-using Example.Schemas.Dtos;
-using Example.Server.Domain.Auth.Guards;
-using Example.Server.Domain.Auth.Middlewares;
+using Example.Modules.Server.Domain.Auth.Guards;
+using Example.Modules.Server.Domain.Auth.Middlewares;
+using Example.Modules.Schemas.Dtos;
 
 
 namespace BIDTP.Dotnet.Module.MockableServer.Controllers;

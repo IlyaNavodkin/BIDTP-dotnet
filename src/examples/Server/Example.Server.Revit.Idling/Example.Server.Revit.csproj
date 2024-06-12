@@ -66,16 +66,14 @@
         <StartArguments>/language ENG</StartArguments>
     </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*-*" />
-        <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*-*" />
-        <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*-*" />
-        <PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*-*" />
-        <PackageReference Include="Nice3point.Revit.Api.UIFrameworkServices" Version="$(RevitVersion).*-*" />
-        <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
-        
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*-*" />
+		<PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="$(RevitVersion).*-*" />
+		<PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*-*" />
+		<PackageReference Include="Nice3point.Revit.Api.UIFramework" Version="$(RevitVersion).*-*" />
+		<PackageReference Include="Nice3point.Revit.Api.UIFrameworkServices" Version="$(RevitVersion).*-*" />
+		<PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*-*" />
+	</ItemGroup>
 
     <ItemGroup>
         <Compile Remove="Properties\AssemblyInfo.cs" />
@@ -86,10 +84,9 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Example.Revit\Example.Modules.Revit.csproj" />
-      <ProjectReference Include="..\..\..\..\Example.Revit\Example.Revit.csproj" />
       <ProjectReference Include="..\..\..\libs\BIDTP.Dotnet.Core\BIDTP.Dotnet.Core.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Modules.Server.csproj" />
-      <ProjectReference Include="..\..\Modules\Example.Server\Example.Server.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Schemas\Example.Modules.Schemas.csproj" />
+      <ProjectReference Include="..\..\Modules\Example.Modules.Server\Example.Modules.Server.csproj" />
     </ItemGroup>
+    
 </Project>

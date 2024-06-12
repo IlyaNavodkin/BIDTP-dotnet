@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using BIDTP.Dotnet.Core.Iteraction;
 using BIDTP.Dotnet.Core.Iteraction.Enums;
 using BIDTP.Dotnet.Core.Iteraction.Schema;
-using Example.Schemas.Dtos;
-using Example.Schemas.Requests;
+using Example.Modules.Schemas.Dtos;
+using Example.Modules.Schemas.Requests;
 using Example.Server.Domain.Elements.Services;
 
 namespace Example.Client.WPF.Views.Tabs;
