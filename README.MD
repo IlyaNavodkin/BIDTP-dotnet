@@ -1,3 +1,7 @@
+#
+
+Nuget - https://www.nuget.org/packages/BIDTP.Dotnet.Core
+
 # Preface
 
 BIDTP-dotnet - this is library for implementing client-server architecture for inter-process communication based on BIDTP protocol for dotnet.
