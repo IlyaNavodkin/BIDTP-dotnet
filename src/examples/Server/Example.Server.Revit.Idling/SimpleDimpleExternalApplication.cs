@@ -9,6 +9,8 @@ using Example.Modules.Revit.Controllers;
 using Example.Modules.Server.Domain.Auth.Providers;
 using Example.Modules.Server.Domain.Colors.Providers;
 using Example.Server.Revit.Configurator;
+using Example.Server.Revit.Constants;
+using Example.Server.Revit.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Nice3point.Revit.Toolkit.External;
@@ -57,10 +59,11 @@ public class SimpleDimpleExternalApplication: ExternalApplication
 
             builder.Services.AddSingleton<AsyncEventHandler>(AsyncEventHandler);
 
+            builder.Services.AddSingleton<ExecuteModuleStateStores>();
             builder.Services.AddScoped<AuthProvider>();
             builder.Services.AddScoped<ColorProvider>();
 
-            builder.WithPipeName("testpipe");
+            builder.WithPipeName(ServerApplicationConstants.PipeServerName);
             builder.WithProcessPipeQueueDelayTime(100);
 
             builder.WithController<RevitColorController>();

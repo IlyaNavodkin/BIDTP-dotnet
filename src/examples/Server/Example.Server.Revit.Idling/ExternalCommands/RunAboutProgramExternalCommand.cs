@@ -3,75 +3,50 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Example.Server.Revit;
-using Microsoft.Win32;
+using Example.Server.Revit.Constants;
+using Example.Server.Revit.Stores;
+using Microsoft.Extensions.DependencyInjection;
+using Nice3point.Revit.Toolkit.External;
+using static Example.Server.Revit.Constants.ModulesConstants;
 
 namespace Example.Modules.Server.Revit.ExternalCommands;
 
 /// <summary>
-///  The run about program external command
+/// Запускает внешний UI-процесс
 /// </summary>
 [Transaction(TransactionMode.Manual)]
 [Regeneration(RegenerationOption.Manual)]
-public class RunAboutProgramExternalCommand : Nice3point.Revit.Toolkit.External.ExternalCommand
+public class RunAboutProgramExternalCommand : IExternalCommand
 {
-    /// <summary>
-    ///  Is running flag
-    /// </summary>
-    private static bool _isRunning;
-    /// <summary>
-    ///  Execute the external command
-    /// </summary>
-    public override void Execute()
+    public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
     {
-        SuppressExceptions(exception =>
+        try
         {
-            _isRunning = false;
-        });
+            var services = SimpleDimpleExternalApplication.BidtpServer.Services;
+            var store = services.GetRequiredService<ExecuteModuleStateStores>();
 
-        if (_isRunning)
-        {
-            MessageBox.Show($"UI process of {nameof(RunAboutProgramExternalCommand)} is already running");
+            if (store.IsRunning(ModulesConstants.ElementSelector.Name))
+            {
+                MessageBox.Show($"UI process of {nameof(RunAboutProgramExternalCommand)} is already running");
+                return Result.Cancelled;
+            }
 
-            Result = Result.Cancelled;
-            return;
+            var server = SimpleDimpleExternalApplication.BidtpServer
+                         ?? throw new NullReferenceException("BidtpServer is null");
+
+            var state = store.StartModule(ElementSelector.Name, 
+                ElementSelector.RelativePath, ServerApplicationConstants.PipeServerName);
+
+            return Result.Succeeded;
         }
-
-        var openFileDialog = new OpenFileDialog();
-        openFileDialog.Filter = "Text files (*.exe)|*.exe";
-        openFileDialog.Multiselect = false;
-
-        var result = openFileDialog.ShowDialog();
-        if (result != true) throw new FileNotFoundException("File not found");
-
-        var filename = openFileDialog.FileName;
-
-        var server = SimpleDimpleExternalApplication.BidtpServer;
-
-        if (server == null) throw new NullReferenceException("BidtpServer is null");
-
-        var childProcess = RunClientProcess(server.PipeName, filename);
-
-        Result = Result.Succeeded;
-    }
-
-    private Process RunClientProcess(string pipeName, string clientPath)
-    {
-        var fileIsExist = File.Exists(clientPath);
-
-        if (!fileIsExist) throw new FileNotFoundException($"Iteraction file not found at {clientPath}.");
-
-        var processId = Process.GetCurrentProcess().Id.ToString();
-
-        var arguments = "--pn=\"" + pipeName + "\" --pid=\"" + processId + "\"";
-        var childProcess = Process.Start(clientPath, arguments);
-
-        childProcess.Exited += (sender, args) =>
+        catch (Exception ex)
         {
-            _isRunning = false;
-        };
+            TaskDialog.Show("Error", ex.Message);
 
-        return childProcess;
+            return Result.Failed;
+        }
     }
 }

@@ -32,7 +32,17 @@ public class RevitUiConfigurator
                 "Выбирает файл WPF клиента и запускает его - передавая необходимые аргументы"
             );
 
+        var uploadModelButtonModal = uiService
+            .CreatePushButton<ModalRunAboutProgramExternalCommand>
+            (
+                "Modal Выбрать файл WPF клиента",
+                null,
+                null,
+                "Выбирает файл WPF клиента и запускает его - передавая необходимые аргументы"
+            );
+
         uploadPanel.AddItem(uploadModelButton);
+        uploadPanel.AddItem(uploadModelButtonModal);
 
         return bimdataTab;
     }
